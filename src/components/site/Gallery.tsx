@@ -16,7 +16,7 @@ const items = [
 
 export function Gallery() {
   return (
-    <section id="gallery" className="py-24 lg:py-32">
+    <section id="gallery" className="py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">The Space</span>

@@ -61,7 +61,7 @@ export function Navbar() {
           </a>
           <a
             href="#appointment"
-            className="rounded-full bg-coffee px-5 py-2.5 text-sm text-primary-foreground hover:opacity-90 transition shadow-soft"
+            className="animate-pulse-ring rounded-full bg-coffee px-5 py-2.5 text-sm text-primary-foreground hover:opacity-90 transition shadow-soft"
           >
             Book Appointment
           </a>

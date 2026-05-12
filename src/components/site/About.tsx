@@ -12,7 +12,7 @@ const points = [
 
 export function About() {
   return (
-    <section id="about" className="py-24 lg:py-32">
+    <section id="about" className="py-14 lg:py-28">
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 lg:grid-cols-2 lg:px-10">
         <div className="reveal relative">
           <div className="absolute -inset-4 gradient-warm rounded-[2rem] opacity-60 blur-2xl" />
@@ -23,7 +23,7 @@ export function About() {
               loading="lazy"
               width={1024}
               height={1280}
-              className="h-[520px] w-full object-cover lg:h-[620px]"
+              className="h-[240px] sm:h-[380px] w-full object-cover lg:h-[620px]"
             />
           </div>
           <div className="absolute -right-4 bottom-8 hidden lg:block glass rounded-2xl px-6 py-5 border border-border/60 shadow-soft max-w-[220px]">

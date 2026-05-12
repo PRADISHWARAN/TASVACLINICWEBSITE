@@ -63,7 +63,7 @@ Message: ${parsed.data.message || "-"}`;
     "w-full rounded-xl border border-border bg-background/70 px-4 py-3 pl-11 text-sm text-coffee placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-gold/40 transition";
 
   return (
-    <section id="appointment" className="py-24 lg:py-32 relative overflow-hidden">
+    <section id="appointment" className="py-14 lg:py-28 relative overflow-hidden">
       <div className="absolute inset-0 bg-marble" />
       <div className="relative mx-auto max-w-6xl px-6 lg:px-10">
         <div className="grid gap-14 lg:grid-cols-12 items-start">
@@ -77,7 +77,7 @@ Message: ${parsed.data.message || "-"}`;
               WhatsApp. Same-day consultations subject to availability.
             </p>
 
-            <div className="mt-8 space-y-4 text-sm text-coffee">
+            <div className="mt-6 space-y-3 text-sm text-coffee hidden sm:block">
               <div className="flex items-center gap-3">
                 <Sparkles className="h-4 w-4 text-gold" /> Personalised consultation
               </div>

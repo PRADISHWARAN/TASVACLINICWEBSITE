@@ -11,7 +11,7 @@ const items = [
 
 export function WhyChoose() {
   return (
-    <section id="why" className="py-24 lg:py-32">
+    <section id="why" className="py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4 reveal">
@@ -25,18 +25,21 @@ export function WhyChoose() {
             </p>
           </div>
 
-          <div className="lg:col-span-8 grid gap-5 sm:grid-cols-2">
+          <div className="lg:col-span-8 grid grid-cols-2 gap-4 lg:gap-5">
             {items.map(({ icon: Icon, title, desc }, i) => (
               <div
                 key={title}
-                className="reveal rounded-2xl border border-border bg-card p-7 shadow-card hover:shadow-luxe transition"
+                className="reveal rounded-2xl border border-border bg-card p-4 sm:p-7 shadow-card hover:shadow-luxe hover:-translate-y-1 transition-[box-shadow,transform] duration-300 relative overflow-hidden"
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
-                <div className="grid h-11 w-11 place-items-center rounded-full gradient-gold text-coffee">
+                <span className="absolute -right-1 -top-3 font-display text-6xl sm:text-7xl text-coffee/5 select-none pointer-events-none leading-none">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="grid h-11 w-11 place-items-center rounded-full gradient-gold text-coffee shadow-soft">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-5 font-display text-xl text-coffee">{title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                <h3 className="mt-4 font-display text-lg sm:text-xl text-coffee">{title}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>

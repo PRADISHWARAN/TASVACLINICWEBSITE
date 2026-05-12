@@ -3,7 +3,7 @@ import { GraduationCap, Stethoscope, Award } from "lucide-react";
 
 export function Doctor() {
   return (
-    <section id="doctor" className="bg-cream/60 py-24 lg:py-32">
+    <section id="doctor" className="bg-cream/60 py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-14 lg:grid-cols-12 items-center">
           <div className="lg:col-span-5 reveal">
@@ -16,7 +16,7 @@ export function Doctor() {
                   loading="lazy"
                   width={1024}
                   height={1024}
-                  className="h-[520px] w-full object-cover"
+                  className="h-[280px] sm:h-[400px] w-full object-cover"
                 />
               </div>
             </div>
@@ -44,7 +44,14 @@ export function Doctor() {
               ))}
             </div>
 
-            <p className="mt-8 text-muted-foreground leading-relaxed max-w-2xl">
+            <div className="mt-6 flex flex-wrap gap-2">
+              {["Board Certified Dermatologist", "IADVL Member", "Trichology Specialist"].map((badge) => (
+                <span key={badge} className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-cream px-3 py-1.5 text-[11px] font-medium text-coffee">
+                  <span className="text-gold">✓</span> {badge}
+                </span>
+              ))}
+            </div>
+            <p className="mt-6 text-muted-foreground leading-relaxed max-w-2xl">
               Dr. Krithi Subhas is known for her precise, science-led approach to
               dermatology and trichology. She has helped thousands of patients
               restore healthy skin and hair with bespoke, evidence-based protocols

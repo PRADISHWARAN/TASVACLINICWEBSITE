@@ -3,7 +3,7 @@ import { SITE, buildWhatsAppLink } from "@/lib/site";
 
 export function Contact() {
   return (
-    <section id="contact" className="bg-cream/60 py-24 lg:py-32">
+    <section id="contact" className="bg-cream/60 py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Get in Touch</span>
@@ -41,7 +41,7 @@ export function Contact() {
           </div>
 
           <div className="lg:col-span-7 reveal">
-            <div className="overflow-hidden rounded-3xl border border-border shadow-luxe h-[480px] lg:h-full min-h-[480px]">
+            <div className="overflow-hidden rounded-3xl border border-border shadow-luxe h-[260px] sm:h-[380px] lg:h-full lg:min-h-[480px]">
               <iframe
                 title="Tasvaa Clinic location"
                 src={SITE.mapsEmbed}

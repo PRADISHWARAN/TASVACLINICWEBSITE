@@ -24,7 +24,7 @@ const services = [
 
 export function Services() {
   return (
-    <section id="services" className="bg-cream/60 py-24 lg:py-32 relative">
+    <section id="services" className="bg-cream/60 py-14 lg:py-28 relative">
       <div className="absolute inset-x-0 top-0 hairline" />
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
@@ -38,11 +38,11 @@ export function Services() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-10 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6 sm:mx-0 sm:px-0 sm:grid sm:gap-5 sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-4">
           {services.map(({ icon: Icon, name, desc }, i) => (
             <article
               key={name}
-              className="reveal group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-7 shadow-card transition-all duration-500 hover:-translate-y-1 hover:shadow-luxe"
+              className="reveal group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-5 sm:p-7 shadow-card transition-[box-shadow,transform] duration-500 hover:-translate-y-1 hover:shadow-luxe flex-none w-[240px] snap-start sm:w-auto"
               style={{ transitionDelay: `${(i % 4) * 60}ms` }}
             >
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 gradient-warm" />
