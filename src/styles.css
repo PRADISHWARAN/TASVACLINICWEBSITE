@@ -181,24 +181,33 @@
     animation: shimmer 3s linear infinite;
   }
 
-  /* ── Reveal from sides ── */
+  /* ── Reveal from sides — vertical on mobile, horizontal on md+ ── */
   .reveal-left {
     opacity: 0;
-    transform: translateX(-48px);
+    transform: translateY(24px);
     transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal-left.is-visible {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
+  @media (min-width: 768px) {
+    .reveal-left { transform: translateX(-48px); }
+    .reveal-left.is-visible { transform: translateX(0); }
+  }
+
   .reveal-right {
     opacity: 0;
-    transform: translateX(48px);
+    transform: translateY(24px);
     transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal-right.is-visible {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
+  }
+  @media (min-width: 768px) {
+    .reveal-right { transform: translateX(48px); }
+    .reveal-right.is-visible { transform: translateX(0); }
   }
   .reveal-scale {
     opacity: 0;

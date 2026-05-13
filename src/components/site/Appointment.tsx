@@ -70,36 +70,43 @@ Message: ${parsed.data.message || "-"}`;
   return (
     <section id="appointment" className="py-14 lg:py-28 relative overflow-hidden">
       <div className="absolute inset-0 bg-marble" />
-      <div className="relative mx-auto max-w-6xl px-6 lg:px-10">
+      <div className="relative mx-auto max-w-6xl px-5 sm:px-6 lg:px-10">
         <div className="grid gap-8 lg:gap-14 lg:grid-cols-12 items-start">
+
+          {/* Left info panel */}
           <div className="lg:col-span-5 reveal">
-            <span className="text-xs uppercase tracking-[0.3em] text-gold">Book a Visit</span>
+            <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Book a Visit</span>
             <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
               Request your appointment.
             </h2>
-            <p className="mt-5 text-muted-foreground leading-relaxed">
+            <p className="mt-4 text-muted-foreground leading-relaxed text-sm sm:text-base">
               Share a few details and our team will confirm your slot via
               WhatsApp. Same-day consultations subject to availability.
             </p>
 
-            <div className="mt-6 space-y-3 text-sm text-coffee hidden sm:block">
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-4 w-4 text-gold" /> Personalised consultation
+            {/* Info bullets — always visible (was hidden on mobile) */}
+            <div className="mt-5 space-y-3 text-sm text-coffee">
+              <div className="flex items-start gap-3">
+                <Sparkles className="h-4 w-4 text-gold mt-0.5 shrink-0" />
+                <span>Personalised consultation with Dr. Krithi Subhas</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-gold" /> Mon–Thu & Sat · 11am–8pm · Sun · 10:30am–1:30pm · Fri Closed
+              <div className="flex items-start gap-3">
+                <Clock className="h-4 w-4 text-gold mt-0.5 shrink-0" />
+                <span>Mon–Thu &amp; Sat · 11am–8pm<br />Sun · 10:30am–1:30pm · Fri Closed</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-gold" /> Instant WhatsApp confirmation
+              <div className="flex items-start gap-3">
+                <Phone className="h-4 w-4 text-gold mt-0.5 shrink-0" />
+                <span>Instant WhatsApp confirmation</span>
               </div>
             </div>
           </div>
 
+          {/* Form */}
           <form
             onSubmit={onSubmit}
-            className="lg:col-span-7 reveal rounded-3xl border border-border bg-card/90 backdrop-blur p-7 sm:p-10 shadow-luxe"
+            className="lg:col-span-7 reveal rounded-3xl border border-border bg-card/90 backdrop-blur p-5 sm:p-8 lg:p-10 shadow-luxe"
           >
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
               <Field label="Full Name" error={errors.name}>
                 <User className="field-icon" />
                 <input name="name" placeholder="Your name" className={inputCls} maxLength={80} />
@@ -127,7 +134,7 @@ Message: ${parsed.data.message || "-"}`;
                 <MessageSquare className="field-icon" />
                 <textarea
                   name="message"
-                  rows={4}
+                  rows={3}
                   maxLength={500}
                   placeholder="Tell us briefly about your concern..."
                   className={inputCls + " pl-11 pt-3 resize-none"}
@@ -137,7 +144,7 @@ Message: ${parsed.data.message || "-"}`;
 
             <button
               type="submit"
-              className="mt-7 w-full rounded-full bg-coffee px-7 py-4 text-sm text-primary-foreground shadow-luxe hover:opacity-95 transition"
+              className="mt-6 w-full rounded-full bg-coffee px-7 py-4 text-sm text-primary-foreground shadow-luxe hover:opacity-95 active:scale-[0.98] transition"
             >
               Send Request via WhatsApp
             </button>
