@@ -1,5 +1,5 @@
 ﻿import doctorImg from "@/assets/Doctor.jpg";
-import { GraduationCap, Stethoscope, Award } from "lucide-react";
+import { GraduationCap, Award } from "lucide-react";
 
 export function Doctor() {
   return (
@@ -27,14 +27,13 @@ export function Doctor() {
             <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
               Dr. Krithi Subhas
             </h2>
-            <p className="mt-2 text-muted-foreground">Founder & Chief Dermatologist</p>
+            <p className="mt-2 text-muted-foreground">Consultant Dermatologist</p>
             <div className="hairline my-8 max-w-xs" />
 
-            <div className="grid gap-5 sm:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2">
               {[
-                { icon: GraduationCap, label: "Qualification", value: "MBBS, MD (Dermatology)" },
-                { icon: Award, label: "Experience", value: "12+ Years" },
-                { icon: Stethoscope, label: "Specialty", value: "Aesthetic & Hair" },
+                { icon: GraduationCap, label: "Qualification", value: "MBBS, MD (Dermatology), DNB" },
+                { icon: Award, label: "Experience", value: "8+ Years" },
               ].map(({ icon: Icon, label, value }) => (
                 <div key={label} className="rounded-2xl border border-border bg-card p-5 shadow-card">
                   <Icon className="h-5 w-5 text-gold" />
@@ -45,7 +44,7 @@ export function Doctor() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
-              {["Board Certified Dermatologist", "IADVL Member", "Trichology Specialist"].map((badge) => (
+              {["Board Certified Dermatologist", "IADVL Member"].map((badge) => (
                 <span key={badge} className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-cream px-3 py-1.5 text-[11px] font-medium text-coffee">
                   <span className="text-gold">✓</span> {badge}
                 </span>
@@ -53,9 +52,9 @@ export function Doctor() {
             </div>
             <p className="mt-6 text-muted-foreground leading-relaxed max-w-2xl">
               Dr. Krithi Subhas is known for her precise, science-led approach to
-              dermatology and trichology. She has helped thousands of patients
-              restore healthy skin and hair with bespoke, evidence-based protocols
-              delivered in a warm, personal setting.
+              dermatology. She has helped thousands of patients restore healthy skin
+              and hair with bespoke, evidence-based protocols delivered in a warm,
+              personal setting.
             </p>
           </div>
         </div>

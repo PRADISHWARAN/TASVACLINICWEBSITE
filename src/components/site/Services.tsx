@@ -1,6 +1,6 @@
 import {
   Droplets, Sparkles, Scissors, Syringe, Sun, FlaskConical,
-  Zap, Wind, Leaf, Moon, HeartPulse, Star, Bandage, Stethoscope, Flower2,
+  Zap, Wind, Leaf, Moon, Star, Bandage, Stethoscope, Flower2,
 } from "lucide-react";
 
 const services = [
@@ -19,7 +19,6 @@ const services = [
   { icon: Flower2, name: "Medi Facials", desc: "Doctor-led facials for visible results." },
   { icon: Bandage, name: "Scar Treatment", desc: "Smoother, refined skin surface." },
   { icon: Stethoscope, name: "Dermatology Consultation", desc: "Personalized expert assessment." },
-  { icon: HeartPulse, name: "Wellness & Skin Health", desc: "Holistic skin & hair protocols." },
 ];
 
 export function Services() {

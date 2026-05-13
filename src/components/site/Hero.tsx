@@ -32,9 +32,8 @@ export function Hero() {
           </h1>
 
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            At Tasvaa, science meets serenity. Experience world-class dermatology and
-            trichology in a calm, luxurious setting designed around your unique skin and
-            hair journey.
+            At Tasvaa, science meets serenity. Experience world-class dermatology in a calm,
+            luxurious setting designed around your unique skin and hair journey.
           </p>
 
           {/* Google rating */}
@@ -68,7 +67,7 @@ export function Hero() {
           {/* Stats */}
           <dl className="mt-10 grid grid-cols-3 w-full max-w-[300px] sm:w-auto sm:max-w-none overflow-hidden rounded-2xl border border-border bg-white/60 shadow-card backdrop-blur-sm">
             {[
-              ["10+", "Years"],
+              ["8+", "Years"],
               ["15K+", "Patients"],
               ["20+", "Treatments"],
             ].map(([n, l], i) => (

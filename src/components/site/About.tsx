@@ -38,10 +38,10 @@ export function About() {
           </h2>
           <div className="hairline my-8 max-w-xs" />
           <p className="text-muted-foreground leading-relaxed">
-            Tasvaa Skin and Hair Clinic is a premium destination for advanced
-            dermatology and hair restoration. Every detail — from our marble
-            interiors to our evidence-based protocols — is designed to deliver
-            visible results while making you feel completely at ease.
+            Tasvaa Skin and Hair Clinic offers advanced dermatology and hair
+            restoration care. Every detail — from our evidence-based protocols
+            to our personalised approach — is designed to deliver visible results
+            while making you feel completely at ease.
           </p>
 
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">

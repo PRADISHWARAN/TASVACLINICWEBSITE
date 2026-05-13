@@ -4,7 +4,7 @@ const items = [
   { icon: Cpu, title: "Advanced Technology", desc: "FDA-approved equipment and the latest dermatology innovations." },
   { icon: UserCheck, title: "Personalized Care", desc: "Treatments crafted around your skin biology and goals." },
   { icon: Award, title: "Experienced Specialists", desc: "Board-certified doctors with proven aesthetic expertise." },
-  { icon: Building2, title: "Premium Environment", desc: "A calm, marble-and-walnut sanctuary built around comfort." },
+  { icon: Building2, title: "Premium Environment", desc: "A calm, thoughtfully designed space built around your comfort." },
   { icon: ShieldCheck, title: "Safe Procedures", desc: "Strict hygiene and global safety protocols, every visit." },
   { icon: HeartHandshake, title: "Trusted Care", desc: "Honest advice, transparent pricing and long-term support." },
 ];

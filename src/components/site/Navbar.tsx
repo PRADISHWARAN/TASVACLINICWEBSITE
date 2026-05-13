@@ -8,6 +8,7 @@ const links = [
   { href: "#why", label: "Why Tasvaa" },
   { href: "#doctor", label: "Doctor" },
   { href: "#blog", label: "Blog" },
+  { href: "#faq", label: "FAQ" },
   { href: "#gallery", label: "Gallery" },
   { href: "#contact", label: "Contact" },
 ];

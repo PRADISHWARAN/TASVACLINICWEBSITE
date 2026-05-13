@@ -11,6 +11,7 @@ import { Appointment } from "@/components/site/Appointment";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { Blog } from "@/components/site/Blog";
+import { FAQ } from "@/components/site/FAQ";
 import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { useReveal } from "@/hooks/use-reveal";
 
@@ -30,6 +31,7 @@ export default function App() {
         <Doctor />
         <Testimonials />
         <Blog />
+        <FAQ />
         <Gallery />
         <Appointment />
         <Contact />

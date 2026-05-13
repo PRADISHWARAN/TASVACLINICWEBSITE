@@ -1,17 +1,9 @@
 import g1 from "@/assets/4.webp";
 import g2 from "@/assets/5.webp";
-import g3 from "@/assets/4.webp";
-import g4 from "@/assets/5.webp";
-import hero from "@/assets/hero-clinic.jpg";
-import about from "@/assets/about-treatment.jpg";
 
 const items = [
-  { src: g2, alt: "Reception lounge", className: "row-span-2" },
-  { src: g1, alt: "Treatment room", className: "" },
-  { src: hero, alt: "Clinic reception", className: "" },
-  { src: g4, alt: "Glowing skin result", className: "row-span-2" },
-  { src: about, alt: "Skincare on marble", className: "" },
-  { src: g3, alt: "Premium serum range", className: "" },
+  { src: g1, alt: "Tasvaa Clinic treatment room" },
+  { src: g2, alt: "Tasvaa Clinic reception lounge" },
 ];
 
 export function Gallery() {
@@ -28,23 +20,27 @@ export function Gallery() {
           </p>
         </div>
 
-        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 auto-rows-[160px] sm:auto-rows-[200px] lg:auto-rows-[220px] gap-3 sm:gap-4">
+        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {items.map((it, i) => (
             <figure
               key={i}
-              className={`reveal group relative overflow-hidden rounded-2xl shadow-card ${it.className}`}
+              className="reveal group relative overflow-hidden rounded-2xl shadow-card"
               style={{ transitionDelay: `${i * 60}ms` }}
             >
               <img
                 src={it.src}
                 alt={it.alt}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-[1.2s] group-hover:scale-110"
+                className="h-[280px] sm:h-[400px] w-full object-cover transition-transform duration-[1.2s] group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-coffee/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition" />
             </figure>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-sm text-muted-foreground/60 italic">
+          More photos coming soon.
+        </p>
       </div>
     </section>
   );
