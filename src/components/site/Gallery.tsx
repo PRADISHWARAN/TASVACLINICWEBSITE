@@ -28,7 +28,7 @@ export function Gallery() {
           </p>
         </div>
 
-        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 auto-rows-[180px] sm:auto-rows-[220px] gap-4">
+        <div className="mt-14 grid grid-cols-2 lg:grid-cols-4 auto-rows-[160px] sm:auto-rows-[200px] lg:auto-rows-[220px] gap-3 sm:gap-4">
           {items.map((it, i) => (
             <figure
               key={i}

@@ -5,6 +5,7 @@ const quick = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Treatments" },
   { href: "#doctor", label: "Doctor" },
+  { href: "#blog", label: "Blog" },
   { href: "#gallery", label: "Gallery" },
   { href: "#appointment", label: "Book" },
   { href: "#contact", label: "Contact" },
@@ -18,8 +19,8 @@ const treatments = [
 export function Footer() {
   return (
     <footer className="bg-coffee text-primary-foreground">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-10 lg:grid-cols-12">
-        <div className="lg:col-span-4">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-12 lg:py-16 grid gap-8 lg:gap-10 sm:grid-cols-2 lg:grid-cols-12">
+        <div className="sm:col-span-2 lg:col-span-4">
           <div className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-full gradient-gold text-coffee font-display text-lg font-semibold">T</span>
             <span className="font-display text-2xl">Tasvaa</span>

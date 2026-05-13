@@ -25,7 +25,7 @@ export function WhyChoose() {
             </p>
           </div>
 
-          <div className="lg:col-span-8 grid grid-cols-2 gap-4 lg:gap-5">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
             {items.map(({ icon: Icon, title, desc }, i) => (
               <div
                 key={title}

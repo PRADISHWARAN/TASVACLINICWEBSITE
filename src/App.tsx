@@ -10,6 +10,7 @@ import { Gallery } from "@/components/site/Gallery";
 import { Appointment } from "@/components/site/Appointment";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
+import { Blog } from "@/components/site/Blog";
 import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { useReveal } from "@/hooks/use-reveal";
 
@@ -28,6 +29,7 @@ export default function App() {
         <WhyChoose />
         <Doctor />
         <Testimonials />
+        <Blog />
         <Gallery />
         <Appointment />
         <Contact />

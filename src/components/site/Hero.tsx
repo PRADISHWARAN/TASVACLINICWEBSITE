@@ -26,7 +26,7 @@ export function Hero() {
             Premium Dermatology · Bengaluru
           </div>
 
-          <h1 className="mt-5 font-display text-5xl leading-[1.05] text-coffee sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 font-display text-[2.1rem] leading-[1.08] text-coffee sm:text-5xl lg:text-7xl">
             Advanced Skin &amp; Hair Care
             <span className="block italic text-walnut/90">with personalized treatment.</span>
           </h1>
@@ -38,46 +38,46 @@ export function Hero() {
           </p>
 
           {/* Google rating */}
-          <div className="mt-5 inline-flex items-center gap-2.5 rounded-full border border-border bg-white/70 px-4 py-2 shadow-soft backdrop-blur-sm">
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border bg-white/70 px-3 py-2 sm:px-4 shadow-soft backdrop-blur-sm">
             <div className="flex gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />
+                <Star key={i} className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-gold text-gold" />
               ))}
             </div>
-            <span className="text-xs font-medium text-coffee">4.9 · Trusted by 15,000+ Patients</span>
+            <span className="text-[11px] sm:text-xs font-medium text-coffee">4.9 · 15,000+ Patients</span>
           </div>
 
           {/* CTAs */}
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
             <a
               href={buildWhatsAppLink("Hi Tasvaa, I'd like to book a consultation.")}
               target="_blank"
               rel="noreferrer"
-              className="animate-pulse-ring inline-flex items-center gap-2 rounded-full bg-coffee px-7 py-4 text-sm text-primary-foreground shadow-luxe hover:-translate-y-0.5 transition-transform"
+              className="animate-pulse-ring inline-flex items-center justify-center gap-2 rounded-full bg-coffee px-7 py-4 text-sm text-primary-foreground shadow-luxe hover:-translate-y-0.5 transition-transform"
             >
               <MessageCircle className="h-4 w-4" /> Book via WhatsApp
             </a>
             <a
               href="#appointment"
-              className="inline-flex items-center gap-2 rounded-full border border-coffee/30 bg-white/50 px-7 py-4 text-sm text-coffee hover:bg-cream hover:border-coffee/50 transition backdrop-blur-sm"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-coffee/30 bg-white/50 px-7 py-4 text-sm text-coffee hover:bg-cream hover:border-coffee/50 transition backdrop-blur-sm"
             >
               Request Appointment <ArrowRight className="h-4 w-4" />
             </a>
           </div>
 
           {/* Stats */}
-          <dl className="mt-10 inline-grid grid-cols-3 overflow-hidden rounded-2xl border border-border bg-white/60 shadow-card backdrop-blur-sm">
+          <dl className="mt-10 grid grid-cols-3 w-full max-w-[300px] sm:w-auto sm:max-w-none overflow-hidden rounded-2xl border border-border bg-white/60 shadow-card backdrop-blur-sm">
             {[
-              ["10+", "Years Expertise"],
-              ["15K+", "Happy Patients"],
+              ["10+", "Years"],
+              ["15K+", "Patients"],
               ["20+", "Treatments"],
             ].map(([n, l], i) => (
               <div
                 key={l}
-                className={`px-5 py-4 text-center ${i > 0 ? "border-l border-border" : ""}`}
+                className={`px-3 py-3 sm:px-5 sm:py-4 text-center ${i > 0 ? "border-l border-border" : ""}`}
               >
-                <dt className="font-display text-2xl text-coffee sm:text-3xl">{n}</dt>
-                <dd className="mt-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+                <dt className="font-display text-xl text-coffee sm:text-2xl lg:text-3xl">{n}</dt>
+                <dd className="mt-0.5 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">
                   {l}
                 </dd>
               </div>

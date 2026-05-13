@@ -5,7 +5,7 @@ export function Doctor() {
   return (
     <section id="doctor" className="bg-cream/60 py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="grid gap-14 lg:grid-cols-12 items-center">
+        <div className="grid gap-8 lg:gap-14 lg:grid-cols-12 items-center">
           <div className="lg:col-span-5 reveal">
             <div className="relative">
               <div className="absolute -inset-5 gradient-gold opacity-25 rounded-[2rem] blur-2xl" />

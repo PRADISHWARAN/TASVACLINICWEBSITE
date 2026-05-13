@@ -13,7 +13,7 @@ const points = [
 export function About() {
   return (
     <section id="about" className="py-14 lg:py-28">
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 lg:grid-cols-2 lg:px-10">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 lg:gap-14 px-6 lg:grid-cols-2 lg:px-10">
         <div className="reveal relative">
           <div className="absolute -inset-4 gradient-warm rounded-[2rem] opacity-60 blur-2xl" />
           <div className="relative overflow-hidden rounded-[2rem] shadow-luxe">

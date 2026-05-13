@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { SITE, buildWhatsAppLink } from "@/lib/site";
+import { trackEvent } from "@/lib/analytics";
 
 export function Contact() {
   return (
@@ -15,12 +16,12 @@ export function Contact() {
         <div className="mt-14 grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-5 space-y-5">
             {[
-              { icon: Phone, label: "Call Us", value: SITE.phone, href: `tel:${SITE.phoneRaw}` },
-              { icon: MessageCircle, label: "WhatsApp", value: "Chat instantly", href: buildWhatsAppLink("Hi Tasvaa, I'd like to know more.") },
-              { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}` },
+              { icon: Phone, label: "Call Us", value: SITE.phone, href: `tel:${SITE.phoneRaw}`, event: "click_call" },
+              { icon: MessageCircle, label: "WhatsApp", value: "Chat instantly", href: buildWhatsAppLink("Hi Tasvaa, I'd like to know more."), event: "click_whatsapp" },
+              { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}`, event: "click_email" },
               { icon: MapPin, label: "Address", value: SITE.address },
               { icon: Clock, label: "Working Hours", value: SITE.hours },
-            ].map(({ icon: Icon, label, value, href }, i) => {
+            ].map(({ icon: Icon, label, value, href, event: evName }, i) => {
               const content = (
                 <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 shadow-card hover:shadow-luxe transition reveal" style={{ transitionDelay: `${i * 60}ms` }}>
                   <div className="grid h-11 w-11 place-items-center rounded-full gradient-gold text-coffee shrink-0">
@@ -33,7 +34,7 @@ export function Contact() {
                 </div>
               );
               return href ? (
-                <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">{content}</a>
+                <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" onClick={() => evName && trackEvent(evName, { label })}>{content}</a>
               ) : (
                 <div key={label}>{content}</div>
               );

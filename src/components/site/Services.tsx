@@ -38,7 +38,8 @@ export function Services() {
           </p>
         </div>
 
-        <div className="mt-10 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6 sm:mx-0 sm:px-0 sm:grid sm:gap-5 sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-4">
+        <p className="mt-4 text-center text-xs text-muted-foreground/70 sm:hidden">Swipe to explore →</p>
+        <div className="mt-3 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6 sm:mx-0 sm:px-0 sm:mt-10 sm:grid sm:gap-5 sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3 xl:grid-cols-4">
           {services.map(({ icon: Icon, name, desc }, i) => (
             <article
               key={name}

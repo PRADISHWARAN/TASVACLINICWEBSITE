@@ -7,6 +7,7 @@ const links = [
   { href: "#services", label: "Treatments" },
   { href: "#why", label: "Why Tasvaa" },
   { href: "#doctor", label: "Doctor" },
+  { href: "#blog", label: "Blog" },
   { href: "#gallery", label: "Gallery" },
   { href: "#contact", label: "Contact" },
 ];
@@ -68,7 +69,7 @@ export function Navbar() {
         </div>
 
         <button
-          className="lg:hidden text-coffee p-2"
+          className="lg:hidden text-coffee p-3 -mr-1 rounded-xl hover:bg-cream transition"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
         >
@@ -78,13 +79,13 @@ export function Navbar() {
 
       {open && (
         <div className="lg:hidden glass border-t border-border">
-          <div className="flex flex-col px-6 py-4 gap-4">
+          <div className="flex flex-col px-6 py-4 gap-1">
             {links.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="text-coffee/90 py-1"
+                className="text-coffee/90 py-3 text-base border-b border-border/40 last:border-0"
               >
                 {l.label}
               </a>

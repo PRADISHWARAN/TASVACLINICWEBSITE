@@ -70,7 +70,7 @@ export function Testimonials() {
         </h2>
 
         {/* Testimonial cards */}
-        <div className="mt-10 relative h-[360px] sm:h-[280px]">
+        <div className="mt-10 relative h-[430px] sm:h-[290px]">
           {reviews.map((r, idx) => (
             <article
               key={r.name}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { buildWhatsAppLink } from "@/lib/site";
+import { trackEvent } from "@/lib/analytics";
 import { CalendarDays, Clock, Phone, User, MessageSquare, Sparkles, ChevronDown } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 
@@ -48,6 +49,10 @@ export function Appointment() {
       return;
     }
     setErrors({});
+    trackEvent("appointment_request", {
+      treatment: parsed.data.treatment,
+      preferred_date: parsed.data.date,
+    });
     const msg = `New Appointment Request
 
 Name: ${parsed.data.name}
@@ -66,7 +71,7 @@ Message: ${parsed.data.message || "-"}`;
     <section id="appointment" className="py-14 lg:py-28 relative overflow-hidden">
       <div className="absolute inset-0 bg-marble" />
       <div className="relative mx-auto max-w-6xl px-6 lg:px-10">
-        <div className="grid gap-14 lg:grid-cols-12 items-start">
+        <div className="grid gap-8 lg:gap-14 lg:grid-cols-12 items-start">
           <div className="lg:col-span-5 reveal">
             <span className="text-xs uppercase tracking-[0.3em] text-gold">Book a Visit</span>
             <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
@@ -169,7 +174,9 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
       <Popover.Portal>
         <Popover.Content
           sideOffset={8}
-          className="z-50 w-72 rounded-2xl border border-border bg-card shadow-luxe p-4 animate-in fade-in-0 zoom-in-95"
+          align="start"
+          collisionPadding={16}
+          className="z-50 w-[min(18rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card shadow-luxe p-4 animate-in fade-in-0 zoom-in-95"
         >
           <div className="flex items-center gap-2 mb-4">
             <Clock className="h-4 w-4 text-gold" />
