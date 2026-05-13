@@ -39,9 +39,9 @@ export function Blog() {
       <div className="absolute inset-x-0 top-0 hairline" />
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Expert Insights</span>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Expert Insights</span>
           <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
-            Skin & hair knowledge, simplified.
+            Skin &amp; hair knowledge, simplified.
           </h2>
           <p className="mt-5 text-muted-foreground">
             Practical advice from our clinic — evidence-based, jargon-free, and
@@ -53,7 +53,7 @@ export function Blog() {
           {posts.map((post, i) => (
             <article
               key={post.title}
-              className={`reveal group rounded-3xl border border-border bg-gradient-to-br ${post.color} p-7 shadow-card hover:shadow-luxe transition-[box-shadow,transform] duration-500 hover:-translate-y-1 flex flex-col`}
+              className={`reveal group rounded-3xl border border-border bg-gradient-to-br ${post.color} p-7 shadow-card hover-glow flex flex-col`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               <div>

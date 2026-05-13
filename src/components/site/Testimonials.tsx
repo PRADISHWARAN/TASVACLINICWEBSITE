@@ -53,7 +53,7 @@ export function Testimonials() {
 
       <div className="relative mx-auto max-w-5xl px-6 lg:px-10 text-center">
         {/* Google rating badge */}
-        <div className="inline-flex items-center gap-3 rounded-full border border-border bg-white/80 px-5 py-2.5 shadow-soft backdrop-blur-sm mb-6">
+        <div className="reveal-scale inline-flex items-center gap-3 rounded-full border border-border bg-white/80 px-5 py-2.5 shadow-soft backdrop-blur-sm mb-6">
           <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, k) => (
               <Star key={k} className="h-3.5 w-3.5 fill-gold text-gold" />
@@ -64,8 +64,8 @@ export function Testimonials() {
           <span className="text-xs text-muted-foreground">200+ Reviews</span>
         </div>
 
-        <span className="text-xs uppercase tracking-[0.3em] text-gold">Patient Stories</span>
-        <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+        <span className="reveal block text-xs uppercase tracking-[0.3em] text-gold-shimmer">Patient Stories</span>
+        <h2 className="reveal mt-3 font-display text-4xl text-coffee sm:text-5xl">
           Loved by those we care for.
         </h2>
 
@@ -81,7 +81,6 @@ export function Testimonials() {
               }`}
             >
               <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-luxe">
-                {/* Avatar + quote icon */}
                 <div className="flex items-center justify-center gap-4 mb-5">
                   <div
                     className={`h-12 w-12 rounded-full bg-gradient-to-br ${r.gradient} flex items-center justify-center text-white font-semibold text-sm shadow-soft`}

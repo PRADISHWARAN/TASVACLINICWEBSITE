@@ -14,8 +14,8 @@ export function WhyChoose() {
     <section id="why" className="py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-4 reveal">
-            <span className="text-xs uppercase tracking-[0.3em] text-gold">Why Tasvaa</span>
+          <div className="lg:col-span-4 reveal-left">
+            <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Why Tasvaa</span>
             <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
               A standard of care you can feel.
             </h2>
@@ -29,14 +29,14 @@ export function WhyChoose() {
             {items.map(({ icon: Icon, title, desc }, i) => (
               <div
                 key={title}
-                className="reveal rounded-2xl border border-border bg-card p-4 sm:p-7 shadow-card hover:shadow-luxe hover:-translate-y-1 transition-[box-shadow,transform] duration-300 relative overflow-hidden"
-                style={{ transitionDelay: `${i * 50}ms` }}
+                className="reveal group rounded-2xl border border-border bg-card p-4 sm:p-7 shadow-card hover-glow relative overflow-hidden"
+                style={{ transitionDelay: `${i * 60}ms` }}
               >
                 <span className="absolute -right-1 -top-3 font-display text-6xl sm:text-7xl text-coffee/5 select-none pointer-events-none leading-none">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <div className="grid h-11 w-11 place-items-center rounded-full gradient-gold text-coffee shadow-soft">
-                  <Icon className="h-5 w-5" />
+                <div className="grid h-11 w-11 place-items-center rounded-full gradient-gold text-coffee shadow-soft transition-transform duration-300 group-hover:scale-110">
+                  <Icon className="h-5 w-5 icon-hover" />
                 </div>
                 <h3 className="mt-4 font-display text-lg sm:text-xl text-coffee">{title}</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{desc}</p>

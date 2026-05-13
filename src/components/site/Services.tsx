@@ -27,9 +27,9 @@ export function Services() {
       <div className="absolute inset-x-0 top-0 hairline" />
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Treatments</span>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Treatments</span>
           <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
-            Curated treatments for skin & hair.
+            Curated treatments for skin &amp; hair.
           </h2>
           <p className="mt-5 text-muted-foreground">
             Every treatment is doctor-led, evidence-based, and tailored to
@@ -42,13 +42,13 @@ export function Services() {
           {services.map(({ icon: Icon, name, desc }, i) => (
             <article
               key={name}
-              className="reveal group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-5 sm:p-7 shadow-card transition-[box-shadow,transform] duration-500 hover:-translate-y-1 hover:shadow-luxe flex-none w-[240px] snap-start sm:w-auto"
+              className="reveal group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-5 sm:p-7 shadow-card hover-glow flex-none w-[240px] snap-start sm:w-auto cursor-default"
               style={{ transitionDelay: `${(i % 4) * 60}ms` }}
             >
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 gradient-warm" />
               <div className="relative">
-                <div className="grid h-12 w-12 place-items-center rounded-xl gradient-gold text-coffee shadow-soft">
-                  <Icon className="h-5 w-5" />
+                <div className="grid h-12 w-12 place-items-center rounded-xl gradient-gold text-coffee shadow-soft transition-transform duration-300 group-hover:scale-110">
+                  <Icon className="h-5 w-5 icon-hover" />
                 </div>
                 <h3 className="mt-5 font-display text-xl text-coffee">{name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{desc}</p>

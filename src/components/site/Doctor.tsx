@@ -1,4 +1,4 @@
-﻿import doctorImg from "@/assets/Doctor.jpg";
+import doctorImg from "@/assets/Doctor.jpg";
 import { GraduationCap, Award } from "lucide-react";
 
 export function Doctor() {
@@ -6,13 +6,13 @@ export function Doctor() {
     <section id="doctor" className="bg-cream/60 py-14 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-8 lg:gap-14 lg:grid-cols-12 items-center">
-          <div className="lg:col-span-5 reveal">
+          <div className="lg:col-span-5 reveal-left">
             <div className="relative">
               <div className="absolute -inset-5 gradient-gold opacity-25 rounded-[2rem] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-border shadow-luxe">
+              <div className="relative overflow-hidden rounded-[2rem] border border-border shadow-luxe hover-glow">
                 <img
                   src={doctorImg}
-                  alt="Dr. Krithi Subhas â€” Lead Dermatologist at Tasvaa Clinic"
+                  alt="Dr. Krithi Subhas — Consultant Dermatologist at Tasvaa Skin and Hair Clinic, Bengaluru"
                   loading="lazy"
                   width={1024}
                   height={1024}
@@ -22,8 +22,8 @@ export function Doctor() {
             </div>
           </div>
 
-          <div className="lg:col-span-7 reveal">
-            <span className="text-xs uppercase tracking-[0.3em] text-gold">Meet Your Specialist</span>
+          <div className="lg:col-span-7 reveal-right">
+            <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Meet Your Specialist</span>
             <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
               Dr. Krithi Subhas
             </h2>
@@ -35,8 +35,8 @@ export function Doctor() {
                 { icon: GraduationCap, label: "Qualification", value: "MBBS, MD (Dermatology), DNB" },
                 { icon: Award, label: "Experience", value: "8+ Years" },
               ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="rounded-2xl border border-border bg-card p-5 shadow-card">
-                  <Icon className="h-5 w-5 text-gold" />
+                <div key={label} className="group rounded-2xl border border-border bg-card p-5 shadow-card hover-glow">
+                  <Icon className="h-5 w-5 text-gold icon-hover" />
                   <p className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
                   <p className="mt-1 text-coffee font-medium">{value}</p>
                 </div>
@@ -62,4 +62,3 @@ export function Doctor() {
     </section>
   );
 }
-

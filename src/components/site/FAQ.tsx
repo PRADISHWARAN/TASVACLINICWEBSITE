@@ -52,7 +52,7 @@ export function FAQ() {
       <div className="absolute inset-x-0 top-0 hairline" />
       <div className="mx-auto max-w-4xl px-6 lg:px-10">
         <div className="text-center reveal">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">FAQs</span>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">FAQs</span>
           <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
             Frequently asked questions.
           </h2>
@@ -65,27 +65,28 @@ export function FAQ() {
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i;
             return (
-              <div key={i} className="reveal">
+              <div key={i} className="reveal" style={{ transitionDelay: `${i * 40}ms` }}>
                 <button
-                  className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                  className="flex w-full items-center justify-between gap-4 py-5 text-left group"
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   aria-expanded={isOpen}
                 >
-                  <span className="font-display text-lg text-coffee sm:text-xl">
+                  <span className="font-display text-lg text-coffee sm:text-xl group-hover:text-walnut transition-colors">
                     {faq.question}
                   </span>
-                  <ChevronDown
-                    className={`h-5 w-5 shrink-0 text-gold transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/40 bg-cream transition-all duration-300 ${isOpen ? "bg-coffee border-coffee rotate-180" : ""}`}>
+                    <ChevronDown className={`h-4 w-4 transition-colors ${isOpen ? "text-white" : "text-gold"}`} />
+                  </span>
                 </button>
+                {/* Smooth grid-rows accordion */}
                 <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isOpen ? "max-h-80 opacity-100 pb-5" : "max-h-0 opacity-0"
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                   }`}
                 >
-                  <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
+                  <div className="overflow-hidden">
+                    <p className="pb-5 text-muted-foreground leading-relaxed">{faq.answer}</p>
+                  </div>
                 </div>
               </div>
             );

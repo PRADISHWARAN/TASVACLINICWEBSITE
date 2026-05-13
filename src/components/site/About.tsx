@@ -14,12 +14,12 @@ export function About() {
   return (
     <section id="about" className="py-14 lg:py-28">
       <div className="mx-auto grid max-w-7xl items-center gap-8 lg:gap-14 px-6 lg:grid-cols-2 lg:px-10">
-        <div className="reveal relative">
+        <div className="reveal-left relative">
           <div className="absolute -inset-4 gradient-warm rounded-[2rem] opacity-60 blur-2xl" />
-          <div className="relative overflow-hidden rounded-[2rem] shadow-luxe">
+          <div className="relative overflow-hidden rounded-[2rem] shadow-luxe hover-glow">
             <img
               src={aboutImg}
-              alt="Premium skincare products on marble counter at Tasvaa Clinic"
+              alt="Skincare products at Tasvaa Skin and Hair Clinic, Bengaluru"
               loading="lazy"
               width={1024}
               height={1280}
@@ -31,8 +31,8 @@ export function About() {
           </div>
         </div>
 
-        <div className="reveal">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">About the Clinic</span>
+        <div className="reveal-right">
+          <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">About the Clinic</span>
           <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
             Where dermatology meets quiet luxury.
           </h2>
@@ -47,7 +47,7 @@ export function About() {
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
             {points.map((p) => (
               <li key={p} className="flex items-start gap-3 text-sm text-coffee/90">
-                <span className="mt-0.5 grid h-5 w-5 place-items-center rounded-full gradient-gold">
+                <span className="mt-0.5 grid h-5 w-5 place-items-center rounded-full gradient-gold shrink-0">
                   <Check className="h-3 w-3 text-coffee" />
                 </span>
                 {p}

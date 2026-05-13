@@ -1,29 +1,30 @@
 import heroImg from "@/assets/2.webp";
 import { buildWhatsAppLink } from "@/lib/site";
 import { ArrowRight, MessageCircle, Sparkles, Star } from "lucide-react";
+import { CountUp } from "@/components/ui/CountUp";
 
 export function Hero() {
   return (
     <section id="top" className="relative min-h-[100svh] overflow-hidden pt-24 pb-16 lg:pt-28">
       {/* Background */}
       <div className="absolute inset-0 bg-marble" />
-      {/* Gold bokeh blobs */}
+      {/* Gold bokeh blobs — animated drift */}
       <div
-        className="absolute -top-20 right-0 h-[600px] w-[600px] rounded-full opacity-25 blur-[120px] pointer-events-none"
+        className="absolute -top-20 right-0 h-[600px] w-[600px] rounded-full opacity-25 blur-[120px] pointer-events-none animate-blob"
         style={{ background: "radial-gradient(circle, oklch(0.82 0.09 78), transparent)" }}
       />
       <div
-        className="absolute bottom-0 -left-20 h-[400px] w-[400px] rounded-full opacity-20 blur-[100px] pointer-events-none"
+        className="absolute bottom-0 -left-20 h-[400px] w-[400px] rounded-full opacity-20 blur-[100px] pointer-events-none animate-blob-delay"
         style={{ background: "radial-gradient(circle, oklch(0.74 0.1 78), transparent)" }}
       />
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 lg:grid-cols-12 lg:gap-10 lg:px-10">
         {/* ── Left Column ── */}
-        <div className="lg:col-span-6">
-          {/* Premium badge */}
+        <div className="lg:col-span-6 reveal-left">
+          {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-gradient-to-r from-cream to-sand/60 px-4 py-2 text-xs tracking-[0.2em] uppercase text-coffee shadow-soft">
             <Sparkles className="h-3.5 w-3.5 text-gold" />
-            Premium Dermatology · Bengaluru
+            <span className="text-gold-shimmer">Advanced Dermatology · Bengaluru</span>
           </div>
 
           <h1 className="mt-5 font-display text-[2.1rem] leading-[1.08] text-coffee sm:text-5xl lg:text-7xl">
@@ -64,20 +65,22 @@ export function Hero() {
             </a>
           </div>
 
-          {/* Stats */}
+          {/* Stats — count-up animation */}
           <dl className="mt-10 grid grid-cols-3 w-full max-w-[300px] sm:w-auto sm:max-w-none overflow-hidden rounded-2xl border border-border bg-white/60 shadow-card backdrop-blur-sm">
             {[
-              ["8+", "Years"],
-              ["15K+", "Patients"],
-              ["20+", "Treatments"],
-            ].map(([n, l], i) => (
+              { end: 8, suffix: "+", label: "Years" },
+              { end: 15, suffix: "K+", label: "Patients" },
+              { end: 20, suffix: "+", label: "Treatments" },
+            ].map(({ end, suffix, label }, i) => (
               <div
-                key={l}
+                key={label}
                 className={`px-3 py-3 sm:px-5 sm:py-4 text-center ${i > 0 ? "border-l border-border" : ""}`}
               >
-                <dt className="font-display text-xl text-coffee sm:text-2xl lg:text-3xl">{n}</dt>
+                <dt className="font-display text-xl text-coffee sm:text-2xl lg:text-3xl">
+                  <CountUp end={end} suffix={suffix} />
+                </dt>
                 <dd className="mt-0.5 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">
-                  {l}
+                  {label}
                 </dd>
               </div>
             ))}
@@ -85,7 +88,7 @@ export function Hero() {
         </div>
 
         {/* ── Right Column ── */}
-        <div className="lg:col-span-6 relative mt-4 lg:mt-0">
+        <div className="lg:col-span-6 relative mt-4 lg:mt-0 reveal-right">
           {/* Floating treatment tags */}
           <div className="absolute top-[8%] -left-3 z-10 hidden sm:flex animate-float items-center gap-1.5 glass rounded-full px-4 py-2 text-xs font-medium text-coffee border border-gold/30 shadow-soft">
             <span>✨</span> Hydra Facial
@@ -101,10 +104,10 @@ export function Hero() {
           <div className="absolute -inset-6 gradient-gold opacity-20 blur-3xl rounded-[3rem] pointer-events-none" />
 
           {/* Hero image */}
-          <div className="relative overflow-hidden rounded-[2.5rem] shadow-luxe border border-gold/20">
+          <div className="relative overflow-hidden rounded-[2.5rem] shadow-luxe border border-gold/20 hover-glow">
             <img
               src={heroImg}
-              alt="Luxurious Tasvaa skin and hair clinic interior"
+              alt="Tasvaa Skin and Hair Clinic — Advanced Dermatology in Bengaluru"
               width={1600}
               height={1024}
               className="h-[360px] w-full object-cover sm:h-[500px] lg:h-[640px]"

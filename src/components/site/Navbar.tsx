@@ -16,19 +16,31 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 16);
+      const total = document.body.scrollHeight - window.innerHeight;
+      setProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
+    };
     onScroll();
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <header
-      style={{ backgroundColor: "#faf7f2", boxShadow: "0 1px 8px 0 rgba(0,0,0,0.07)" }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-stone-200"
+      style={{ backgroundColor: "#faf7f2", boxShadow: scrolled ? "0 1px 8px 0 rgba(0,0,0,0.07)" : "none" }}
+      className="fixed inset-x-0 top-0 z-50 border-b border-stone-200 transition-shadow duration-300"
     >
+      {/* Scroll progress bar */}
+      <div
+        className="scroll-progress"
+        style={{ width: `${progress}%` }}
+        aria-hidden="true"
+      />
+
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#top" className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-full gradient-gold text-coffee font-display text-lg font-semibold">
@@ -37,17 +49,17 @@ export function Navbar() {
           <span className="font-display text-xl text-coffee leading-none">
             Tasvaa
             <span className="block text-[10px] tracking-[0.3em] text-muted-foreground uppercase mt-0.5">
-              Skin & Hair
+              Skin &amp; Hair
             </span>
           </span>
         </a>
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-coffee/80 hover:text-coffee transition-colors"
+              className="text-sm text-coffee/80 hover:text-coffee transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-gold after:transition-[width] after:duration-300 hover:after:w-full"
             >
               {l.label}
             </a>
@@ -73,6 +85,7 @@ export function Navbar() {
           className="lg:hidden text-coffee p-3 -mr-1 rounded-xl hover:bg-cream transition"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
+          aria-expanded={open}
         >
           {open ? <X /> : <Menu />}
         </button>
