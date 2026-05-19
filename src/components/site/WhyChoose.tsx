@@ -20,8 +20,8 @@ export function WhyChoose() {
               A standard of care you can feel.
             </h2>
             <p className="mt-6 text-muted-foreground leading-relaxed">
-              We pair clinical excellence with a hospitality-led experience —
-              so every appointment feels considered, calm and unmistakably premium.
+              By combining evidence-based treatments with a patient-first approach,
+              we create a skincare experience that is deeply personalised.
             </p>
           </div>
 

@@ -1,4 +1,4 @@
-import heroImg from "@/assets/2.webp";
+import heroImg from "@/assets/Main.JPG";
 import { buildWhatsAppLink } from "@/lib/site";
 import { ArrowRight, MessageCircle, Sparkles, Star } from "lucide-react";
 import { CountUp } from "@/components/ui/CountUp";

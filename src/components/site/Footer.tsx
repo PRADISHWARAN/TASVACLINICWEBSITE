@@ -1,5 +1,6 @@
 import { Instagram, Facebook, Youtube, Phone, Mail, MapPin } from "lucide-react";
 import { SITE } from "@/lib/site";
+import logoImg from "@/assets/Logo.jpeg";
 
 const quick = [
   { href: "#about", label: "About" },
@@ -26,9 +27,8 @@ export function Footer() {
 
           {/* Brand — full width on mobile, half on sm, 4/12 on lg */}
           <div className="col-span-2 sm:col-span-2 lg:col-span-4">
-            <div className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-full gradient-gold text-coffee font-display text-lg font-semibold shrink-0">T</span>
-              <span className="font-display text-2xl">Tasvaa</span>
+            <div className="flex items-center">
+              <img src={logoImg} alt="Tasvaa Skin & Hair Clinic" className="h-12 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="mt-4 text-sm text-primary-foreground/70 leading-relaxed max-w-sm">
               Advanced skin and hair care — clinical results delivered with a

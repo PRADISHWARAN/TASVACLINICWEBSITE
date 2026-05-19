@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import { SITE } from "@/lib/site";
+import logoImg from "@/assets/Logo.jpeg";
 
 const links = [
   { href: "#about", label: "About" },
@@ -42,16 +43,8 @@ export function Navbar() {
       />
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        <a href="#top" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-full gradient-gold text-coffee font-display text-lg font-semibold">
-            T
-          </span>
-          <span className="font-display text-xl text-coffee leading-none">
-            Tasvaa
-            <span className="block text-[10px] tracking-[0.3em] text-muted-foreground uppercase mt-0.5">
-              Skin &amp; Hair
-            </span>
-          </span>
+        <a href="#top" className="flex items-center">
+          <img src={logoImg} alt="Tasvaa Skin & Hair Clinic" className="h-12 w-auto object-contain" />
         </a>
 
         <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">

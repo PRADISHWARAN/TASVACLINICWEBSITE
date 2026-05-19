@@ -1,9 +1,13 @@
-import g1 from "@/assets/4.webp";
-import g2 from "@/assets/5.webp";
+import g1 from "@/assets/Reception.JPG";
+import g2 from "@/assets/DSC_9806.JPG";
+import g3 from "@/assets/DSC_9800.JPG";
+import g4 from "@/assets/Eqp.JPG";
 
 const items = [
-  { src: g1, alt: "Tasvaa Clinic treatment room" },
-  { src: g2, alt: "Tasvaa Clinic reception lounge" },
+  { src: g1, alt: "Tasvaa Clinic reception lounge" },
+  { src: g2, alt: "Tasvaa Clinic" },
+  { src: g3, alt: "Tasvaa Clinic" },
+  { src: g4, alt: "Tasvaa Clinic treatment room" },
 ];
 
 export function Gallery() {
@@ -24,7 +28,7 @@ export function Gallery() {
           {items.map((it, i) => (
             <figure
               key={i}
-              className={`group relative overflow-hidden rounded-2xl shadow-card hover-glow ${i === 0 ? "reveal-left" : "reveal-right"}`}
+              className={`group relative overflow-hidden rounded-2xl shadow-card hover-glow ${i % 2 === 0 ? "reveal-left" : "reveal-right"}`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               <img

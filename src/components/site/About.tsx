@@ -1,4 +1,4 @@
-import aboutImg from "@/assets/3.webp";
+import aboutImg from "@/assets/Main2.JPG";
 import { Check } from "lucide-react";
 
 const points = [
