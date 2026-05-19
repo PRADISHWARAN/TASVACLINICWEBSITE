@@ -40,7 +40,7 @@ export function Blog() {
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
           <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Expert Insights</span>
-          <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+          <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
             Skin &amp; hair knowledge, simplified.
           </h2>
           <p className="mt-5 text-muted-foreground">
@@ -53,7 +53,7 @@ export function Blog() {
           {posts.map((post, i) => (
             <article
               key={post.title}
-              className={`reveal group rounded-3xl border border-border bg-gradient-to-br ${post.color} p-7 shadow-card hover-glow flex flex-col`}
+              className={`reveal group rounded-3xl border border-border bg-gradient-to-br ${post.color} p-5 sm:p-7 shadow-card hover-glow flex flex-col`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               <div>

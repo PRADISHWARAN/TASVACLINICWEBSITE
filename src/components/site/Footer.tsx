@@ -28,7 +28,7 @@ export function Footer() {
           {/* Brand — full width on mobile, half on sm, 4/12 on lg */}
           <div className="col-span-2 sm:col-span-2 lg:col-span-4">
             <div className="flex items-center">
-              <img src={logoImg} alt="Tasvaa Skin & Hair Clinic" className="h-12 w-auto object-contain brightness-0 invert" />
+              <img src={logoImg} alt="Tasvaa Skin & Hair Clinic" className="h-10 sm:h-12 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="mt-4 text-sm text-primary-foreground/70 leading-relaxed max-w-sm">
               Advanced skin and hair care — clinical results delivered with a

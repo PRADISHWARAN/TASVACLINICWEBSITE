@@ -8,7 +8,7 @@ export function Contact() {
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-10">
         <div className="text-center max-w-2xl mx-auto reveal">
           <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Get in Touch</span>
-          <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+          <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
             Visit our clinic.
           </h2>
         </div>

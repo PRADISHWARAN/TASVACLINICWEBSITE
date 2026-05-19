@@ -72,7 +72,7 @@ export function Hero() {
               <span className="text-gold-shimmer">Advanced Dermatology · Bengaluru</span>
             </div>
 
-            <h1 className="mt-4 font-display text-[1.85rem] leading-[1.08] text-coffee sm:text-5xl lg:text-7xl">
+            <h1 className="mt-4 font-display text-[1.6rem] leading-[1.08] text-coffee xs:text-[1.85rem] sm:text-5xl lg:text-7xl">
               Advanced Skin &amp; Hair Care
               <span className="block italic text-walnut/90">with personalized treatment.</span>
             </h1>

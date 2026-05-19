@@ -16,7 +16,7 @@ export function WhyChoose() {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4 reveal-left">
             <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Why Tasvaa</span>
-            <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+            <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
               A standard of care you can feel.
             </h2>
             <p className="mt-6 text-muted-foreground leading-relaxed">

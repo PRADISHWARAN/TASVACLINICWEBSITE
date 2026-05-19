@@ -65,12 +65,12 @@ export function Testimonials() {
         </div>
 
         <span className="reveal block text-xs uppercase tracking-[0.3em] text-gold-shimmer">Patient Stories</span>
-        <h2 className="reveal mt-3 font-display text-4xl text-coffee sm:text-5xl">
+        <h2 className="reveal mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
           Loved by those we care for.
         </h2>
 
         {/* Testimonial cards */}
-        <div className="mt-10 relative h-[430px] sm:h-[290px]">
+        <div className="mt-10 relative h-[370px] sm:h-[260px]">
           {reviews.map((r, idx) => (
             <article
               key={r.name}
@@ -80,7 +80,7 @@ export function Testimonials() {
                   : "opacity-0 translate-y-4 scale-95 pointer-events-none"
               }`}
             >
-              <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-luxe">
+              <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-card p-4 sm:p-8 shadow-luxe">
                 <div className="flex items-center justify-center gap-4 mb-5">
                   <div
                     className={`h-12 w-12 rounded-full bg-gradient-to-br ${r.gradient} flex items-center justify-center text-white font-semibold text-sm shadow-soft`}
@@ -90,7 +90,7 @@ export function Testimonials() {
                   <Quote className="h-7 w-7 text-gold" />
                 </div>
 
-                <p className="font-display text-xl sm:text-2xl text-coffee leading-relaxed">
+                <p className="font-display text-base sm:text-xl text-coffee leading-relaxed">
                   "{r.text}"
                 </p>
 

@@ -53,7 +53,7 @@ export function FAQ() {
       <div className="mx-auto max-w-4xl px-6 lg:px-10">
         <div className="text-center reveal">
           <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">FAQs</span>
-          <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+          <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
             Frequently asked questions.
           </h2>
           <p className="mt-5 text-muted-foreground">
@@ -71,7 +71,7 @@ export function FAQ() {
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   aria-expanded={isOpen}
                 >
-                  <span className="font-display text-lg text-coffee sm:text-xl group-hover:text-walnut transition-colors">
+                  <span className="font-display text-base text-coffee sm:text-lg group-hover:text-walnut transition-colors">
                     {faq.question}
                   </span>
                   <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/40 bg-cream transition-all duration-300 ${isOpen ? "bg-coffee border-coffee rotate-180" : ""}`}>

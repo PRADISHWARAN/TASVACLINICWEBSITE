@@ -33,7 +33,7 @@ export function About() {
 
         <div className="reveal-right">
           <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">About the Clinic</span>
-          <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+          <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
             Where dermatology meets quiet luxury.
           </h2>
           <div className="hairline my-8 max-w-xs" />

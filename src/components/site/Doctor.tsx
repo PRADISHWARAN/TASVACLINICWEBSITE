@@ -24,7 +24,7 @@ export function Doctor() {
 
           <div className="lg:col-span-7 reveal-right">
             <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Meet Your Specialist</span>
-            <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+            <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
               Dr. Krithi Subhas
             </h2>
             <p className="mt-2 text-muted-foreground">Consultant Dermatologist</p>

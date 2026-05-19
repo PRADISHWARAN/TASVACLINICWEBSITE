@@ -44,7 +44,7 @@ export function Navbar() {
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#top" className="flex items-center">
-          <img src={logoImg} alt="Tasvaa Skin & Hair Clinic" className="h-12 w-auto object-contain" />
+          <img src={logoImg} alt="Tasvaa Skin & Hair Clinic" className="h-10 sm:h-12 w-auto object-contain" />
         </a>
 
         <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">

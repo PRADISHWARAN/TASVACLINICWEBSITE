@@ -20,8 +20,8 @@ const timeSlots = [
 const treatments = [
   "Acne Treatment", "Pigmentation Treatment", "Hair Fall Treatment", "PRP Therapy",
   "Hydra Facial", "Chemical Peel", "Laser Hair Reduction", "Skin Rejuvenation",
-  "Anti Aging Treatment", "Dandruff Treatment", "Hair Regrowth Therapy",
-  "Skin Brightening", "Medi Facials", "Scar Treatment", "Dermatology Consultation",
+  "Anti Aging Treatment", "Dandruff Treatment", "Medi Facials", "Scar Treatment",
+  "Dermatology Consultation",
 ];
 
 const schema = z.object({
@@ -76,7 +76,7 @@ Message: ${parsed.data.message || "-"}`;
           {/* Left info panel */}
           <div className="lg:col-span-5 reveal">
             <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Book a Visit</span>
-            <h2 className="mt-3 font-display text-4xl text-coffee sm:text-5xl">
+            <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
               Request your appointment.
             </h2>
             <p className="mt-4 text-muted-foreground leading-relaxed text-sm sm:text-base">
