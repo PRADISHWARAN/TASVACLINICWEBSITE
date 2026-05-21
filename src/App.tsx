@@ -7,11 +7,13 @@ import { BlogPage } from "@/pages/BlogPage";
 import { GalleryPage } from "@/pages/GalleryPage";
 import { AppointmentsPage } from "@/pages/AppointmentsPage";
 import { ContactPage } from "@/pages/ContactPage";
+import { SkinGuidePage } from "@/pages/SkinGuidePage";
 
 function renderPage(path: string) {
   switch (path) {
     case "/about":        return <AboutPage />;
     case "/treatments":   return <TreatmentsPage />;
+    case "/skin-guide":   return <SkinGuidePage />;
     case "/blog":         return <BlogPage />;
     case "/gallery":      return <GalleryPage />;
     case "/appointments": return <AppointmentsPage />;

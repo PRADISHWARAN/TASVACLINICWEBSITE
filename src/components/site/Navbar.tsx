@@ -5,11 +5,12 @@ import { useRouter } from "@/lib/use-router";
 import logoImg from "@/assets/Logo.jpeg";
 
 const links = [
-  { href: "/about",      label: "About" },
-  { href: "/treatments", label: "Treatments" },
-  { href: "/gallery",    label: "Gallery" },
-  { href: "/blog",       label: "Blog" },
-  { href: "/contact",    label: "Contact" },
+  { href: "/about",       label: "About" },
+  { href: "/treatments",  label: "Treatments" },
+  { href: "/skin-guide",  label: "Skin Guide" },
+  { href: "/gallery",     label: "Gallery" },
+  { href: "/blog",        label: "Blog" },
+  { href: "/contact",     label: "Contact" },
 ];
 
 export function Navbar() {
