@@ -43,7 +43,6 @@
 :root {
   --radius: 0.75rem;
 
-  /* Beige / marble white background */
   --background: oklch(0.975 0.012 80);
   --foreground: oklch(0.24 0.025 50);
 
@@ -53,18 +52,15 @@
   --popover: oklch(0.99 0.008 85);
   --popover-foreground: oklch(0.24 0.025 50);
 
-  /* Coffee brown */
   --primary: oklch(0.36 0.045 45);
   --primary-foreground: oklch(0.97 0.012 80);
 
-  /* Cream / sand */
   --secondary: oklch(0.93 0.025 75);
   --secondary-foreground: oklch(0.28 0.035 50);
 
   --muted: oklch(0.94 0.015 80);
   --muted-foreground: oklch(0.48 0.025 55);
 
-  /* Soft gold accent */
   --accent: oklch(0.78 0.085 75);
   --accent-foreground: oklch(0.25 0.03 50);
 
@@ -112,107 +108,139 @@
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
 }
 
 @layer utilities {
+  /* ── Page enter animation ── */
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-enter {
+    animation: page-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Backgrounds ── */
   .bg-marble {
     background-image:
       radial-gradient(at 20% 10%, oklch(0.96 0.02 80 / 0.9), transparent 50%),
       radial-gradient(at 80% 60%, oklch(0.9 0.03 75 / 0.6), transparent 55%),
       linear-gradient(180deg, var(--background), oklch(0.93 0.022 78));
   }
+  .bg-hero-pattern {
+    background-image:
+      radial-gradient(circle at 25% 35%, oklch(0.82 0.09 78 / 0.07) 0%, transparent 50%),
+      radial-gradient(circle at 75% 65%, oklch(0.65 0.08 65 / 0.05) 0%, transparent 50%);
+  }
+  .section-alt {
+    background: linear-gradient(180deg, oklch(0.97 0.014 82), oklch(0.96 0.018 85), oklch(0.97 0.014 82));
+  }
+
+  /* ── Colors ── */
   .text-gold { color: var(--gold); }
   .bg-coffee { background-color: var(--coffee); }
   .text-coffee { color: var(--coffee); }
   .bg-cream { background-color: var(--cream); }
+
+  /* ── Shadows ── */
   .shadow-luxe { box-shadow: var(--shadow-luxe); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-card { box-shadow: var(--shadow-card); }
+
+  /* ── Gradients ── */
   .gradient-gold { background: var(--gradient-gold); }
   .gradient-warm { background: var(--gradient-warm); }
-  .glass {
-    background: oklch(0.98 0.012 80 / 0.65);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+  .gradient-coffee {
+    background: linear-gradient(135deg, oklch(0.32 0.045 45), oklch(0.42 0.055 50));
   }
+  .gradient-gold-border {
+    background: linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(135deg, oklch(0.82 0.09 78), oklch(0.65 0.08 65)) border-box;
+    border: 1px solid transparent;
+  }
+
+  /* ── Glass ── */
+  .glass {
+    background: oklch(0.98 0.012 80 / 0.72);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  }
+  .glass-dark {
+    background: oklch(0.32 0.045 45 / 0.65);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  }
+
+  /* ── Hairline divider ── */
   .hairline {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
   }
+  .hairline-v {
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  }
+
+  /* ── Scroll progress bar ── */
+  .scroll-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, oklch(0.65 0.08 65), oklch(0.82 0.09 78), oklch(0.74 0.1 78));
+    transition: width 0.08s linear;
+    pointer-events: none;
+  }
+
+  /* ── Reveal animations ── */
   .reveal {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.9s ease, transform 0.9s ease;
+    transform: translateY(28px);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
 
-  /* Floating animation for hero tags */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  .animate-float {
-    animation: float 3.5s ease-in-out infinite;
-  }
-
-  /* Pulsing ring on primary CTA */
-  @keyframes pulse-ring {
-    0%   { box-shadow: 0 0 0 0 oklch(0.32 0.045 45 / 0.45); }
-    70%  { box-shadow: 0 0 0 14px oklch(0.32 0.045 45 / 0); }
-    100% { box-shadow: 0 0 0 0 oklch(0.32 0.045 45 / 0); }
-  }
-  .animate-pulse-ring {
-    animation: pulse-ring 2.4s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-  }
-
-  /* Gold shimmer on section labels */
-  @keyframes shimmer {
-    0%   { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-  .text-gold-shimmer {
-    background: linear-gradient(90deg, oklch(0.65 0.08 65), oklch(0.82 0.09 78), oklch(0.65 0.08 65));
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 3s linear infinite;
-  }
-
-  /* ── Reveal from sides — vertical on mobile, horizontal on md+ ── */
   .reveal-left {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal-left.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
   @media (min-width: 768px) {
-    .reveal-left { transform: translateX(-48px); }
+    .reveal-left { transform: translateX(-52px); }
     .reveal-left.is-visible { transform: translateX(0); }
   }
 
   .reveal-right {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal-right.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
   @media (min-width: 768px) {
-    .reveal-right { transform: translateX(48px); }
+    .reveal-right { transform: translateX(52px); }
     .reveal-right.is-visible { transform: translateX(0); }
   }
+
   .reveal-scale {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.88);
     transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .reveal-scale.is-visible {
@@ -220,7 +248,58 @@
     transform: scale(1);
   }
 
-  /* ── Icon bounce on card hover ── */
+  /* ── Hover effects ── */
+  .hover-glow {
+    transition: box-shadow 0.35s ease, transform 0.35s ease;
+  }
+  .hover-glow:hover {
+    box-shadow:
+      0 0 32px -4px oklch(0.74 0.1 78 / 0.32),
+      0 30px 80px -30px oklch(0.32 0.045 45 / 0.22);
+    transform: translateY(-4px);
+  }
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px -20px oklch(0.32 0.045 45 / 0.3);
+  }
+
+  /* ── Float animation (hero tags) ── */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-10px); }
+  }
+  .animate-float {
+    animation: float 3.5s ease-in-out infinite;
+  }
+
+  /* ── Pulsing ring on CTA ── */
+  @keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 oklch(0.32 0.045 45 / 0.5); }
+    70%  { box-shadow: 0 0 0 14px oklch(0.32 0.045 45 / 0); }
+    100% { box-shadow: 0 0 0 0 oklch(0.32 0.045 45 / 0); }
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 2.4s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  }
+
+  /* ── Gold shimmer text ── */
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+  .text-gold-shimmer {
+    background: linear-gradient(90deg, oklch(0.65 0.08 65), oklch(0.82 0.09 78), oklch(0.74 0.1 78), oklch(0.65 0.08 65));
+    background-size: 250% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3.5s linear infinite;
+  }
+
+  /* ── Icon bounce ── */
   @keyframes icon-bounce {
     0%, 100% { transform: translateY(0) scale(1); }
     35%       { transform: translateY(-7px) scale(1.12); }
@@ -230,27 +309,25 @@
     animation: icon-bounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* ── Scroll progress bar ── */
-  .scroll-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    background: linear-gradient(90deg, oklch(0.74 0.1 78), oklch(0.82 0.09 78));
-    transition: width 0.08s linear;
-    pointer-events: none;
+  /* ── Blob drift (hero bg) ── */
+  @keyframes blob-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(30px, -20px) scale(1.08); }
+    66%       { transform: translate(-20px, 15px) scale(0.94); }
+  }
+  .animate-blob       { animation: blob-drift 12s ease-in-out infinite; }
+  .animate-blob-delay { animation: blob-drift 14s ease-in-out infinite reverse; }
+
+  /* ── Fade-up scale (testimonials) ── */
+  @keyframes fade-up-scale {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-fade-up {
+    animation: fade-up-scale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  /* ── Card gold glow on hover ── */
-  .hover-glow {
-    transition: box-shadow 0.35s ease, transform 0.35s ease;
-  }
-  .hover-glow:hover {
-    box-shadow: 0 0 28px -4px oklch(0.74 0.1 78 / 0.28), 0 30px 80px -30px oklch(0.32 0.045 45 / 0.22);
-    transform: translateY(-3px);
-  }
-
-  /* ── Number pop on count finish ── */
+  /* ── Number pop ── */
   @keyframes number-pop {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.18); }
@@ -260,25 +337,64 @@
     animation: number-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
-  /* ── Soft gradient drift for hero bg bokeh ── */
-  @keyframes blob-drift {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%       { transform: translate(30px, -20px) scale(1.08); }
-    66%       { transform: translate(-20px, 15px) scale(0.94); }
+  /* ── Rotating border gradient ── */
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
   }
-  .animate-blob {
-    animation: blob-drift 12s ease-in-out infinite;
+  .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+  /* ── Slide down (mobile menu) ── */
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .animate-blob-delay {
-    animation: blob-drift 14s ease-in-out infinite reverse;
+  .animate-slide-down { animation: slide-down 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+  /* ── Image overlay on hover (gallery) ── */
+  .img-reveal-overlay {
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .group:hover .img-reveal-overlay { transform: scale(1.06); }
+
+  /* ── Stat counter border animation ── */
+  .stat-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, oklch(0.82 0.09 78 / 0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .stat-card:hover::before { opacity: 1; }
+
+  /* ── Field icon helper ── */
+  .field-icon {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 18px;
+    height: 18px;
+    color: var(--gold);
+    pointer-events: none;
   }
 
-  /* ── Fade-up with slight scale for testimonials ── */
-  @keyframes fade-up-scale {
-    from { opacity: 0; transform: translateY(16px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+  /* ── Section label ── */
+  .section-label {
+    display: inline-block;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    font-weight: 500;
   }
-  .animate-fade-up {
-    animation: fade-up-scale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  /* ── Decorative dots pattern ── */
+  .dots-pattern {
+    background-image: radial-gradient(oklch(0.74 0.1 78 / 0.18) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }

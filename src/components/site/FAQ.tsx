@@ -10,7 +10,7 @@ const faqs = [
   {
     question: "How do I book an appointment?",
     answer:
-      "You can book an appointment by calling us, messaging us on WhatsApp, or filling out the appointment request form on this page. We'll confirm your slot within a few hours.",
+      "You can book by calling us, messaging us on WhatsApp, or filling out the appointment request form on this page. We'll confirm your slot within a few hours.",
   },
   {
     question: "Is PRP therapy painful?",
@@ -25,7 +25,7 @@ const faqs = [
   {
     question: "Are the treatments safe for all skin types?",
     answer:
-      "Yes. All our treatments are performed or supervised by a qualified dermatologist and are tailored to your specific skin type and concern. We use FDA-approved equipment and follow strict safety protocols.",
+      "Yes. All our treatments are performed or supervised by a qualified dermatologist and are tailored to your specific skin type. We use FDA-approved equipment and follow strict safety protocols.",
   },
   {
     question: "What is the cost of a consultation?",
@@ -35,7 +35,7 @@ const faqs = [
   {
     question: "How long does a Hydra Facial session take?",
     answer:
-      "A typical Hydra Facial session takes 45–60 minutes. There is no downtime, so you can return to your daily activities immediately after the treatment.",
+      "A typical Hydra Facial session takes 45–60 minutes. There is no downtime, so you can return to your daily activities immediately after.",
   },
   {
     question: "Do I need to prepare anything before my first visit?",
@@ -48,44 +48,51 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="bg-cream/60 py-14 lg:py-28 relative">
+    <section id="faq" className="bg-cream/50 py-12 sm:py-16 lg:py-28 relative">
       <div className="absolute inset-x-0 top-0 hairline" />
-      <div className="mx-auto max-w-4xl px-6 lg:px-10">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-10">
         <div className="text-center reveal">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">FAQs</span>
+          <span className="section-label text-gold-shimmer">FAQs</span>
           <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
             Frequently asked questions.
           </h2>
-          <p className="mt-5 text-muted-foreground">
+          <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
             Answers to the questions our patients ask most often.
           </p>
         </div>
 
-        <div className="mt-12 divide-y divide-border">
+        <div className="mt-10 sm:mt-12 divide-y divide-border">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i;
             return (
               <div key={i} className="reveal" style={{ transitionDelay: `${i * 40}ms` }}>
                 <button
-                  className="flex w-full items-center justify-between gap-4 py-5 text-left group"
+                  className="flex w-full items-start justify-between gap-3 py-5 sm:py-5 text-left group min-h-[60px]"
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   aria-expanded={isOpen}
                 >
-                  <span className="font-display text-base text-coffee sm:text-lg group-hover:text-walnut transition-colors">
+                  <span className="font-display text-base sm:text-lg text-coffee group-hover:text-walnut transition-colors pr-2 leading-snug">
                     {faq.question}
                   </span>
-                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/40 bg-cream transition-all duration-300 ${isOpen ? "bg-coffee border-coffee rotate-180" : ""}`}>
+                  <span
+                    className={`grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-full border transition-all duration-300 mt-0.5 ${
+                      isOpen
+                        ? "bg-coffee border-coffee rotate-180"
+                        : "border-gold/40 bg-cream"
+                    }`}
+                  >
                     <ChevronDown className={`h-4 w-4 transition-colors ${isOpen ? "text-white" : "text-gold"}`} />
                   </span>
                 </button>
-                {/* Smooth grid-rows accordion */}
                 <div
                   className={`grid transition-all duration-300 ease-in-out ${
                     isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="pb-5 text-muted-foreground leading-relaxed">{faq.answer}</p>
+                    <p className="pb-5 text-sm sm:text-base text-muted-foreground leading-relaxed">
+                      {faq.answer}
+                    </p>
                   </div>
                 </div>
               </div>

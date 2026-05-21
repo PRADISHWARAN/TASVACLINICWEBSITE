@@ -1,39 +1,32 @@
-import { Navbar } from "@/components/site/Navbar";
-import { Hero } from "@/components/site/Hero";
-import { About } from "@/components/site/About";
-import { Services } from "@/components/site/Services";
-import { WhyChoose } from "@/components/site/WhyChoose";
-import { Doctor } from "@/components/site/Doctor";
-import { Testimonials } from "@/components/site/Testimonials";
-import { Gallery } from "@/components/site/Gallery";
-import { Appointment } from "@/components/site/Appointment";
-import { Contact } from "@/components/site/Contact";
-import { Footer } from "@/components/site/Footer";
-import { Blog } from "@/components/site/Blog";
-import { FAQ } from "@/components/site/FAQ";
-import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
-import { useReveal } from "@/hooks/use-reveal";
+import { RouterContext, useRouterProvider } from "@/lib/use-router";
+import { Layout } from "@/components/site/Layout";
+import { HomePage } from "@/pages/HomePage";
+import { AboutPage } from "@/pages/AboutPage";
+import { TreatmentsPage } from "@/pages/TreatmentsPage";
+import { BlogPage } from "@/pages/BlogPage";
+import { GalleryPage } from "@/pages/GalleryPage";
+import { AppointmentsPage } from "@/pages/AppointmentsPage";
+import { ContactPage } from "@/pages/ContactPage";
+
+function renderPage(path: string) {
+  switch (path) {
+    case "/about":        return <AboutPage />;
+    case "/treatments":   return <TreatmentsPage />;
+    case "/blog":         return <BlogPage />;
+    case "/gallery":      return <GalleryPage />;
+    case "/appointments": return <AppointmentsPage />;
+    case "/contact":      return <ContactPage />;
+    default:              return <HomePage />;
+  }
+}
 
 export default function App() {
-  useReveal();
+  const router = useRouterProvider();
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Services />
-        <WhyChoose />
-        <Doctor />
-        <Testimonials />
-        <Blog />
-        <FAQ />
-        <Gallery />
-        <Appointment />
-        <Contact />
-      </main>
-      <Footer />
-      <FloatingWhatsApp />
-    </div>
+    <RouterContext.Provider value={router}>
+      <Layout>
+        {renderPage(router.path)}
+      </Layout>
+    </RouterContext.Provider>
   );
 }

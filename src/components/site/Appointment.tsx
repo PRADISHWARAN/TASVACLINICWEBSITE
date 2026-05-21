@@ -2,7 +2,9 @@ import { useState } from "react";
 import { z } from "zod";
 import { buildWhatsAppLink } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
-import { CalendarDays, Clock, Phone, User, MessageSquare, Sparkles, ChevronDown } from "lucide-react";
+import {
+  CalendarDays, Clock, Phone, User, MessageSquare, Sparkles, ChevronDown,
+} from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 
 const timeSlots = [
@@ -33,9 +35,14 @@ const schema = z.object({
   message: z.string().max(500).optional().or(z.literal("")),
 });
 
+/* iOS Safari will auto-zoom if font-size < 16px — use 16px for all inputs */
+const inputCls =
+  "w-full rounded-xl border border-border bg-background/70 px-4 py-3.5 pl-11 text-base text-coffee placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-gold/40 transition leading-tight";
+
 export function Appointment() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedTime, setSelectedTime] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,6 +56,7 @@ export function Appointment() {
       return;
     }
     setErrors({});
+    setSubmitted(true);
     trackEvent("appointment_request", {
       treatment: parsed.data.treatment,
       preferred_date: parsed.data.date,
@@ -64,18 +72,15 @@ Message: ${parsed.data.message || "-"}`;
     window.open(buildWhatsAppLink(msg), "_blank");
   };
 
-  const inputCls =
-    "w-full rounded-xl border border-border bg-background/70 px-4 py-3 pl-11 text-sm text-coffee placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-gold/40 transition";
-
   return (
-    <section id="appointment" className="py-14 lg:py-28 relative overflow-hidden">
+    <section id="appointment" className="py-12 sm:py-16 lg:py-28 relative overflow-hidden">
       <div className="absolute inset-0 bg-marble" />
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-6 lg:px-10">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
         <div className="grid gap-8 lg:gap-14 lg:grid-cols-12 items-start">
 
           {/* Left info panel */}
           <div className="lg:col-span-5 reveal">
-            <span className="text-xs uppercase tracking-[0.3em] text-gold-shimmer">Book a Visit</span>
+            <span className="section-label text-gold-shimmer">Book a Visit</span>
             <h2 className="mt-3 font-display text-3xl text-coffee sm:text-4xl lg:text-5xl">
               Request your appointment.
             </h2>
@@ -84,45 +89,73 @@ Message: ${parsed.data.message || "-"}`;
               WhatsApp. Same-day consultations subject to availability.
             </p>
 
-            {/* Info bullets — always visible (was hidden on mobile) */}
-            <div className="mt-5 space-y-3 text-sm text-coffee">
-              <div className="flex items-start gap-3">
-                <Sparkles className="h-4 w-4 text-gold mt-0.5 shrink-0" />
-                <span>Personalised consultation with Dr. Krithi Subhas</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <Clock className="h-4 w-4 text-gold mt-0.5 shrink-0" />
-                <span>Mon–Thu &amp; Sat · 11am–8pm<br />Sun · 10:30am–1:30pm · Fri Closed</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <Phone className="h-4 w-4 text-gold mt-0.5 shrink-0" />
-                <span>Instant WhatsApp confirmation</span>
-              </div>
+            <div className="mt-6 space-y-4">
+              {[
+                { icon: Sparkles, text: "Personalised consultation with Dr. Krithi Subhas" },
+                { icon: Clock, text: "Mon–Thu & Sat · 11am–8pm\nSun · 10:30am–1:30pm · Fri Closed" },
+                { icon: Phone, text: "Instant WhatsApp confirmation" },
+              ].map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-start gap-3">
+                  <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full gradient-gold text-coffee mt-0.5">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <p className="text-sm text-coffee/90 leading-relaxed whitespace-pre-line">{text}</p>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Form */}
           <form
             onSubmit={onSubmit}
-            className="lg:col-span-7 reveal rounded-3xl border border-border bg-card/90 backdrop-blur p-5 sm:p-8 lg:p-10 shadow-luxe"
+            className="lg:col-span-7 reveal rounded-3xl border border-border bg-card/90 backdrop-blur p-5 sm:p-8 shadow-luxe"
           >
-            <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
+            {submitted && (
+              <div className="mb-5 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+                ✓ Request sent! We'll confirm your slot via WhatsApp shortly.
+              </div>
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Full Name" error={errors.name}>
                 <User className="field-icon" />
-                <input name="name" placeholder="Your name" className={inputCls} maxLength={80} />
+                <input
+                  name="name"
+                  placeholder="Your name"
+                  className={inputCls}
+                  maxLength={80}
+                  autoComplete="name"
+                />
               </Field>
+
               <Field label="Phone Number" error={errors.phone}>
                 <Phone className="field-icon" />
-                <input name="phone" type="tel" placeholder="+91 ..." className={inputCls} maxLength={20} />
+                <input
+                  name="phone"
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  className={inputCls}
+                  maxLength={20}
+                  autoComplete="tel"
+                  inputMode="tel"
+                />
               </Field>
+
               <Field label="Preferred Date" error={errors.date}>
                 <CalendarDays className="field-icon" />
-                <input name="date" type="date" className={inputCls} />
+                <input
+                  name="date"
+                  type="date"
+                  className={inputCls}
+                  min={new Date().toISOString().split("T")[0]}
+                />
               </Field>
+
               <Field label="Preferred Time" error={errors.time}>
                 <input type="hidden" name="time" value={selectedTime} />
                 <TimePicker value={selectedTime} onChange={setSelectedTime} />
               </Field>
+
               <Field label="Treatment Interested In" error={errors.treatment} className="sm:col-span-2">
                 <Sparkles className="field-icon" />
                 <select name="treatment" className={inputCls} defaultValue="">
@@ -130,6 +163,7 @@ Message: ${parsed.data.message || "-"}`;
                   {treatments.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </Field>
+
               <Field label="Message (optional)" error={errors.message} className="sm:col-span-2">
                 <MessageSquare className="field-icon" />
                 <textarea
@@ -137,14 +171,14 @@ Message: ${parsed.data.message || "-"}`;
                   rows={3}
                   maxLength={500}
                   placeholder="Tell us briefly about your concern..."
-                  className={inputCls + " pl-11 pt-3 resize-none"}
+                  className={inputCls + " pl-11 pt-3.5 resize-none"}
                 />
               </Field>
             </div>
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-full bg-coffee px-7 py-4 text-sm text-primary-foreground shadow-luxe hover:opacity-95 active:scale-[0.98] transition"
+              className="mt-5 w-full rounded-full bg-coffee px-7 py-4 text-base font-medium text-primary-foreground shadow-luxe hover:opacity-95 active:scale-[0.98] transition"
             >
               Send Request via WhatsApp
             </button>
@@ -154,8 +188,6 @@ Message: ${parsed.data.message || "-"}`;
           </form>
         </div>
       </div>
-
-      <style>{`.field-icon{position:absolute;left:14px;top:14px;width:18px;height:18px;color:var(--gold);pointer-events:none;}`}</style>
     </section>
   );
 }
@@ -170,11 +202,13 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
       <Popover.Trigger asChild>
         <button
           type="button"
-          className="w-full rounded-xl border border-border bg-background/70 px-4 py-3 pl-11 text-sm text-left transition focus:outline-none focus:ring-2 focus:ring-gold/40 flex items-center justify-between"
+          className="w-full rounded-xl border border-border bg-background/70 px-4 py-3.5 pl-11 text-base text-left transition focus:outline-none focus:ring-2 focus:ring-gold/40 flex items-center justify-between"
         >
-          <Clock className="absolute left-[14px] top-[14px] h-[18px] w-[18px] text-gold pointer-events-none" />
-          <span className={value ? "text-coffee" : "text-muted-foreground/70"}>{value || "Select a time"}</span>
-          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+          <Clock className="field-icon" />
+          <span className={value ? "text-coffee" : "text-muted-foreground/60"}>
+            {value || "Select a time"}
+          </span>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
         </button>
       </Popover.Trigger>
 
@@ -183,7 +217,7 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
           sideOffset={8}
           align="start"
           collisionPadding={16}
-          className="z-50 w-[min(18rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card shadow-luxe p-4 animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card shadow-luxe p-4 animate-in fade-in-0 zoom-in-95"
         >
           <div className="flex items-center gap-2 mb-4">
             <Clock className="h-4 w-4 text-gold" />
@@ -199,7 +233,7 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
                     key={t}
                     type="button"
                     onClick={() => { onChange(t); setOpen(false); }}
-                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                    className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                       value === t
                         ? "bg-coffee text-primary-foreground shadow-sm"
                         : "bg-background hover:bg-gold/10 text-coffee border border-border"
@@ -213,13 +247,13 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
 
             <div>
               <p className="text-[10px] uppercase tracking-widest text-gold mb-2 text-center">Afternoon</p>
-              <div className="grid grid-cols-1 gap-1.5 max-h-52 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-1.5 max-h-52 overflow-y-auto pr-0.5">
                 {pmSlots.map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => { onChange(t); setOpen(false); }}
-                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                    className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                       value === t
                         ? "bg-coffee text-primary-foreground shadow-sm"
                         : "bg-background hover:bg-gold/10 text-coffee border border-border"
@@ -243,9 +277,13 @@ function Field({
 }: { label: string; children: React.ReactNode; error?: string; className?: string }) {
   return (
     <label className={`block ${className}`}>
-      <span className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">{label}</span>
+      <span className="block text-xs uppercase tracking-widest text-muted-foreground mb-2 font-medium">
+        {label}
+      </span>
       <div className="relative">{children}</div>
-      {error && <span className="mt-1 block text-xs text-destructive">{error}</span>}
+      {error && (
+        <span className="mt-1.5 block text-xs text-destructive font-medium">{error}</span>
+      )}
     </label>
   );
 }
