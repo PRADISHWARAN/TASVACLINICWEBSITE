@@ -2,12 +2,18 @@ import g1 from "@/assets/Reception.JPG";
 import g2 from "@/assets/DSC_9806.JPG";
 import g3 from "@/assets/DSC_9800.JPG";
 import g4 from "@/assets/Eqp.JPG";
+import g5 from "@/assets/Pic1.JPG";
+import g6 from "@/assets/Pic2.JPG";
+import g7 from "@/assets/Pic3.JPG";
 
 const items = [
   { src: g1, alt: "Tasvaa Clinic reception lounge" },
   { src: g2, alt: "Tasvaa Clinic" },
   { src: g3, alt: "Tasvaa Clinic" },
   { src: g4, alt: "Tasvaa Clinic treatment room" },
+  { src: g5, alt: "Tasvaa Clinic" },
+  { src: g6, alt: "Tasvaa Clinic" },
+  { src: g7, alt: "Tasvaa Clinic" },
 ];
 
 export function Gallery() {
