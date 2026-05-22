@@ -1,4 +1,4 @@
-import { MessageCircle, ArrowRight, Sparkles, Syringe, Droplets, Star } from "lucide-react";
+import { MessageCircle, ArrowRight, Sparkles, Syringe, Droplets, Star, Zap, Activity } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Hero } from "@/components/site/Hero";
 import { Testimonials } from "@/components/site/Testimonials";
@@ -6,11 +6,10 @@ import { useReveal } from "@/hooks/use-reveal";
 import { useRouter } from "@/lib/use-router";
 import { buildWhatsAppLink } from "@/lib/site";
 import acneIcon from "@/assets/icons/Acne.jpeg";
-import pigmentationIcon from "@/assets/icons/Pigmentation.jpeg";
-import hairFallIcon from "@/assets/icons/HairFall.jpeg";
-import antiAgingIcon from "@/assets/icons/Anti aging.jpeg";
+import chemicalPeelIcon from "@/assets/icons/Chemical Peel.jpeg";
 import laserIcon from "@/assets/icons/Laser Hair reduction.jpeg";
 import mediFacialIcon from "@/assets/icons/Medi facial.jpeg";
+import scarIcon from "@/assets/icons/Scar.jpeg";
 
 type FeaturedTreatment = { name: string; tag: string } & (
   | { imgSrc: string; Icon?: never }
@@ -18,14 +17,14 @@ type FeaturedTreatment = { name: string; tag: string } & (
 );
 
 const featured: FeaturedTreatment[] = [
-  { imgSrc: acneIcon,         name: "Acne Treatment",       tag: "Most Requested" },
-  { imgSrc: pigmentationIcon, name: "Pigmentation",         tag: "Even Skin Tone" },
-  { imgSrc: hairFallIcon,     name: "Hair Fall Treatment",  tag: "Hair Restoration" },
-  { Icon: Syringe,            name: "PRP Therapy",          tag: "Regenerative" },
-  { Icon: Droplets,           name: "Hydra Facial",         tag: "Instant Glow" },
-  { imgSrc: laserIcon,        name: "Laser Hair Reduction", tag: "Long Lasting" },
-  { imgSrc: antiAgingIcon,    name: "Anti Aging",           tag: "Youthful Skin" },
-  { imgSrc: mediFacialIcon,   name: "Medi Facials",         tag: "Doctor Led" },
+  { imgSrc: acneIcon,         name: "Acne & Acne Scars",    tag: "Most Requested" },
+  { imgSrc: chemicalPeelIcon, name: "Chemical Peel",         tag: "Instant Radiance" },
+  { Icon: Zap,                name: "Fractional CO2 Laser",  tag: "Skin Resurfacing" },
+  { imgSrc: laserIcon,        name: "Laser Hair Reduction",  tag: "Long Lasting" },
+  { Icon: Syringe,            name: "Microneedling",         tag: "Collagen Boost" },
+  { Icon: Activity,           name: "Microneedling RF",      tag: "Skin Tightening" },
+  { Icon: Droplets,           name: "PRP / GFC Therapy",     tag: "Regenerative" },
+  { imgSrc: mediFacialIcon,   name: "Hydrafacial",           tag: "Deep Hydration" },
 ];
 
 function FeaturedTreatments() {
@@ -46,7 +45,7 @@ function FeaturedTreatments() {
             onClick={() => navigate("/treatments")}
             className="inline-flex items-center gap-1.5 text-sm text-coffee/80 hover:text-coffee transition-colors self-start sm:self-auto shrink-0 min-h-[44px]"
           >
-            View all 13 <ArrowRight className="h-4 w-4" />
+            View all 15 <ArrowRight className="h-4 w-4" />
           </button>
         </div>
 
@@ -83,12 +82,12 @@ function FeaturedTreatments() {
           <div className="inline-flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 shadow-card">
             <Sparkles className="h-4 w-4 text-gold shrink-0" />
             <p className="text-sm text-muted-foreground">
-              Plus 5 more treatments —
+              Plus 7 more treatments —
               <button
                 onClick={() => navigate("/treatments")}
                 className="ml-1 text-coffee font-medium hover:underline"
               >
-                explore all 13 →
+                explore all 15 →
               </button>
             </p>
           </div>
@@ -102,7 +101,7 @@ function SocialProofStrip() {
   const stats = [
     { value: "8+",   label: "Years" },
     { value: "15K+", label: "Patients" },
-    { value: "13",   label: "Treatments" },
+    { value: "15",   label: "Treatments" },
     { value: "4.9★", label: "Rating" },
   ];
   return (
@@ -189,7 +188,7 @@ function WhyTasvaaStrip() {
               { num: "8+",   label: "Years of experience",    sub: "Dr. Krithi Subhas" },
               { num: "15K+", label: "Patients treated",       sub: "& counting" },
               { num: "4.9",  label: "Google rating",          sub: "200+ reviews" },
-              { num: "13",   label: "Specialist treatments",  sub: "All skin & hair" },
+              { num: "15",   label: "Specialist treatments",  sub: "All skin & hair" },
             ].map((s) => (
               <div
                 key={s.label}

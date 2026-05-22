@@ -1,15 +1,10 @@
-import { Syringe, Droplets, Sparkles } from "lucide-react";
+import { Syringe, Droplets, Sparkles, Zap, Activity, Eraser, Scissors, CircleDot, Target } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import acneIcon from "@/assets/icons/Acne.jpeg";
-import pigmentationIcon from "@/assets/icons/Pigmentation.jpeg";
-import hairFallIcon from "@/assets/icons/HairFall.jpeg";
 import chemicalPeelIcon from "@/assets/icons/Chemical Peel.jpeg";
 import laserIcon from "@/assets/icons/Laser Hair reduction.jpeg";
-import antiAgingIcon from "@/assets/icons/Anti aging.jpeg";
-import dandruffIcon from "@/assets/icons/dandruff.jpeg";
 import mediFacialIcon from "@/assets/icons/Medi facial.jpeg";
 import scarIcon from "@/assets/icons/Scar.jpeg";
-import dermatologyIcon from "@/assets/icons/Dermotology Consultation.jpeg";
 import { useRouter } from "@/lib/use-router";
 
 type Service = { name: string; desc: string } & (
@@ -18,19 +13,21 @@ type Service = { name: string; desc: string } & (
 );
 
 const services: Service[] = [
-  { imgSrc: acneIcon,         name: "Acne Treatment",           desc: "Clinical protocols for clear, balanced skin." },
-  { imgSrc: pigmentationIcon, name: "Pigmentation Treatment",   desc: "Even, luminous tone with targeted therapy." },
-  { imgSrc: hairFallIcon,     name: "Hair Fall Treatment",      desc: "Root-cause analysis & restorative care." },
-  { Icon: Syringe,            name: "PRP Therapy",              desc: "Regenerative therapy for hair & skin." },
-  { Icon: Droplets,           name: "Hydra Facial",             desc: "Deep hydration with instant glow." },
-  { imgSrc: chemicalPeelIcon, name: "Chemical Peel",            desc: "Renewed, radiant skin texture." },
-  { imgSrc: laserIcon,        name: "Laser Hair Reduction",     desc: "Smooth, lasting hair-free skin." },
-  { Icon: Sparkles,           name: "Skin Rejuvenation",        desc: "Refresh tone, texture & radiance." },
-  { imgSrc: antiAgingIcon,    name: "Anti Aging Treatment",     desc: "Lift, firm and restore youthful skin." },
-  { imgSrc: dandruffIcon,     name: "Dandruff Treatment",       desc: "Healthy, flake-free, balanced scalp." },
-  { imgSrc: mediFacialIcon,   name: "Medi Facials",             desc: "Doctor-led facials for visible results." },
-  { imgSrc: scarIcon,         name: "Scar Treatment",           desc: "Smoother, refined skin surface." },
-  { imgSrc: dermatologyIcon,  name: "Dermatology Consultation", desc: "Personalised expert assessment." },
+  { imgSrc: acneIcon,         name: "Acne & Acne Scars",              desc: "Clinical protocols for clear skin & lasting scar reduction." },
+  { imgSrc: chemicalPeelIcon, name: "Chemical Peel",                  desc: "Renewed radiance and texture with targeted exfoliation." },
+  { Icon: Zap,                name: "Fractional CO2 Laser",           desc: "Precision resurfacing for scars, texture & fine lines." },
+  { imgSrc: laserIcon,        name: "Laser Hair Reduction",           desc: "Smooth, long-lasting results with advanced laser." },
+  { Icon: Syringe,            name: "Microneedling",                  desc: "Collagen induction for firmer, refined skin." },
+  { Icon: Activity,           name: "Microneedling RF (MNRF)",        desc: "Deep RF energy for skin tightening & rejuvenation." },
+  { Icon: Eraser,             name: "Laser Tattoo Removal",           desc: "Safe, effective ink clearance across all skin tones." },
+  { Icon: Sparkles,           name: "Laser Toning",                   desc: "Even skin tone & a healthy glow with gentle laser." },
+  { Icon: Droplets,           name: "PRP / GFC Therapy",              desc: "Growth factors for hair density & skin repair." },
+  { imgSrc: scarIcon,         name: "Scar Revision",                  desc: "Smoother, refined skin surface treatment." },
+  { Icon: Scissors,           name: "Wart & Skin Tag Removal",        desc: "Safe, precise removal with minimal downtime." },
+  { Icon: CircleDot,          name: "Mole Removal",                   desc: "Expert assessment and safe removal." },
+  { Icon: Scissors,           name: "Nail Excision",                  desc: "Specialist nail procedure performed with care." },
+  { Icon: Target,             name: "Cyst Excision",                  desc: "Clean, precise excision under local anaesthetic." },
+  { imgSrc: mediFacialIcon,   name: "Hydrafacial Treatment",          desc: "Deep cleanse, exfoliate & hydrate in one session." },
 ];
 
 export function Services() {

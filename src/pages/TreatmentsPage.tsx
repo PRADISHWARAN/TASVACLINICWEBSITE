@@ -34,7 +34,7 @@ export function TreatmentsPage() {
     <div className="page-enter">
       <PageHero
         title="Our Treatments"
-        subtitle="13 doctor-led, evidence-based treatments for every skin and hair concern."
+        subtitle="15 doctor-led, evidence-based treatments for every skin and hair concern."
       />
       <Services />
       <TreatmentsCtaBanner />

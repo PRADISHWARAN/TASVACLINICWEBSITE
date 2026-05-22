@@ -13,12 +13,12 @@ const quick = [
 ];
 
 const treatments = [
-  "Acne Treatment",
-  "Hair Fall Treatment",
-  "PRP Therapy",
-  "Hydra Facial",
+  "Acne & Acne Scars",
+  "Chemical Peel",
+  "Fractional CO2 Laser",
   "Laser Hair Reduction",
-  "Anti Aging",
+  "PRP / GFC Therapy",
+  "Hydrafacial Treatment",
 ];
 
 export function Footer() {
