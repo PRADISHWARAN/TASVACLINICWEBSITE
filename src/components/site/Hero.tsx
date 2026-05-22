@@ -47,10 +47,9 @@ export function Hero() {
               <img
                 src={heroImg}
                 alt="Tasvaa Skin and Hair Clinic — Advanced Dermatology in Bengaluru"
-                width={1600}
-                height={1024}
-                className="w-full object-cover"
-                style={{ height: "clamp(200px, 56vw, 600px)" }}
+                width={4032}
+                height={6048}
+                className="h-auto w-full object-contain lg:h-[clamp(420px,56vw,600px)] lg:object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-coffee/30 via-transparent to-transparent" />
 
