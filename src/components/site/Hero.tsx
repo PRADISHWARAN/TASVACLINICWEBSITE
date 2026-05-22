@@ -9,7 +9,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative min-h-[100svh] overflow-x-hidden pt-16 sm:pt-20 pb-10 lg:pt-28 lg:pb-16"
+      className="relative min-h-[100svh] overflow-x-clip pt-16 sm:pt-20 pb-10 lg:pt-28 lg:pb-16"
     >
       {/* Background */}
       <div className="absolute inset-0 bg-marble" />
@@ -26,7 +26,7 @@ export function Hero() {
         <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-12 lg:gap-10">
 
           {/* ── Right column (image) — shows FIRST on mobile ── */}
-          <div className="order-first lg:order-last lg:col-span-6 relative reveal-right">
+          <div className="order-first lg:order-last lg:col-span-6 relative hero-image">
 
             {/* Floating treatment tags — desktop only */}
             <div className="absolute top-[8%] -left-2 z-10 hidden lg:flex animate-float items-center gap-1.5 glass rounded-full px-4 py-2 text-xs font-medium text-coffee border border-gold/30 shadow-soft">
@@ -85,7 +85,7 @@ export function Hero() {
           </div>
 
           {/* ── Left column (text) — shows SECOND on mobile ── */}
-          <div className="order-last lg:order-first lg:col-span-6 reveal-left">
+          <div className="order-last lg:order-first lg:col-span-6 hero-text">
 
             {/* Overline badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-gradient-to-r from-cream to-sand/60 px-3 py-1.5 text-[10px] sm:text-xs tracking-[0.18em] uppercase text-coffee shadow-soft">

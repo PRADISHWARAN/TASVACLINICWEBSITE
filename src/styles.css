@@ -90,15 +90,23 @@
     border-color: var(--color-border);
   }
   html {
-    scroll-behavior: smooth;
+    min-height: 100%;
+    overflow-x: clip;
+    overflow-y: auto;
   }
   body {
+    min-height: 100%;
+    margin: 0;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
+  }
+  #root {
+    min-height: 100dvh;
+    overflow-x: clip;
   }
   button, a {
     -webkit-tap-highlight-color: transparent;
@@ -117,11 +125,27 @@
 @layer utilities {
   /* ── Page enter animation ── */
   @keyframes page-in {
-    from { opacity: 0; transform: translateY(14px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   .page-enter {
     animation: page-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Hero immediate animations (no IntersectionObserver, play on load) ── */
+  @keyframes hero-fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes hero-fade-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-image {
+    animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-text {
+    animation: hero-fade-up 0.8s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   /* ── Backgrounds ── */

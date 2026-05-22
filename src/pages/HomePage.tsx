@@ -55,7 +55,7 @@ function FeaturedTreatments() {
             <button
               key={t.name}
               onClick={() => navigate("/treatments")}
-              className="reveal group text-left rounded-2xl border border-border/70 bg-card p-4 sm:p-5 shadow-card hover-glow transition-all"
+              className="reveal group relative overflow-hidden text-left rounded-2xl border border-border/70 bg-card p-4 sm:p-5 shadow-card hover-glow transition-all"
               style={{ transitionDelay: `${i * 50}ms` }}
             >
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 gradient-warm rounded-2xl pointer-events-none" />
