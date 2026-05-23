@@ -13,12 +13,26 @@ const quick = [
 ];
 
 const treatments = [
-  "Acne & Acne Scars",
+  "Acne and acne scars treatment",
   "Chemical Peel",
   "Fractional CO2 Laser",
   "Laser Hair Reduction",
-  "PRP / GFC Therapy",
-  "Hydrafacial Treatment",
+  "Microneedling",
+  "Microneedling Radiofrequency ( MNRF)",
+  "Laser tattoo removal",
+  "Laser toning",
+  "PRP/ GFC therapy",
+  "Scar Revision",
+  "Wart and Skin tag removal",
+  "Mole removal",
+  "Nail excision",
+  "Cyst excision",
+  "Hydrafacial treatment",
+];
+
+const treatmentColumns = [
+  treatments.slice(0, 8),
+  treatments.slice(8),
 ];
 
 export function Footer() {
@@ -31,7 +45,7 @@ export function Footer() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-12">
 
           {/* Brand — full width on mobile */}
-          <div className="sm:col-span-2 lg:col-span-4">
+          <div className="sm:col-span-2 lg:col-span-3">
             <button onClick={() => navigate("/")} className="flex items-center">
               <img
                 src={logoImg}
@@ -80,20 +94,24 @@ export function Footer() {
           </div>
 
           {/* Treatments */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             <h4 className="font-display text-base sm:text-lg mb-4">Treatments</h4>
-            <ul className="space-y-2.5">
-              {treatments.map((t) => (
-                <li key={t}>
-                  <button
-                    onClick={() => navigate("/treatments")}
-                    className="text-sm text-primary-foreground/65 hover:text-primary-foreground transition-colors text-left min-h-[32px] flex items-center"
-                  >
-                    {t}
-                  </button>
-                </li>
+            <div className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
+              {treatmentColumns.map((column, index) => (
+                <ul key={index} className="space-y-3">
+                  {column.map((t) => (
+                    <li key={t}>
+                      <button
+                        onClick={() => navigate("/treatments")}
+                        className="text-left text-sm leading-snug text-primary-foreground/65 hover:text-primary-foreground transition-colors"
+                      >
+                        {t}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               ))}
-            </ul>
+            </div>
           </div>
 
           {/* Contact — full width on mobile */}

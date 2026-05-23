@@ -20,10 +20,21 @@ const timeSlots = [
 ];
 
 const treatments = [
-  "Acne Treatment", "Pigmentation Treatment", "Hair Fall Treatment", "PRP Therapy",
-  "Hydra Facial", "Chemical Peel", "Laser Hair Reduction", "Skin Rejuvenation",
-  "Anti Aging Treatment", "Dandruff Treatment", "Medi Facials", "Scar Treatment",
-  "Dermatology Consultation",
+  "Acne and acne scars treatment",
+  "Chemical Peel",
+  "Fractional CO2 Laser",
+  "Laser Hair Reduction",
+  "Microneedling",
+  "Microneedling Radiofrequency ( MNRF)",
+  "Laser tattoo removal",
+  "Laser toning",
+  "PRP/ GFC therapy",
+  "Scar Revision",
+  "Wart and Skin tag removal",
+  "Mole removal",
+  "Nail excision",
+  "Cyst excision",
+  "Hydrafacial treatment",
 ];
 
 const schema = z.object({

@@ -17,14 +17,14 @@ type FeaturedTreatment = { name: string; tag: string } & (
 );
 
 const featured: FeaturedTreatment[] = [
-  { imgSrc: acneIcon,         name: "Acne & Acne Scars",    tag: "Most Requested" },
-  { imgSrc: chemicalPeelIcon, name: "Chemical Peel",         tag: "Instant Radiance" },
-  { Icon: Zap,                name: "Fractional CO2 Laser",  tag: "Skin Resurfacing" },
-  { imgSrc: laserIcon,        name: "Laser Hair Reduction",  tag: "Long Lasting" },
-  { Icon: Syringe,            name: "Microneedling",         tag: "Collagen Boost" },
-  { Icon: Activity,           name: "Microneedling RF",      tag: "Skin Tightening" },
-  { Icon: Droplets,           name: "PRP / GFC Therapy",     tag: "Regenerative" },
-  { imgSrc: mediFacialIcon,   name: "Hydrafacial",           tag: "Deep Hydration" },
+  { imgSrc: acneIcon,         name: "Acne and acne scars treatment", tag: "Most Requested" },
+  { imgSrc: chemicalPeelIcon, name: "Chemical Peel",                 tag: "Instant Radiance" },
+  { Icon: Zap,                name: "Fractional CO2 Laser",          tag: "Skin Resurfacing" },
+  { imgSrc: laserIcon,        name: "Laser Hair Reduction",          tag: "Long Lasting" },
+  { Icon: Syringe,            name: "Microneedling",                 tag: "Collagen Boost" },
+  { Icon: Activity,           name: "Microneedling Radiofrequency ( MNRF)", tag: "Skin Tightening" },
+  { Icon: Droplets,           name: "PRP/ GFC therapy",              tag: "Regenerative" },
+  { imgSrc: mediFacialIcon,   name: "Hydrafacial treatment",         tag: "Deep Hydration" },
 ];
 
 function FeaturedTreatments() {

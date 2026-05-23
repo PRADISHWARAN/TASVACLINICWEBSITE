@@ -1,4 +1,4 @@
-import { Syringe, Droplets, Sparkles, Zap, Activity, Eraser, Scissors, CircleDot, Target } from "lucide-react";
+import { Syringe, Droplets, Sparkles, Zap, Activity, Eraser, Scissors, CircleDot, Target, Hand } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import acneIcon from "@/assets/icons/Acne.jpeg";
 import chemicalPeelIcon from "@/assets/icons/Chemical Peel.jpeg";
@@ -13,21 +13,21 @@ type Service = { name: string; desc: string } & (
 );
 
 const services: Service[] = [
-  { imgSrc: acneIcon,         name: "Acne & Acne Scars",              desc: "Clinical protocols for clear skin & lasting scar reduction." },
+  { imgSrc: acneIcon,         name: "Acne and acne scars treatment",  desc: "Clinical protocols for clear skin & lasting scar reduction." },
   { imgSrc: chemicalPeelIcon, name: "Chemical Peel",                  desc: "Renewed radiance and texture with targeted exfoliation." },
   { Icon: Zap,                name: "Fractional CO2 Laser",           desc: "Precision resurfacing for scars, texture & fine lines." },
   { imgSrc: laserIcon,        name: "Laser Hair Reduction",           desc: "Smooth, long-lasting results with advanced laser." },
   { Icon: Syringe,            name: "Microneedling",                  desc: "Collagen induction for firmer, refined skin." },
-  { Icon: Activity,           name: "Microneedling RF (MNRF)",        desc: "Deep RF energy for skin tightening & rejuvenation." },
-  { Icon: Eraser,             name: "Laser Tattoo Removal",           desc: "Safe, effective ink clearance across all skin tones." },
-  { Icon: Sparkles,           name: "Laser Toning",                   desc: "Even skin tone & a healthy glow with gentle laser." },
-  { Icon: Droplets,           name: "PRP / GFC Therapy",              desc: "Growth factors for hair density & skin repair." },
+  { Icon: Activity,           name: "Microneedling Radiofrequency ( MNRF)", desc: "Deep RF energy for skin tightening & rejuvenation." },
+  { Icon: Eraser,             name: "Laser tattoo removal",           desc: "Safe, effective ink clearance across all skin tones." },
+  { Icon: Sparkles,           name: "Laser toning",                   desc: "Even skin tone & a healthy glow with gentle laser." },
+  { Icon: Droplets,           name: "PRP/ GFC therapy",               desc: "Growth factors for hair density & skin repair." },
   { imgSrc: scarIcon,         name: "Scar Revision",                  desc: "Smoother, refined skin surface treatment." },
-  { Icon: Scissors,           name: "Wart & Skin Tag Removal",        desc: "Safe, precise removal with minimal downtime." },
-  { Icon: CircleDot,          name: "Mole Removal",                   desc: "Expert assessment and safe removal." },
-  { Icon: Scissors,           name: "Nail Excision",                  desc: "Specialist nail procedure performed with care." },
-  { Icon: Target,             name: "Cyst Excision",                  desc: "Clean, precise excision under local anaesthetic." },
-  { imgSrc: mediFacialIcon,   name: "Hydrafacial Treatment",          desc: "Deep cleanse, exfoliate & hydrate in one session." },
+  { Icon: Scissors,           name: "Wart and Skin tag removal",      desc: "Safe, precise removal with minimal downtime." },
+  { Icon: CircleDot,          name: "Mole removal",                   desc: "Expert assessment and safe removal." },
+  { Icon: Hand,               name: "Nail excision",                  desc: "Specialist nail procedure performed with care." },
+  { Icon: Target,             name: "Cyst excision",                  desc: "Clean, precise excision under local anaesthetic." },
+  { imgSrc: mediFacialIcon,   name: "Hydrafacial treatment",          desc: "Deep cleanse, exfoliate & hydrate in one session." },
 ];
 
 export function Services() {
