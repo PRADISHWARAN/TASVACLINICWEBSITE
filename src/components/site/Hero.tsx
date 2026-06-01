@@ -1,4 +1,5 @@
-import heroImg from "@/assets/Main.JPG";
+import heroImgWebP from "@/assets/Main.webp";
+import heroImgFallback from "@/assets/Main_opt.jpg";
 import { buildWhatsAppLink } from "@/lib/site";
 import { ArrowRight, MessageCircle, Sparkles, Star } from "lucide-react";
 import { CountUp } from "@/components/ui/CountUp";
@@ -44,13 +45,18 @@ export function Hero() {
 
             {/* Hero image */}
             <div className="relative overflow-hidden rounded-2xl sm:rounded-[2.5rem] shadow-luxe border border-gold/20">
-              <img
-                src={heroImg}
-                alt="Tasvaa Skin and Hair Clinic — Advanced Dermatology in Bengaluru"
-                width={4032}
-                height={6048}
-                className="h-auto w-full object-contain lg:h-[clamp(420px,56vw,600px)] lg:object-cover"
-              />
+              <picture>
+                <source srcSet={heroImgWebP} type="image/webp" />
+                <img
+                  src={heroImgFallback}
+                  alt="Tasvaa Skin and Hair Clinic — Advanced Dermatology in Bengaluru"
+                  width={900}
+                  height={1350}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="w-full h-[clamp(260px,72vw,460px)] object-cover object-top lg:h-[clamp(420px,56vw,600px)] lg:object-top"
+                />
+              </picture>
               <div className="absolute inset-0 bg-gradient-to-t from-coffee/30 via-transparent to-transparent" />
 
               {/* "Consultations Open" badge — overlaid on image bottom on mobile */}
