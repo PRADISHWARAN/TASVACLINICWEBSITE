@@ -6,7 +6,7 @@ export const SITE = {
   address: "First Floor, HEGmel House, 26/A, 1st Cross Rd, KPTCL Layout, Bengaluru, Karnataka 560035",
   hours: "Mon–Thu & Sat · 11 am–8 pm  |  Sun · 10:30 am–1:30 pm  |  Fri · Closed",
   mapsEmbed:
-    "https://maps.google.com/maps?q=First+Floor,+HEGmel+House,+26%2FA,+1st+Cross+Rd,+KPTCL+Layout,+Bengaluru,+Karnataka+560035&output=embed",
+    "https://maps.google.com/maps?q=Tasvaa+Skin+and+Hair+Clinic,+KPTCL+Layout,+Bengaluru,+Karnataka&output=embed",
 };
 
 export const buildWhatsAppLink = (message: string) =>
