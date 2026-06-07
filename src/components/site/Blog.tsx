@@ -4,36 +4,39 @@ import { useRouter } from "@/lib/use-router";
 const posts = [
   {
     category: "Skin Care",
-    title: "5 Signs You Need a Dermatologist (Not a Home Remedy)",
+    title: "Before You Buy Expensive Skincare Products, Read This",
     excerpt:
-      "DIY face packs and pharmacy creams can soothe minor irritation, but some skin conditions worsen with delay. Here's when to book a professional consultation.",
+      "Good skincare does not always need expensive products. A simple routine with a gentle cleanser, moisturiser, and sunscreen — along with safe daily habits — is often enough.",
     author: "Dr. Tasvaa Team",
-    readTime: "4 min",
-    date: "May 2026",
+    readTime: "5 min",
+    date: "June 2026",
     color: "from-amber-50 to-orange-50",
     border: "border-amber-200/60",
+    slug: "/blog/affordable-skincare-simple-routine",
+  },
+  {
+    category: "Acne & Skin Health",
+    title: "Acne, Skin Changes & When Should You See a Dermatologist?",
+    excerpt:
+      "Acne can happen due to oil, hormones, dandruff, stress, and more. If it is recurring, painful, or leaving marks, early consultation can prevent long-term skin damage.",
+    author: "Dr. Tasvaa Team",
+    readTime: "7 min",
+    date: "June 2026",
+    color: "from-rose-50 to-pink-50",
+    border: "border-rose-200/60",
+    slug: "/blog/acne-treatment-skin-changes-dermatologist",
   },
   {
     category: "Hair Care",
-    title: "PRP Therapy for Hair Loss: What to Expect at Your First Session",
+    title: "Hair Fall: Causes, Myths & When to See a Dermatologist",
     excerpt:
-      "Platelet-Rich Plasma therapy is one of the most effective non-surgical treatments for hair thinning. We walk you through the full process — from blood draw to visible results.",
-    author: "Dr. Tasvaa Team",
-    readTime: "5 min",
-    date: "April 2026",
-    color: "from-rose-50 to-pink-50",
-    border: "border-rose-200/60",
-  },
-  {
-    category: "Skin Tips",
-    title: "Building a Skincare Routine for Bangalore's Climate",
-    excerpt:
-      "Bengaluru's mix of humidity, pollution, and temperature swings makes generic skincare routines fall short. Our dermatologists share what actually works.",
+      "Not all hair fall is the same. Understanding the root cause — whether hormonal, nutritional, or scalp-related — is the first step toward effective treatment.",
     author: "Dr. Tasvaa Team",
     readTime: "6 min",
-    date: "March 2026",
+    date: "Coming Soon",
     color: "from-emerald-50 to-teal-50",
     border: "border-emerald-200/60",
+    slug: "/blog",
   },
 ];
 
@@ -90,10 +93,10 @@ export function Blog() {
               </div>
 
               <button
-                onClick={() => navigate("/appointments")}
+                onClick={() => navigate(post.slug)}
                 className="mt-4 inline-flex items-center gap-1 text-xs uppercase tracking-widest text-coffee/70 hover:text-coffee transition-colors"
               >
-                Book a Consult <ArrowRight className="h-3 w-3" />
+                Read Article <ArrowRight className="h-3 w-3" />
               </button>
             </article>
           ))}

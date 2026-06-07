@@ -8,6 +8,8 @@ import { GalleryPage } from "@/pages/GalleryPage";
 import { AppointmentsPage } from "@/pages/AppointmentsPage";
 import { ContactPage } from "@/pages/ContactPage";
 import { SkinGuidePage } from "@/pages/SkinGuidePage";
+import { BlogAffordableSkincarePage } from "@/pages/BlogAffordableSkincarePage";
+import { BlogAcneSkinChangesPage } from "@/pages/BlogAcneSkinChangesPage";
 
 function renderPage(path: string) {
   switch (path) {
@@ -15,6 +17,8 @@ function renderPage(path: string) {
     case "/treatments":   return <TreatmentsPage />;
     case "/skin-guide":   return <SkinGuidePage />;
     case "/blog":         return <BlogPage />;
+    case "/blog/affordable-skincare-simple-routine": return <BlogAffordableSkincarePage />;
+    case "/blog/acne-treatment-skin-changes-dermatologist": return <BlogAcneSkinChangesPage />;
     case "/gallery":      return <GalleryPage />;
     case "/appointments": return <AppointmentsPage />;
     case "/contact":      return <ContactPage />;
