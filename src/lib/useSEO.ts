@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const BASE_URL = "https://tasvaclinicwebsite-1.onrender.com";
+const BASE_URL = "https://tasvaaskinandhairclinic.com";
 const PAGE_SCHEMA_ID = "seo-page-schema";
 
 const DEFAULTS = {

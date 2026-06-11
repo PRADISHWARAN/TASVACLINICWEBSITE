@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tasvaclinicwebsite-1.onrender.com/sitemap.xml
+Sitemap: https://tasvaaskinandhairclinic.com/sitemap.xml

@@ -9,8 +9,8 @@ const ABOUT_SCHEMA = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaclinicwebsite-1.onrender.com/" },
-    { "@type": "ListItem", position: 2, name: "About Us", item: "https://tasvaclinicwebsite-1.onrender.com/about" },
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaaskinandhairclinic.com/" },
+    { "@type": "ListItem", position: 2, name: "About Us", item: "https://tasvaaskinandhairclinic.com/about" },
   ],
 });
 

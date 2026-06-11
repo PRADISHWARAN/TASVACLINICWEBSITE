@@ -11,13 +11,13 @@ const ACNE_BLOG_SCHEMA = JSON.stringify([
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaclinicwebsite-1.onrender.com/" },
-      { "@type": "ListItem", position: 2, name: "Blog", item: "https://tasvaclinicwebsite-1.onrender.com/blog" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaaskinandhairclinic.com/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://tasvaaskinandhairclinic.com/blog" },
       {
         "@type": "ListItem",
         position: 3,
         name: "Acne, Skin Changes & When Should You See a Dermatologist?",
-        item: "https://tasvaclinicwebsite-1.onrender.com/blog/acne-treatment-skin-changes-dermatologist",
+        item: "https://tasvaaskinandhairclinic.com/blog/acne-treatment-skin-changes-dermatologist",
       },
     ],
   },
@@ -31,12 +31,12 @@ const ACNE_BLOG_SCHEMA = JSON.stringify([
     publisher: {
       "@type": "Organization",
       name: "Tasvaa Skin and Hair Clinic",
-      url: "https://tasvaclinicwebsite-1.onrender.com",
+      url: "https://tasvaaskinandhairclinic.com",
     },
     datePublished: "2026-06-01",
-    url: "https://tasvaclinicwebsite-1.onrender.com/blog/acne-treatment-skin-changes-dermatologist",
+    url: "https://tasvaaskinandhairclinic.com/blog/acne-treatment-skin-changes-dermatologist",
     mainEntityOfPage:
-      "https://tasvaclinicwebsite-1.onrender.com/blog/acne-treatment-skin-changes-dermatologist",
+      "https://tasvaaskinandhairclinic.com/blog/acne-treatment-skin-changes-dermatologist",
     keywords:
       "acne treatment Bengaluru, acne causes, dermatologist Sarjapur, skin changes, acne scars treatment, when to see dermatologist",
     articleSection: "Acne & Skin Health",
