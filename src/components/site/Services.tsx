@@ -62,7 +62,7 @@ export function Services() {
                 {/* Icon */}
                 <div className="grid h-11 w-11 sm:h-12 sm:w-12 place-items-center rounded-xl gradient-gold text-coffee shadow-soft transition-transform duration-300 group-hover:scale-110">
                   {service.imgSrc
-                    ? <img src={service.imgSrc} alt={service.name} className="h-6 w-6 sm:h-7 sm:w-7 object-contain" />
+                    ? <img src={service.imgSrc} alt={service.name} width={28} height={28} loading="lazy" className="h-6 w-6 sm:h-7 sm:w-7 object-contain" />
                     : service.Icon && <service.Icon className="h-5 w-5 icon-hover" />
                   }
                 </div>

@@ -3,6 +3,43 @@ import { useRouter } from "@/lib/use-router";
 import { SITE } from "@/lib/site";
 import { ArrowLeft, Clock, User, Calendar, MapPin, Phone } from "lucide-react";
 import { ChevronRight } from "lucide-react";
+import { useSEO } from "@/lib/useSEO";
+
+const AFFORDABLE_SKINCARE_SCHEMA = JSON.stringify([
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaclinicwebsite-1.onrender.com/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://tasvaclinicwebsite-1.onrender.com/blog" },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "Before You Buy Expensive Skincare Products, Read This",
+        item: "https://tasvaclinicwebsite-1.onrender.com/blog/affordable-skincare-simple-routine",
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: "Before You Buy Expensive Skincare Products, Read This",
+    description:
+      "Simple skincare habits can often work better than expensive products when they are chosen correctly.",
+    author: { "@type": "Organization", name: "Tasvaa Skin and Hair Clinic" },
+    publisher: {
+      "@type": "Organization",
+      name: "Tasvaa Skin and Hair Clinic",
+      url: "https://tasvaclinicwebsite-1.onrender.com",
+    },
+    datePublished: "2026-06-01",
+    url: "https://tasvaclinicwebsite-1.onrender.com/blog/affordable-skincare-simple-routine",
+    mainEntityOfPage: "https://tasvaclinicwebsite-1.onrender.com/blog/affordable-skincare-simple-routine",
+    keywords: "affordable skincare, simple skincare routine, dermatologist skincare tips, sunscreen, moisturiser",
+    articleSection: "Skin Care",
+    inLanguage: "en-IN",
+  },
+]);
 
 const tocItems = [
   { id: "section-1", label: "A Simple Routine Is Enough" },
@@ -64,6 +101,16 @@ const remediesToAvoid = [
 export function BlogAffordableSkincarePage() {
   useReveal();
   const { navigate } = useRouter();
+  useSEO({
+    title: "Affordable Skincare: Simple Routine That Works | Tasvaa Clinic Blog",
+    description:
+      "Before you spend on expensive skincare products, read this. A dermatologist-backed guide to simple, effective skincare habits that actually work.",
+    path: "/blog/affordable-skincare-simple-routine",
+    ogTitle: "Before You Buy Expensive Skincare Products, Read This",
+    ogDescription:
+      "Simple skincare habits can often work better than expensive products. A guide to building an effective, affordable routine from a Bengaluru dermatologist.",
+    schemaJson: AFFORDABLE_SKINCARE_SCHEMA,
+  });
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });

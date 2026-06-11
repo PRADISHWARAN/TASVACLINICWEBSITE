@@ -3,6 +3,16 @@ import { Services } from "@/components/site/Services";
 import { PageHero } from "@/components/site/PageHero";
 import { useReveal } from "@/hooks/use-reveal";
 import { useRouter } from "@/lib/use-router";
+import { useSEO } from "@/lib/useSEO";
+
+const TREATMENTS_SCHEMA = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaclinicwebsite-1.onrender.com/" },
+    { "@type": "ListItem", position: 2, name: "Treatments", item: "https://tasvaclinicwebsite-1.onrender.com/treatments" },
+  ],
+});
 
 function TreatmentsCtaBanner() {
   const { navigate } = useRouter();
@@ -30,6 +40,13 @@ function TreatmentsCtaBanner() {
 
 export function TreatmentsPage() {
   useReveal();
+  useSEO({
+    title: "Skin & Hair Treatments | Tasvaa Clinic | Bengaluru Dermatologist",
+    description:
+      "Explore 15 doctor-led treatments: acne, pigmentation, PRP therapy, laser hair reduction, hydra facials, chemical peels & more at Tasvaa Skin & Hair Clinic, Bengaluru.",
+    path: "/treatments",
+    schemaJson: TREATMENTS_SCHEMA,
+  });
   return (
     <div className="page-enter">
       <PageHero

@@ -47,11 +47,27 @@
     <meta name="theme-color" content="#6b4c35" />
     <meta name="msapplication-TileColor" content="#6b4c35" />
 
-    <!-- ── JSON-LD: Local Business (Clinic) ── -->
+    <!-- ── JSON-LD: WebSite ── -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": ["LocalBusiness", "MedicalBusiness"],
+      "@type": "WebSite",
+      "@id": "https://tasvaclinicwebsite-1.onrender.com/#website",
+      "name": "Tasvaa Skin and Hair Clinic",
+      "url": "https://tasvaclinicwebsite-1.onrender.com/",
+      "description": "Advanced skin and hair clinic in Sarjapur, Bengaluru offering dermatology, PRP therapy, laser treatments, hydra facials, hair restoration, acne and pigmentation treatments.",
+      "publisher": {
+        "@id": "https://tasvaclinicwebsite-1.onrender.com/#clinic"
+      },
+      "inLanguage": "en-IN"
+    }
+    </script>
+
+    <!-- ── JSON-LD: MedicalClinic (Local Business) ── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["MedicalClinic", "LocalBusiness"],
       "@id": "https://tasvaclinicwebsite-1.onrender.com/#clinic",
       "name": "Tasvaa Skin and Hair Clinic",
       "alternateName": "Tasvaa Clinic",
@@ -64,7 +80,10 @@
       "priceRange": "₹₹",
       "currenciesAccepted": "INR",
       "paymentAccepted": "Cash, Credit Card, UPI",
-      "medicalSpecialty": "Dermatology",
+      "medicalSpecialty": {
+        "@type": "MedicalSpecialty",
+        "name": "Dermatology"
+      },
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "First Floor, HEGmel House, 26/A, 1st Cross Rd, KPTCL Layout",

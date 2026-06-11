@@ -4,6 +4,45 @@ import { useRouter } from "@/lib/use-router";
 import { SITE } from "@/lib/site";
 import { ArrowLeft, Clock, User, Calendar, MapPin, Phone, Plus, Minus } from "lucide-react";
 import { ChevronRight } from "lucide-react";
+import { useSEO } from "@/lib/useSEO";
+
+const ACNE_BLOG_SCHEMA = JSON.stringify([
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://tasvaclinicwebsite-1.onrender.com/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://tasvaclinicwebsite-1.onrender.com/blog" },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "Acne, Skin Changes & When Should You See a Dermatologist?",
+        item: "https://tasvaclinicwebsite-1.onrender.com/blog/acne-treatment-skin-changes-dermatologist",
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: "Acne, Skin Changes & When Should You See a Dermatologist?",
+    description:
+      "Understand acne causes, treatment options, skin changes to watch for, and when expert care can make a difference.",
+    author: { "@type": "Organization", name: "Tasvaa Skin and Hair Clinic" },
+    publisher: {
+      "@type": "Organization",
+      name: "Tasvaa Skin and Hair Clinic",
+      url: "https://tasvaclinicwebsite-1.onrender.com",
+    },
+    datePublished: "2026-06-01",
+    url: "https://tasvaclinicwebsite-1.onrender.com/blog/acne-treatment-skin-changes-dermatologist",
+    mainEntityOfPage:
+      "https://tasvaclinicwebsite-1.onrender.com/blog/acne-treatment-skin-changes-dermatologist",
+    keywords:
+      "acne treatment Bengaluru, acne causes, dermatologist Sarjapur, skin changes, acne scars treatment, when to see dermatologist",
+    articleSection: "Acne & Skin Health",
+    inLanguage: "en-IN",
+  },
+]);
 
 const tocItems = [
   { id: "section-1", label: "Why Does Acne Happen?" },
@@ -134,6 +173,16 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export function BlogAcneSkinChangesPage() {
   useReveal();
   const { navigate } = useRouter();
+  useSEO({
+    title: "Acne, Skin Changes & When to See a Dermatologist | Tasvaa Clinic Blog",
+    description:
+      "Understand acne causes, treatment options, and unusual skin changes to watch for. Expert advice from Dr. Krithi Subhas, Dermatologist at Tasvaa Clinic, Bengaluru.",
+    path: "/blog/acne-treatment-skin-changes-dermatologist",
+    ogTitle: "Acne, Skin Changes & When Should You See a Dermatologist?",
+    ogDescription:
+      "Understand acne causes, treatment options, skin changes to watch for, and when expert care can make a difference. Tasvaa Clinic, Bengaluru.",
+    schemaJson: ACNE_BLOG_SCHEMA,
+  });
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });

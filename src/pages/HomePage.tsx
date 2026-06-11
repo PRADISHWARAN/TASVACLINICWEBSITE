@@ -5,6 +5,7 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { useReveal } from "@/hooks/use-reveal";
 import { useRouter } from "@/lib/use-router";
 import { buildWhatsAppLink } from "@/lib/site";
+import { useSEO } from "@/lib/useSEO";
 import acneIcon from "@/assets/icons/Acne.jpeg";
 import chemicalPeelIcon from "@/assets/icons/Chemical Peel.jpeg";
 import laserIcon from "@/assets/icons/Laser Hair reduction.jpeg";
@@ -62,7 +63,7 @@ function FeaturedTreatments() {
               <div className="relative">
                 <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl gradient-gold text-coffee shadow-soft mb-3 transition-transform duration-300 group-hover:scale-110">
                   {t.imgSrc
-                    ? <img src={t.imgSrc} alt={t.name} className="h-6 w-6 sm:h-7 sm:w-7 object-contain" />
+                    ? <img src={t.imgSrc} alt={t.name} width={28} height={28} loading="lazy" className="h-6 w-6 sm:h-7 sm:w-7 object-contain" />
                     : t.Icon && <t.Icon className="h-5 w-5 icon-hover" />
                   }
                 </div>
@@ -254,6 +255,15 @@ function HomeCta() {
 
 export function HomePage() {
   useReveal();
+  useSEO({
+    title: "Tasvaa Skin & Hair Clinic | Best Dermatologist in Bengaluru | Sarjapur",
+    description:
+      "Expert skin & hair treatments in Sarjapur, Bengaluru. Consult Dr. Krithi Subhas — MBBS, MD, DNB Dermatologist. Acne, pigmentation, PRP therapy, laser hair reduction, hair fall treatment & more. Book now.",
+    path: "/",
+    ogTitle: "Tasvaa Skin & Hair Clinic | Best Dermatologist in Bengaluru",
+    ogDescription:
+      "Advanced skin & hair treatments in Sarjapur, Bengaluru. Acne, PRP, laser, pigmentation, hydra facials & more — doctor-led, personalised care.",
+  });
   return (
     <div className="page-enter">
       <Hero />
