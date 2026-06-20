@@ -2,6 +2,7 @@ import { Instagram, Facebook, Youtube, Phone, Mail, MapPin } from "lucide-react"
 import { SITE } from "@/lib/site";
 import { useRouter } from "@/lib/use-router";
 import logoImg from "@/assets/Logo.jpeg";
+import { trackPhoneClick } from "@/lib/analytics";
 
 const quick = [
   { href: "/about",        label: "About Us" },
@@ -121,6 +122,7 @@ export function Footer() {
               <li>
                 <a
                   href={`tel:${SITE.phoneRaw}`}
+                  onClick={() => trackPhoneClick(SITE.phone)}
                   className="flex items-center gap-3 text-sm text-primary-foreground/65 hover:text-primary-foreground transition-colors group"
                 >
                   <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold/30 bg-gold/10">

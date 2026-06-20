@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { buildWhatsAppLink } from "@/lib/site";
-import { trackEvent } from "@/lib/analytics";
+import { trackAppointmentLead } from "@/lib/analytics";
 import {
   CalendarDays, Clock, Phone, User, MessageSquare, Sparkles, ChevronDown,
 } from "lucide-react";
@@ -68,10 +68,7 @@ export function Appointment() {
     }
     setErrors({});
     setSubmitted(true);
-    trackEvent("appointment_request", {
-      treatment: parsed.data.treatment,
-      preferred_date: parsed.data.date,
-    });
+    trackAppointmentLead();
     const msg = `New Appointment Request
 
 Name: ${parsed.data.name}

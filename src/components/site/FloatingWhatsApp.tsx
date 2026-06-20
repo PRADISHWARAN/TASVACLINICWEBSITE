@@ -1,5 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import { buildWhatsAppLink } from "@/lib/site";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 export function FloatingWhatsApp() {
   return (
@@ -8,6 +9,7 @@ export function FloatingWhatsApp() {
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"
+      onClick={trackWhatsAppClick}
       className="fixed bottom-6 right-5 sm:right-6 z-40 flex items-center gap-2.5 group"
     >
       {/* Tooltip label — visible on hover */}

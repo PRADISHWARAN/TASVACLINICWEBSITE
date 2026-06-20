@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { trackPageView } from "@/lib/analytics";
 
 const BASE_URL = "https://tasvaaskinandhairclinic.com";
 const PAGE_SCHEMA_ID = "seo-page-schema";
@@ -77,6 +78,7 @@ export function useSEO({
     const resolvedOgDesc = ogDescription ?? description;
 
     document.title = title;
+    trackPageView(path, title);
     setMetaName("description", description);
     setCanonical(canonical);
     setMetaProp("og:title", resolvedOgTitle);

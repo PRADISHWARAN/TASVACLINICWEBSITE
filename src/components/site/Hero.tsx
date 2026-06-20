@@ -4,6 +4,7 @@ import { buildWhatsAppLink } from "@/lib/site";
 import { ArrowRight, MessageCircle, Sparkles, Star } from "lucide-react";
 import { CountUp } from "@/components/ui/CountUp";
 import { useRouter } from "@/lib/use-router";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 export function Hero() {
   const { navigate } = useRouter();
@@ -126,6 +127,7 @@ export function Hero() {
                 href={buildWhatsAppLink("Hi Tasvaa, I'd like to book a consultation.")}
                 target="_blank"
                 rel="noreferrer"
+                onClick={trackWhatsAppClick}
                 className="animate-pulse-ring inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-coffee px-6 py-4 sm:py-3.5 text-sm font-medium text-primary-foreground shadow-luxe active:scale-[0.98] transition-transform"
               >
                 <MessageCircle className="h-4 w-4 shrink-0" /> Book via WhatsApp

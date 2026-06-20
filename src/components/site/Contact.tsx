@@ -1,6 +1,6 @@
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { SITE, buildWhatsAppLink } from "@/lib/site";
-import { trackEvent } from "@/lib/analytics";
+import { trackPhoneClick, trackWhatsAppClick } from "@/lib/analytics";
 
 export function Contact() {
   return (
@@ -81,7 +81,10 @@ export function Contact() {
                   href={href}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel="noreferrer"
-                  onClick={() => evName && trackEvent(evName, { label })}
+                  onClick={() => {
+                    if (evName === "click_call") trackPhoneClick(SITE.phone);
+                    else if (evName === "click_whatsapp") trackWhatsAppClick();
+                  }}
                   className="block active:scale-[0.98] transition-transform"
                 >
                   {inner}

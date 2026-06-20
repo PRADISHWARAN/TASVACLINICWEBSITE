@@ -6,6 +6,7 @@ import { useReveal } from "@/hooks/use-reveal";
 import { useRouter } from "@/lib/use-router";
 import { buildWhatsAppLink } from "@/lib/site";
 import { useSEO } from "@/lib/useSEO";
+import { trackWhatsAppClick } from "@/lib/analytics";
 import acneIcon from "@/assets/icons/Acne.jpeg";
 import chemicalPeelIcon from "@/assets/icons/Chemical Peel.jpeg";
 import laserIcon from "@/assets/icons/Laser Hair reduction.jpeg";
@@ -243,6 +244,7 @@ function HomeCta() {
             href={buildWhatsAppLink("Hi Tasvaa, I'd like to book a consultation.")}
             target="_blank"
             rel="noreferrer"
+            onClick={trackWhatsAppClick}
             className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-primary-foreground/30 px-8 py-4 text-sm text-primary-foreground hover:bg-primary-foreground/10 transition active:scale-[0.98]"
           >
             <MessageCircle className="h-4 w-4" /> Chat on WhatsApp

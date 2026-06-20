@@ -3,6 +3,7 @@ import { Menu, X, Phone, ChevronRight } from "lucide-react";
 import { SITE } from "@/lib/site";
 import { useRouter } from "@/lib/use-router";
 import logoImg from "@/assets/Logo.jpeg";
+import { trackPhoneClick } from "@/lib/analytics";
 
 const links = [
   { href: "/about",       label: "About" },
@@ -81,6 +82,7 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <a
               href={`tel:${SITE.phoneRaw}`}
+              onClick={() => trackPhoneClick(SITE.phone)}
               className="flex items-center gap-2 text-sm text-coffee/70 hover:text-coffee transition-colors"
             >
               <Phone className="h-4 w-4" /> {SITE.phone}
@@ -98,6 +100,7 @@ export function Navbar() {
             <a
               href={`tel:${SITE.phoneRaw}`}
               aria-label="Call us"
+              onClick={() => trackPhoneClick(SITE.phone)}
               className="grid h-11 w-11 place-items-center rounded-xl text-coffee hover:bg-cream transition"
             >
               <Phone className="h-5 w-5" />
@@ -159,6 +162,7 @@ export function Navbar() {
           <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 pt-4 border-t border-border/40 bg-gradient-to-t from-[#faf7f2] to-transparent space-y-3">
             <a
               href={`tel:${SITE.phoneRaw}`}
+              onClick={() => trackPhoneClick(SITE.phone)}
               className="flex items-center justify-center gap-2 w-full rounded-2xl border border-border py-4 text-sm font-medium text-coffee hover:bg-cream transition"
             >
               <Phone className="h-4 w-4 text-gold" /> {SITE.phone}
