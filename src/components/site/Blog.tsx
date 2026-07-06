@@ -27,16 +27,16 @@ const posts = [
     slug: "/blog/acne-treatment-skin-changes-dermatologist",
   },
   {
-    category: "Hair Care",
-    title: "Hair Fall: Causes, Myths & When to See a Dermatologist",
+    category: "Skin Care & Steroid Awareness",
+    title: "Is Your Fairness Cream Secretly Damaging Your Skin?",
     excerpt:
-      "Not all hair fall is the same. Understanding the root cause — whether hormonal, nutritional, or scalp-related — is the first step toward effective treatment.",
+      "A cream that gives quick results isn't always the right one. Learn why using steroid creams without medical supervision can do more harm than good.",
     author: "Dr. Tasvaa Team",
-    readTime: "6 min",
-    date: "Coming Soon",
-    color: "from-emerald-50 to-teal-50",
-    border: "border-emerald-200/60",
-    slug: "/blog",
+    readTime: "5 min",
+    date: "July 2026",
+    color: "from-violet-50 to-purple-50",
+    border: "border-violet-200/60",
+    slug: "/blog/fairness-cream-steroid-skin-awareness",
   },
 ];
 

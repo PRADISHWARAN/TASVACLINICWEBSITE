@@ -10,6 +10,7 @@ import { ContactPage } from "@/pages/ContactPage";
 import { SkinGuidePage } from "@/pages/SkinGuidePage";
 import { BlogAffordableSkincarePage } from "@/pages/BlogAffordableSkincarePage";
 import { BlogAcneSkinChangesPage } from "@/pages/BlogAcneSkinChangesPage";
+import { BlogFairnessCreamSteroidPage } from "@/pages/BlogFairnessCreamSteroidPage";
 
 function renderPage(path: string) {
   switch (path) {
@@ -19,6 +20,7 @@ function renderPage(path: string) {
     case "/blog":         return <BlogPage />;
     case "/blog/affordable-skincare-simple-routine": return <BlogAffordableSkincarePage />;
     case "/blog/acne-treatment-skin-changes-dermatologist": return <BlogAcneSkinChangesPage />;
+    case "/blog/fairness-cream-steroid-skin-awareness": return <BlogFairnessCreamSteroidPage />;
     case "/gallery":      return <GalleryPage />;
     case "/appointments": return <AppointmentsPage />;
     case "/contact":      return <ContactPage />;
