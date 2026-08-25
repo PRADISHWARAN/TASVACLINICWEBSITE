@@ -100,7 +100,7 @@
         </div>
         <div class="field">
           <label for="age">Age</label>
-          <input type="text" id="age" inputmode="numeric" placeholder="Optional">
+          <input type="text" id="age" placeholder="Auto-calculated from DOB" readonly>
         </div>
       </div>
 
@@ -138,15 +138,15 @@
       <legend>Referral & ID</legend>
       <div class="field"><label for="referred_by">Referred by</label><input type="text" id="referred_by"></div>
       <div class="field">
-        <label for="id_proof">ID proof<span class="req">*</span></label>
-        <select id="id_proof" required>
-          <option value="" disabled selected>Select</option>
+        <label for="id_proof">ID proof</label>
+        <select id="id_proof">
+          <option value="" selected>Select</option>
           <option>Aadhaar</option><option>PAN</option><option>Passport</option>
           <option>Voter ID</option><option>Driving License</option><option value="__other__">Other</option>
         </select>
         <input type="text" class="other-input" id="id_proof_other" placeholder="Please specify">
       </div>
-      <div class="field"><label for="id_number">ID number<span class="req">*</span></label><input type="text" id="id_number" required></div>
+      <div class="field"><label for="id_number">ID number</label><input type="text" id="id_number"></div>
     </fieldset>
 
     <fieldset>
@@ -174,6 +174,17 @@
   var form = document.getElementById("intake-form");
   var statusEl = document.getElementById("status");
   var submitBtn = document.getElementById("submit-btn");
+
+  document.getElementById("date_of_birth").addEventListener("input", function () {
+    var ageField = document.getElementById("age");
+    var dob = new Date(this.value + "T00:00:00");
+    if (!this.value || isNaN(dob.getTime())) { ageField.value = ""; return; }
+    var today = new Date();
+    var age = today.getFullYear() - dob.getFullYear();
+    var hadBirthdayThisYear = today.getMonth() > dob.getMonth() || (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+    if (!hadBirthdayThisYear) age--;
+    ageField.value = age >= 0 ? age : "";
+  });
 
   document.querySelectorAll("select").forEach(function (select) {
     var otherInput = document.getElementById(select.id + "_other");
@@ -252,7 +263,7 @@
         next.set("name", name);
         next.set("dob", dob);
         setTimeout(function () {
-          window.location.href = "../appointment/?" + next.toString();
+          window.location.href = "../appointment/index.html?" + next.toString();
         }, 900);
       })
       .catch(function (err) {
