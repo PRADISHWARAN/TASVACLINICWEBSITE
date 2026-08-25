@@ -192,17 +192,44 @@
   .empty { color: var(--ink-muted); font-size: 0.85rem; padding: 20px 0; text-align: center; }
 
   @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+  #login-screen {
+    max-width: 340px; margin: 0 auto; min-height: 100dvh;
+    display: flex; flex-direction: column; justify-content: center; padding: 24px;
+  }
+  #login-screen h1 { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
+  #login-screen p.sub { color: var(--ink-muted); font-size: 0.82rem; margin: 0 0 20px; }
+  #login-error {
+    display: none; background: var(--critical-soft); color: var(--critical); font-size: 0.8rem;
+    padding: 8px 12px; border-radius: 10px; margin-bottom: 12px;
+  }
+  #login-error.show { display: block; }
+  .signout {
+    background: transparent; border: none; color: var(--ink-muted); font-family: inherit;
+    font-size: 0.7rem; text-decoration: underline; cursor: pointer; padding: 0; margin-top: 3px;
+  }
 </style>
 </head>
 <body>
 
-<div id="shell">
+<div id="login-screen" style="display:none">
+  <h1>Supply Room</h1>
+  <p class="sub">Enter the staff password to continue.</p>
+  <div id="login-error"></div>
+  <form id="login-form">
+    <label class="field"><span class="fl">Password</span><input type="password" id="login-password" autocomplete="current-password" required></label>
+    <button type="submit" class="primary" id="login-submit">Continue</button>
+  </form>
+</div>
+
+<div id="shell" style="display:none">
   <header class="topbar">
     <div class="row1">
       <h1>Supply Room</h1>
       <span class="synced" id="synced-indicator"><span class="dot off" id="sync-dot"></span><span id="sync-text">Connecting&hellip;</span></span>
     </div>
     <div class="summary-strip" id="summary-strip"></div>
+    <button class="signout" id="signout-btn">Sign out</button>
   </header>
 
   <main id="view"><div class="empty">Loading stock&hellip;</div></main>
@@ -548,7 +575,51 @@
       });
   }
 
-  loadAll().then(function () { renderAll(); setupRealtime(); });
+  // ---- auth gate ----
+  // Plain shared password, not real per-user auth — the database still trusts
+  // the anon key either way, so this is a "keep casual visitors out" screen,
+  // not real access control. Change SITE_PASSWORD before deploying.
+
+  var SITE_PASSWORD = "hello@tasvaa";
+  var AUTH_STORAGE_KEY = "supplyRoomAuthed";
+
+  var loginScreen = document.getElementById("login-screen");
+  var shell = document.getElementById("shell");
+  var realtimeStarted = false;
+
+  function showApp() {
+    loginScreen.style.display = "none";
+    shell.style.display = "flex";
+    loadAll().then(function () {
+      renderAll();
+      if (!realtimeStarted) { setupRealtime(); realtimeStarted = true; }
+    });
+  }
+
+  function showLogin(message) {
+    shell.style.display = "none";
+    loginScreen.style.display = "flex";
+    var err = document.getElementById("login-error");
+    if (message) { err.textContent = message; err.classList.add("show"); }
+    else { err.classList.remove("show"); }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var password = document.getElementById("login-password").value;
+    if (password !== SITE_PASSWORD) { showLogin("Wrong password"); return; }
+    try { localStorage.setItem(AUTH_STORAGE_KEY, "1"); } catch (err) { /* private browsing etc. — still let them in this session */ }
+    showApp();
+  });
+
+  document.getElementById("signout-btn").addEventListener("click", function () {
+    try { localStorage.removeItem(AUTH_STORAGE_KEY); } catch (err) {}
+    showLogin();
+  });
+
+  var alreadyAuthed = false;
+  try { alreadyAuthed = localStorage.getItem(AUTH_STORAGE_KEY) === "1"; } catch (err) {}
+  if (alreadyAuthed) showApp(); else showLogin();
 })();
 </script>
 </body>
