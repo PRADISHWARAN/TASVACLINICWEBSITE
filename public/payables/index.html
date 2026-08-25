@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #F4F7F5;
+    --surface: #FFFFFF;
+    --surface-2: #EAF0EC;
+    --ink: #16211C;
+    --ink-muted: #5B6961;
+    --line: #DAE3DD;
+    --accent: #0E7C74;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E1F2EF;
+    --good: #2E7D4F;
+    --good-soft: #E4F4E9;
+    --warn: #966008;
+    --warn-soft: #FBF0DD;
+    --critical: #B23A2B;
+    --critical-soft: #FBE6E3;
+    --shadow: 0 1px 2px rgba(20, 30, 25, 0.06), 0 4px 16px rgba(20, 30, 25, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F1613;
+      --surface: #172420;
+      --surface-2: #1E2C27;
+      --ink: #E9F2EC;
+      --ink-muted: #93A69C;
+      --line: #2B3C35;
+      --accent: #45C3B5;
+      --accent-ink: #06201D;
+      --accent-soft: #16332E;
+      --good: #63CC88;
+      --good-soft: #163825;
+      --warn: #E7AC46;
+      --warn-soft: #3A2D14;
+      --critical: #F1786C;
+      --critical-soft: #3B1D18;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+    --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+    --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+    --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; min-height: 100dvh;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  #shell {
+    max-width: 560px; margin: 0 auto; min-height: 100dvh;
+    display: flex; flex-direction: column; background: var(--ground); position: relative;
+  }
+
+  header.topbar {
+    position: sticky; top: 0; z-index: 10; background: var(--ground);
+    border-bottom: 1px solid var(--line); padding: 14px 16px 12px;
+  }
+  header.topbar .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  header.topbar h1 { font-size: 1.05rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  header.topbar .synced { font-size: 0.7rem; color: var(--ink-muted); display: flex; align-items: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex: none; }
+  .dot.off { background: var(--ink-muted); }
+
+  .summary-strip { display: flex; gap: 8px; margin-top: 10px; }
+  .chip {
+    flex: 1; display: flex; align-items: baseline; justify-content: center; gap: 5px;
+    padding: 7px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 600;
+    color: var(--ink-muted); background: var(--surface-2); cursor: pointer; border: none; font-family: inherit;
+  }
+  .chip .n { font-family: "IBM Plex Mono", monospace; font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+  .chip.warn .n { color: var(--warn); }
+  .chip.critical .n { color: var(--critical); }
+  .chip.active { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  main { flex: 1; padding: 14px 16px 40px; overflow-y: auto; }
+
+  .segmented { display: flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 10px; }
+  .segmented button {
+    flex: 1; border: none; background: transparent; color: var(--ink-muted);
+    font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 8px 6px; border-radius: 8px; cursor: pointer;
+  }
+  .segmented button.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .filter-row select { flex: 1; min-width: 0; }
+
+  input[type="search"], input[type="password"], select {
+    font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%;
+  }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  label.field { display: block; margin-bottom: 12px; }
+  label.field span.fl {
+    display: block; font-size: 0.72rem; font-weight: 600; color: var(--ink-muted);
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; margin-bottom: 12px; }
+
+  .group-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); margin: 18px 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
+  .group-title:first-child { margin-top: 0; }
+  .group-title .count { font-family: "IBM Plex Mono", monospace; font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  .po-row { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 12px; padding: 11px 13px; margin-bottom: 8px; }
+  .po-row.overdue { border-left-color: var(--critical); }
+  .po-row.today { border-left-color: var(--warn); }
+  .po-row.week { border-left-color: var(--accent); }
+  .po-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .po-supplier { font-size: 0.92rem; font-weight: 600; line-height: 1.3; }
+  .po-amount { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.92rem; flex: none; white-space: nowrap; }
+  .po-meta { font-size: 0.74rem; color: var(--ink-muted); margin-top: 3px; }
+  .po-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px; flex-wrap: wrap; }
+
+  .pill { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 999px; flex: none; white-space: nowrap; }
+  .pill.good { color: var(--good); background: var(--good-soft); }
+  .pill.warn { color: var(--warn); background: var(--warn-soft); }
+  .pill.critical { color: var(--critical); background: var(--critical-soft); }
+  .pill.neutral { color: var(--ink-muted); background: var(--surface-2); }
+
+  .status-tag {
+    font-size: 0.68rem; font-weight: 600; color: var(--ink-muted); background: var(--surface-2);
+    padding: 2px 7px; border-radius: 6px; text-transform: capitalize;
+  }
+  .reminder-note { font-size: 0.68rem; color: var(--ink-muted); }
+
+  .empty { color: var(--ink-muted); font-size: 0.85rem; padding: 30px 0; text-align: center; }
+
+  #login-screen {
+    max-width: 340px; margin: 0 auto; min-height: 100dvh;
+    display: flex; flex-direction: column; justify-content: center; padding: 24px;
+  }
+  #login-screen h1 { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
+  #login-screen p.sub { color: var(--ink-muted); font-size: 0.82rem; margin: 0 0 20px; }
+  #login-error {
+    display: none; background: var(--critical-soft); color: var(--critical); font-size: 0.8rem;
+    padding: 8px 12px; border-radius: 10px; margin-bottom: 12px;
+  }
+  #login-error.show { display: block; }
+  button.primary {
+    width: 100%; background: var(--accent); color: var(--accent-ink); border: none; border-radius: 10px;
+    padding: 12px; font-family: inherit; font-weight: 700; font-size: 0.92rem; cursor: pointer; margin-top: 10px;
+  }
+  .signout {
+    background: transparent; border: none; color: var(--ink-muted); font-family: inherit;
+    font-size: 0.7rem; text-decoration: underline; cursor: pointer; padding: 0; margin-top: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div id="login-screen" style="display:none">
+  <h1>Payables</h1>
+  <p class="sub">Enter the staff password to continue.</p>
+  <div id="login-error"></div>
+  <form id="login-form">
+    <label class="field"><span class="fl">Password</span><input type="password" id="login-password" autocomplete="current-password" required></label>
+    <button type="submit" class="primary" id="login-submit">Continue</button>
+  </form>
+</div>
+
+<div id="shell" style="display:none">
+  <header class="topbar">
+    <div class="row1">
+      <h1>Payables</h1>
+      <span class="synced" id="synced-indicator"><span class="dot off" id="sync-dot"></span><span id="sync-text">Connecting&hellip;</span></span>
+    </div>
+    <div class="summary-strip" id="summary-strip"></div>
+    <button class="signout" id="signout-btn">Sign out</button>
+  </header>
+
+  <main id="view"><div class="empty">Loading purchase orders&hellip;</div></main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // --- Fill these in before deploying (same project as the stock dashboard) ---
+  var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
+  // -----------------------------------------------------------------------------
+
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var orders = [];
+  var view = document.getElementById("view");
+
+  var urgencyFilter = "all"; // all | overdue | today | week
+  var typeFilter = "";
+  var statusFilter = "";
+  var search = "";
+
+  function fmtMoney(n) {
+    var v = Number(n) || 0;
+    return "₹" + v.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  }
+  function fmtDate(d) {
+    if (!d) return "—";
+    var dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+  function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var due = new Date(dateStr + "T00:00:00");
+    return Math.round((due - today) / 86400000);
+  }
+  function urgencyOf(o) {
+    var d = daysUntil(o.due_date);
+    if (d === null) return "none";
+    if (d < 0) return "overdue";
+    if (d === 0) return "today";
+    if (d <= 7) return "week";
+    if (d <= 30) return "month";
+    return "later";
+  }
+  function dueLabel(o) {
+    var d = daysUntil(o.due_date);
+    if (d === null) return "No due date";
+    if (d < 0) return "Overdue by " + (-d) + " day" + (-d === 1 ? "" : "s");
+    if (d === 0) return "Due today";
+    if (d === 1) return "Due tomorrow";
+    return "Due in " + d + " days";
+  }
+
+  // ---- data ----
+
+  async function loadAll() {
+    var res = await supabaseClient
+      .from("purchase_orders")
+      .select("id,ref_no,document_number,grn_number,document_date,entry_date,supplier_name,purchase_amount,purchase_type,entered_by,medicine_status,due_date,reminder_3day_sent_at,reminder_dueday_sent_at")
+      .order("due_date", { ascending: true, nullsFirst: false });
+
+    if (res.error) {
+      console.error(res.error);
+      view.innerHTML = '<div class="empty">Failed to load purchase orders — check console</div>';
+      return;
+    }
+    orders = res.data || [];
+  }
+
+  // ---- rendering ----
+
+  function renderSummary() {
+    var overdue = 0, today = 0, week = 0;
+    orders.forEach(function (o) {
+      var u = urgencyOf(o);
+      if (u === "overdue") overdue++;
+      else if (u === "today") today++;
+      else if (u === "week") week++;
+    });
+    document.getElementById("summary-strip").innerHTML =
+      '<button class="chip critical' + (urgencyFilter === "overdue" ? " active" : "") + '" data-urgency="overdue"><span class="n">' + overdue + '</span><span>overdue</span></button>' +
+      '<button class="chip warn' + (urgencyFilter === "today" ? " active" : "") + '" data-urgency="today"><span class="n">' + today + '</span><span>today</span></button>' +
+      '<button class="chip' + (urgencyFilter === "week" ? " active" : "") + '" data-urgency="week"><span class="n">' + week + '</span><span>this week</span></button>';
+    document.querySelectorAll(".chip[data-urgency]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var u = btn.getAttribute("data-urgency");
+        urgencyFilter = urgencyFilter === u ? "all" : u;
+        render();
+      });
+    });
+  }
+
+  function distinctValues(key) {
+    var set = {};
+    orders.forEach(function (o) { if (o[key]) set[o[key]] = true; });
+    return Object.keys(set).sort();
+  }
+
+  function renderFilters() {
+    var html = '';
+    html += '<label class="field"><input type="search" id="search-input" placeholder="Search supplier, doc number, ref no&hellip;" value="' + escapeHtml(search) + '"></label>';
+    html += '<div class="segmented">';
+    [["all", "All"], ["overdue", "Overdue"], ["week", "Due soon"]].forEach(function (pair) {
+      html += '<button data-seg="' + pair[0] + '" class="' + (urgencyFilter === pair[0] ? "active" : "") + '">' + pair[1] + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="filter-row">';
+    html += '<select id="type-filter"><option value="">All types</option>';
+    distinctValues("purchase_type").forEach(function (t) { html += '<option value="' + escapeHtml(t) + '" ' + (typeFilter === t ? "selected" : "") + '>' + escapeHtml(t) + '</option>'; });
+    html += '</select>';
+    html += '<select id="status-filter"><option value="">All statuses</option>';
+    distinctValues("medicine_status").forEach(function (s) { html += '<option value="' + escapeHtml(s) + '" ' + (statusFilter === s ? "selected" : "") + '>' + escapeHtml(s) + '</option>'; });
+    html += '</select>';
+    html += '</div>';
+    return html;
+  }
+
+  function poRowHtml(o) {
+    var u = urgencyOf(o);
+    var pillCls = u === "overdue" ? "critical" : u === "today" ? "warn" : u === "week" ? "good" : "neutral";
+    var rowCls = u === "overdue" ? "overdue" : u === "today" ? "today" : u === "week" ? "week" : "";
+    var reminders = [];
+    if (o.reminder_3day_sent_at) reminders.push("3-day reminder sent");
+    if (o.reminder_dueday_sent_at) reminders.push("due-day reminder sent");
+
+    return '<div class="po-row ' + rowCls + '">' +
+      '<div class="po-top">' +
+        '<div><div class="po-supplier">' + escapeHtml(o.supplier_name) + '</div>' +
+        '<div class="po-meta">' + escapeHtml(o.document_number || o.ref_no) + (o.grn_number ? " · GRN " + escapeHtml(o.grn_number) : "") + '</div></div>' +
+        '<div class="po-amount mono">' + fmtMoney(o.purchase_amount) + '</div>' +
+      '</div>' +
+      '<div class="po-bottom">' +
+        '<span class="pill ' + pillCls + '">' + dueLabel(o) + '</span>' +
+        '<span class="status-tag">' + escapeHtml(o.purchase_type) + (o.medicine_status ? " · " + escapeHtml(o.medicine_status) : "") + '</span>' +
+      '</div>' +
+      (reminders.length ? '<div class="reminder-note" style="margin-top:6px">' + reminders.join(" · ") + '</div>' : '') +
+      '<div class="po-meta" style="margin-top:6px">Due ' + fmtDate(o.due_date) + ' · entered by ' + escapeHtml(o.entered_by) + '</div>' +
+    '</div>';
+  }
+
+  function render() {
+    renderSummary();
+
+    var q = search.trim().toLowerCase();
+    var filtered = orders.filter(function (o) {
+      if (urgencyFilter !== "all" && urgencyOf(o) !== urgencyFilter) return false;
+      if (typeFilter && o.purchase_type !== typeFilter) return false;
+      if (statusFilter && o.medicine_status !== statusFilter) return false;
+      if (q) {
+        var hay = ((o.supplier_name || "") + " " + (o.document_number || "") + " " + (o.ref_no || "") + " " + (o.grn_number || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var buckets = { overdue: [], today: [], week: [], month: [], later: [], none: [] };
+    filtered.forEach(function (o) { buckets[urgencyOf(o)].push(o); });
+
+    var labels = {
+      overdue: "Overdue", today: "Due today", week: "Due this week",
+      month: "Due this month", later: "Later", none: "No due date",
+    };
+
+    var html = renderFilters();
+
+    var any = false;
+    ["overdue", "today", "week", "month", "later", "none"].forEach(function (key) {
+      if (buckets[key].length === 0) return;
+      any = true;
+      html += '<div class="group-title">' + labels[key] + '<span class="count">' + buckets[key].length + '</span></div>';
+      buckets[key].forEach(function (o) { html += poRowHtml(o); });
+    });
+    if (!any) html += '<div class="empty">No purchase orders match your filters</div>';
+
+    view.innerHTML = html;
+    wireFilters();
+  }
+
+  function wireFilters() {
+    var s = document.getElementById("search-input");
+    if (s) s.addEventListener("input", function () {
+      search = s.value; var pos = s.selectionStart; render();
+      var el2 = document.getElementById("search-input"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-seg]").forEach(function (btn) {
+      btn.addEventListener("click", function () { urgencyFilter = btn.getAttribute("data-seg"); render(); });
+    });
+    var tf = document.getElementById("type-filter");
+    if (tf) tf.addEventListener("change", function () { typeFilter = tf.value; render(); });
+    var sf = document.getElementById("status-filter");
+    if (sf) sf.addEventListener("change", function () { statusFilter = sf.value; render(); });
+  }
+
+  // ---- realtime ----
+
+  function setupRealtime() {
+    supabaseClient.channel("payables-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "purchase_orders" }, function () { loadAll().then(render); })
+      .subscribe(function (status) {
+        var dot = document.getElementById("sync-dot"); var text = document.getElementById("sync-text");
+        if (status === "SUBSCRIBED") { dot.classList.remove("off"); text.textContent = "Live"; }
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") { dot.classList.add("off"); text.textContent = "Offline"; }
+      });
+  }
+
+  // ---- auth gate (same password/localStorage scheme as the stock dashboard;
+  // same key name so one login on either page covers both, same origin) ----
+
+  var SITE_PASSWORD = "hello@tasvaa";
+  var AUTH_STORAGE_KEY = "supplyRoomAuthed";
+
+  var loginScreen = document.getElementById("login-screen");
+  var shell = document.getElementById("shell");
+  var realtimeStarted = false;
+
+  function showApp() {
+    loginScreen.style.display = "none";
+    shell.style.display = "flex";
+    loadAll().then(function () {
+      render();
+      if (!realtimeStarted) { setupRealtime(); realtimeStarted = true; }
+    });
+  }
+
+  function showLogin(message) {
+    shell.style.display = "none";
+    loginScreen.style.display = "flex";
+    var err = document.getElementById("login-error");
+    if (message) { err.textContent = message; err.classList.add("show"); }
+    else { err.classList.remove("show"); }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var password = document.getElementById("login-password").value;
+    if (password !== SITE_PASSWORD) { showLogin("Wrong password"); return; }
+    try { localStorage.setItem(AUTH_STORAGE_KEY, "1"); } catch (err) {}
+    showApp();
+  });
+
+  document.getElementById("signout-btn").addEventListener("click", function () {
+    try { localStorage.removeItem(AUTH_STORAGE_KEY); } catch (err) {}
+    showLogin();
+  });
+
+  var alreadyAuthed = false;
+  try { alreadyAuthed = localStorage.getItem(AUTH_STORAGE_KEY) === "1"; } catch (err) {}
+  if (alreadyAuthed) showApp(); else showLogin();
+})();
+</script>
+</body>
+</html>
