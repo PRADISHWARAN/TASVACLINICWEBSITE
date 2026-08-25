@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Front Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #F4F7F5; --surface: #FFFFFF; --surface-2: #EAF0EC;
+    --ink: #16211C; --ink-muted: #5B6961; --line: #DAE3DD;
+    --accent: #0E7C74; --accent-ink: #FFFFFF; --accent-soft: #E1F2EF;
+    --good: #2E7D4F; --good-soft: #E4F4E9; --warn: #966008; --warn-soft: #FBF0DD;
+    --critical: #B23A2B; --critical-soft: #FBE6E3;
+    --shadow: 0 1px 2px rgba(20, 30, 25, 0.06), 0 4px 16px rgba(20, 30, 25, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+      --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+      --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+      --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+    --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+    --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+    --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; min-height: 100dvh;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  #shell { max-width: 620px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; background: var(--ground); position: relative; }
+
+  header.topbar { position: sticky; top: 0; z-index: 10; background: var(--ground); border-bottom: 1px solid var(--line); padding: 14px 16px 12px; }
+  header.topbar .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  header.topbar h1 { font-size: 1.05rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  header.topbar .synced { font-size: 0.7rem; color: var(--ink-muted); display: flex; align-items: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex: none; }
+  .dot.off { background: var(--ink-muted); }
+  .signout { background: transparent; border: none; color: var(--ink-muted); font-family: inherit; font-size: 0.7rem; text-decoration: underline; cursor: pointer; padding: 0; margin-top: 4px; }
+
+  .summary-strip { display: flex; gap: 8px; margin-top: 10px; }
+  .chip { flex: 1; display: flex; align-items: baseline; justify-content: center; gap: 5px; padding: 7px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; color: var(--ink-muted); background: var(--surface-2); }
+  .chip .n { font-family: "IBM Plex Mono", monospace; font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+  .chip.warn .n { color: var(--warn); }
+  .chip.critical .n { color: var(--critical); }
+
+  main { flex: 1; padding: 14px 16px 90px; overflow-y: auto; }
+
+  .segmented { display: flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 10px; }
+  .segmented button { flex: 1; border: none; background: transparent; color: var(--ink-muted); font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 8px 6px; border-radius: 8px; cursor: pointer; }
+  .segmented button.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .filter-row select { flex: 1; min-width: 0; }
+
+  input[type="search"], input[type="password"], select {
+    font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%;
+  }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  label.field { display: block; margin-bottom: 12px; }
+  label.field span.fl { display: block; font-size: 0.72rem; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+
+  .group-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); margin: 18px 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
+  .group-title:first-child { margin-top: 0; }
+  .group-title .count { font-family: "IBM Plex Mono", monospace; font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  .row-card { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 12px; padding: 12px 13px; margin-bottom: 8px; }
+  .row-card.today { border-left-color: var(--warn); }
+  .row-card.pastdue { border-left-color: var(--critical); }
+  .row-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .row-name { font-size: 0.92rem; font-weight: 600; line-height: 1.3; }
+  .row-meta { font-size: 0.76rem; color: var(--ink-muted); margin-top: 3px; line-height: 1.5; }
+  .row-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 9px; gap: 8px; flex-wrap: wrap; }
+
+  .pill { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 999px; flex: none; white-space: nowrap; }
+  .pill.good { color: var(--good); background: var(--good-soft); }
+  .pill.warn { color: var(--warn); background: var(--warn-soft); }
+  .pill.critical { color: var(--critical); background: var(--critical-soft); }
+  .pill.neutral { color: var(--ink-muted); background: var(--surface-2); }
+  .pill.accent { color: var(--accent); background: var(--accent-soft); }
+
+  .action-btn { margin-left: auto; background: var(--accent-soft); color: var(--accent); border: none; border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+  .ghost-btn { margin-left: auto; background: transparent; color: var(--ink-muted); border: 1px dashed var(--line); border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+  .link-btn { background: transparent; color: var(--accent); border: none; font-family: inherit; font-size: 0.72rem; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 0; }
+
+  details.more { margin-top: 8px; }
+  details.more summary { font-size: 0.76rem; font-weight: 600; color: var(--accent); cursor: pointer; list-style: none; }
+  details.more summary::-webkit-details-marker { display: none; }
+  details.more .body { font-size: 0.8rem; color: var(--ink); margin-top: 8px; line-height: 1.7; }
+  details.more .body b { font-weight: 600; color: var(--ink-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  details.transcript { background: var(--surface-2); border-radius: 10px; padding: 9px 12px; margin-top: 8px; }
+  details.transcript summary { font-size: 0.76rem; font-weight: 600; cursor: pointer; }
+  details.transcript .body { font-size: 0.76rem; color: var(--ink-muted); white-space: pre-wrap; margin-top: 7px; line-height: 1.5; max-height: 200px; overflow-y: auto; }
+
+  .empty { color: var(--ink-muted); font-size: 0.85rem; padding: 30px 0; text-align: center; }
+
+  #login-screen { max-width: 340px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; padding: 24px; }
+  #login-screen h1 { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
+  #login-screen p.sub { color: var(--ink-muted); font-size: 0.82rem; margin: 0 0 20px; }
+  #login-error { display: none; background: var(--critical-soft); color: var(--critical); font-size: 0.8rem; padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; }
+  #login-error.show { display: block; }
+  button.primary { width: 100%; background: var(--accent); color: var(--accent-ink); border: none; border-radius: 10px; padding: 12px; font-family: inherit; font-weight: 700; font-size: 0.92rem; cursor: pointer; margin-top: 10px; }
+
+  nav.bottomnav { position: sticky; bottom: 0; z-index: 10; display: flex; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 10px calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -2px 10px rgba(20,30,25,0.04); }
+  nav.bottomnav button { flex: 1; background: transparent; border: none; font-family: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-muted); padding: 8px 4px 6px; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  nav.bottomnav button .ic { font-size: 1.1rem; line-height: 1; }
+  nav.bottomnav button.active { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="login-screen" style="display:none">
+  <h1>Front Desk</h1>
+  <p class="sub">Enter the staff password to continue.</p>
+  <div id="login-error"></div>
+  <form id="login-form">
+    <label class="field"><span class="fl">Password</span><input type="password" id="login-password" autocomplete="current-password" required></label>
+    <button type="submit" class="primary" id="login-submit">Continue</button>
+  </form>
+</div>
+
+<div id="shell" style="display:none">
+  <header class="topbar">
+    <div class="row1">
+      <h1>Front Desk</h1>
+      <span class="synced" id="synced-indicator"><span class="dot off" id="sync-dot"></span><span id="sync-text">Connecting&hellip;</span></span>
+    </div>
+    <div class="summary-strip" id="summary-strip"></div>
+    <button class="signout" id="signout-btn">Sign out</button>
+  </header>
+
+  <main id="view"><div class="empty">Loading&hellip;</div></main>
+
+  <nav class="bottomnav">
+    <button id="nav-appts" data-tab="appointments"><span class="ic">📅</span>Appointments</button>
+    <button id="nav-patients" data-tab="patients"><span class="ic">🧾</span>New patients</button>
+  </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
+
+  var activeTab = "appointments";
+  var appts = [];
+  var patients = [];
+
+  var apptFilter = "pending";   // pending | all | handled
+  var apptTypeFilter = "";      // "" | new | existing
+  var apptSearch = "";
+
+  var patientFilter = "pending"; // pending | all | entered
+  var patientSearch = "";
+
+  var view = document.getElementById("view");
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+  function fmtDate(d) {
+    if (!d) return "—";
+    var dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  }
+  function fmtDateTime(iso) {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+    catch (e) { return ""; }
+  }
+  function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var d = new Date(dateStr + "T00:00:00");
+    return Math.round((d - today) / 86400000);
+  }
+
+  // ---------------- data ----------------
+
+  async function apiGet(path) {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
+      headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY },
+    });
+    if (!res.ok) { console.error(await res.text()); return []; }
+    return res.json();
+  }
+  async function apiPatch(table, id, body) {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/" + table + "?id=eq." + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal",
+      },
+      body: JSON.stringify(body),
+    });
+    return res.ok;
+  }
+
+  async function loadAll() {
+    var apptRes = await apiGet("appointment_submissions?select=*&order=preferred_date.asc");
+    var patientRes = await apiGet("patient_intake_queue?select=*&order=created_at.desc");
+    appts = apptRes || [];
+    patients = patientRes || [];
+  }
+
+  async function markAppt(id, handled) {
+    var o = appts.find(function (x) { return x.id === id; });
+    var prev = o ? o.handled_at : null;
+    if (o) o.handled_at = handled ? new Date().toISOString() : null;
+    render();
+    var ok = await apiPatch("appointment_submissions", id, { handled_at: handled ? new Date().toISOString() : null });
+    if (!ok && o) { o.handled_at = prev; render(); }
+  }
+  async function markPatient(id, entered) {
+    var p = patients.find(function (x) { return x.id === id; });
+    var prev = p ? p.entered_crm_at : null;
+    if (p) p.entered_crm_at = entered ? new Date().toISOString() : null;
+    render();
+    var ok = await apiPatch("patient_intake_queue", id, { entered_crm_at: entered ? new Date().toISOString() : null });
+    if (!ok && p) { p.entered_crm_at = prev; render(); }
+  }
+
+  // ---------------- appointments tab ----------------
+
+  function apptBucket(o) {
+    if (o.handled_at) return "handled";
+    var d = daysUntil(o.preferred_date);
+    if (d === null) return "later";
+    if (d < 0) return "pastdue";
+    if (d === 0) return "today";
+    if (d === 1) return "tomorrow";
+    if (d <= 7) return "week";
+    return "later";
+  }
+
+  function renderApptSummary() {
+    var pending = 0, today = 0, pastdue = 0;
+    appts.forEach(function (o) {
+      var b = apptBucket(o);
+      if (b !== "handled") pending++;
+      if (b === "today") today++;
+      if (b === "pastdue") pastdue++;
+    });
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + pending + '</span><span>pending</span></div>' +
+      '<div class="chip warn"><span class="n">' + today + '</span><span>today</span></div>' +
+      '<div class="chip critical"><span class="n">' + pastdue + '</span><span>past due</span></div>';
+  }
+
+  function apptRowHtml(o) {
+    var bucket = apptBucket(o);
+    var rowCls = bucket === "today" ? "today" : bucket === "pastdue" ? "pastdue" : "";
+    var typePill = o.patient_type === "new"
+      ? '<span class="pill accent">New</span>'
+      : '<span class="pill neutral">Existing</span>';
+    var statusPill = o.handled_at
+      ? '<span class="pill good">Booked ' + fmtDateTime(o.handled_at) + '</span>'
+      : (bucket === "pastdue" ? '<span class="pill critical">Past due</span>' : bucket === "today" ? '<span class="pill warn">Today</span>' : '');
+
+    var actionHtml = o.handled_at
+      ? '<button class="ghost-btn" data-unhandle-appt="' + o.id + '">Undo</button>'
+      : '<button class="action-btn" data-handle-appt="' + o.id + '">Mark booked in CareMap</button>';
+
+    var linkTag = o.intake_ref
+      ? '<button class="link-btn" data-jump-intake="' + o.intake_ref + '">View intake record →</button>'
+      : '';
+
+    return '<div class="row-card ' + rowCls + '">' +
+      '<div class="row-top">' +
+        '<div><div class="row-name">' + escapeHtml(o.patient_name) + ' ' + typePill + '</div>' +
+        '<div class="row-meta">' + escapeHtml(o.mobile_number) + ' · ' + fmtDate(o.preferred_date) + ', ' + escapeHtml(o.preferred_time) + '</div></div>' +
+      '</div>' +
+      (o.reason_for_visit ? '<div class="row-meta" style="margin-top:6px">' + escapeHtml(o.reason_for_visit) + '</div>' : '') +
+      '<div class="row-bottom">' + statusPill + linkTag + actionHtml + '</div>' +
+      (o.chat_transcript ? '<details class="transcript"><summary>WhatsApp transcript</summary><div class="body">' + escapeHtml(o.chat_transcript) + '</div></details>' : '') +
+    '</div>';
+  }
+
+  function renderAppointmentsTab() {
+    renderApptSummary();
+
+    var q = apptSearch.trim().toLowerCase();
+    var filtered = appts.filter(function (o) {
+      var bucket = apptBucket(o);
+      if (apptFilter === "pending" && bucket === "handled") return false;
+      if (apptFilter === "handled" && bucket !== "handled") return false;
+      if (apptTypeFilter && o.patient_type !== apptTypeFilter) return false;
+      if (q) {
+        var hay = ((o.patient_name || "") + " " + (o.mobile_number || "") + " " + (o.intake_ref || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var buckets = { pastdue: [], today: [], tomorrow: [], week: [], later: [], handled: [] };
+    filtered.forEach(function (o) { buckets[apptBucket(o)].push(o); });
+    var labels = { pastdue: "Past due", today: "Today", tomorrow: "Tomorrow", week: "This week", later: "Later", handled: "Booked" };
+
+    var html = '';
+    html += '<label class="field"><input type="search" id="appt-search" placeholder="Search name or mobile…" value="' + escapeHtml(apptSearch) + '"></label>';
+    html += '<div class="segmented">';
+    [["pending", "Pending"], ["all", "All"], ["handled", "Booked"]].forEach(function (p) {
+      html += '<button data-appt-seg="' + p[0] + '" class="' + (apptFilter === p[0] ? "active" : "") + '">' + p[1] + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="filter-row"><select id="appt-type-filter">' +
+      '<option value="">All patient types</option>' +
+      '<option value="new" ' + (apptTypeFilter === "new" ? "selected" : "") + '>New patients</option>' +
+      '<option value="existing" ' + (apptTypeFilter === "existing" ? "selected" : "") + '>Existing patients</option>' +
+      '</select></div>';
+
+    var any = false;
+    ["pastdue", "today", "tomorrow", "week", "later", "handled"].forEach(function (key) {
+      if (buckets[key].length === 0) return;
+      any = true;
+      html += '<div class="group-title">' + labels[key] + '<span class="count">' + buckets[key].length + '</span></div>';
+      buckets[key].forEach(function (o) { html += apptRowHtml(o); });
+    });
+    if (!any) html += '<div class="empty">No appointment requests match your filters</div>';
+
+    view.innerHTML = html;
+    wireAppointmentsTab();
+  }
+
+  function wireAppointmentsTab() {
+    var s = document.getElementById("appt-search");
+    if (s) s.addEventListener("input", function () {
+      apptSearch = s.value; var pos = s.selectionStart; renderAppointmentsTab();
+      var el2 = document.getElementById("appt-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-appt-seg]").forEach(function (btn) {
+      btn.addEventListener("click", function () { apptFilter = btn.getAttribute("data-appt-seg"); renderAppointmentsTab(); });
+    });
+    var tf = document.getElementById("appt-type-filter");
+    if (tf) tf.addEventListener("change", function () { apptTypeFilter = tf.value; renderAppointmentsTab(); });
+    document.querySelectorAll("[data-handle-appt]").forEach(function (btn) {
+      btn.addEventListener("click", function () { markAppt(btn.getAttribute("data-handle-appt"), true); });
+    });
+    document.querySelectorAll("[data-unhandle-appt]").forEach(function (btn) {
+      btn.addEventListener("click", function () { if (confirm("Mark this appointment request as not-yet-booked again?")) markAppt(btn.getAttribute("data-unhandle-appt"), false); });
+    });
+    document.querySelectorAll("[data-jump-intake]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        patientSearch = btn.getAttribute("data-jump-intake");
+        patientFilter = "all"; // the linked record might already be marked entered
+        activeTab = "patients";
+        render();
+      });
+    });
+  }
+
+  // ---------------- new patients tab ----------------
+
+  function renderPatientSummary() {
+    var pending = 0;
+    patients.forEach(function (p) { if (!p.entered_crm_at) pending++; });
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + patients.length + '</span><span>total</span></div>' +
+      '<div class="chip warn"><span class="n">' + pending + '</span><span>pending</span></div>' +
+      '<div class="chip good"><span class="n">' + (patients.length - pending) + '</span><span>entered</span></div>';
+  }
+
+  function patientRowHtml(p) {
+    var name = (p.name_prefix ? p.name_prefix + " " : "") + (p.patient_name || "Unnamed");
+    var statusPill = p.entered_crm_at
+      ? '<span class="pill good">Entered ' + fmtDateTime(p.entered_crm_at) + '</span>'
+      : '<span class="pill warn">Pending CRM entry</span>';
+    var actionHtml = p.entered_crm_at
+      ? '<button class="ghost-btn" data-unenter-patient="' + p.id + '">Undo</button>'
+      : '<button class="action-btn" data-enter-patient="' + p.id + '">Mark entered in CRM</button>';
+    var linkTag = p.source_row_ref
+      ? '<button class="link-btn" data-jump-appt="' + p.source_row_ref + '">View appointment →</button>'
+      : '';
+
+    var mobileLine = p.no_phone_number ? "No phone number on file" : escapeHtml(p.mobile_number || "—");
+
+    var details = '';
+    details += fieldLine("Gender / age", (p.gender || "—") + (p.age ? " · " + escapeHtml(p.age) : ""));
+    details += fieldLine("DOB", fmtDate(p.date_of_birth));
+    details += fieldLine("Alternate number", p.alternate_number);
+    details += fieldLine("Email", p.contact_emailid);
+    details += fieldLine("Address", [p.flat_house_building, p.colony_street_locality, p.pincode].filter(Boolean).map(escapeHtml).join(", "));
+    details += fieldLine("Referred by", p.referred_by);
+    details += fieldLine("ID proof", (p.id_proof || "—") + (p.id_number ? " · " + escapeHtml(p.id_number) : ""));
+    details += fieldLine("Emergency contact", [p.emergency_name, p.emergency_relationship, p.emergency_contactnumber].filter(Boolean).map(escapeHtml).join(", "));
+    details += fieldLine("Emergency email", p.emergency_emailid);
+
+    return '<div class="row-card">' +
+      '<div class="row-top"><div><div class="row-name">' + escapeHtml(name) + '</div>' +
+      '<div class="row-meta">' + mobileLine + '</div></div></div>' +
+      '<div class="row-bottom">' + statusPill + linkTag + actionHtml + '</div>' +
+      '<details class="more"><summary>Full registration details</summary><div class="body">' + details + '</div></details>' +
+    '</div>';
+  }
+
+  function fieldLine(label, value) {
+    if (!value) return "";
+    return "<div><b>" + label + "</b><br>" + value + "</div>";
+  }
+
+  function renderPatientsTab() {
+    renderPatientSummary();
+
+    var q = patientSearch.trim().toLowerCase();
+    var filtered = patients.filter(function (p) {
+      var entered = !!p.entered_crm_at;
+      if (patientFilter === "pending" && entered) return false;
+      if (patientFilter === "entered" && !entered) return false;
+      if (q) {
+        var hay = ((p.patient_name || "") + " " + (p.mobile_number || "") + " " + (p.id_number || "") + " " + (p.source_row_ref || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var html = '';
+    html += '<label class="field"><input type="search" id="patient-search" placeholder="Search name, mobile, ID number…" value="' + escapeHtml(patientSearch) + '"></label>';
+    html += '<div class="segmented">';
+    [["pending", "Pending"], ["all", "All"], ["entered", "Entered"]].forEach(function (p) {
+      html += '<button data-patient-seg="' + p[0] + '" class="' + (patientFilter === p[0] ? "active" : "") + '">' + p[1] + '</button>';
+    });
+    html += '</div>';
+
+    if (filtered.length === 0) {
+      html += '<div class="empty">No new-patient registrations match your filters</div>';
+    } else {
+      filtered.forEach(function (p) { html += patientRowHtml(p); });
+    }
+
+    view.innerHTML = html;
+    wirePatientsTab();
+  }
+
+  function wirePatientsTab() {
+    var s = document.getElementById("patient-search");
+    if (s) s.addEventListener("input", function () {
+      patientSearch = s.value; var pos = s.selectionStart; renderPatientsTab();
+      var el2 = document.getElementById("patient-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-patient-seg]").forEach(function (btn) {
+      btn.addEventListener("click", function () { patientFilter = btn.getAttribute("data-patient-seg"); renderPatientsTab(); });
+    });
+    document.querySelectorAll("[data-enter-patient]").forEach(function (btn) {
+      btn.addEventListener("click", function () { markPatient(btn.getAttribute("data-enter-patient"), true); });
+    });
+    document.querySelectorAll("[data-unenter-patient]").forEach(function (btn) {
+      btn.addEventListener("click", function () { if (confirm("Mark this patient as not-yet-entered in CRM again?")) markPatient(btn.getAttribute("data-unenter-patient"), false); });
+    });
+    document.querySelectorAll("[data-jump-appt]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        apptSearch = btn.getAttribute("data-jump-appt");
+        apptFilter = "all"; // the linked appointment might already be marked booked
+        activeTab = "appointments";
+        render();
+      });
+    });
+  }
+
+  // ---------------- top-level ----------------
+
+  function render() {
+    if (activeTab === "appointments") renderAppointmentsTab(); else renderPatientsTab();
+    document.getElementById("nav-appts").classList.toggle("active", activeTab === "appointments");
+    document.getElementById("nav-patients").classList.toggle("active", activeTab === "patients");
+  }
+
+  document.getElementById("nav-appts").addEventListener("click", function () { activeTab = "appointments"; render(); });
+  document.getElementById("nav-patients").addEventListener("click", function () { activeTab = "patients"; render(); });
+
+  function setupRealtime() {
+    var supa = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    if (!supa) return;
+    supa.channel("front-desk-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointment_submissions" }, function () { loadAll().then(render); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "patient_intake_queue" }, function () { loadAll().then(render); })
+      .subscribe(function (status) {
+        var dot = document.getElementById("sync-dot"); var text = document.getElementById("sync-text");
+        if (status === "SUBSCRIBED") { dot.classList.remove("off"); text.textContent = "Live"; }
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") { dot.classList.add("off"); text.textContent = "Offline"; }
+      });
+  }
+
+  // ---------------- auth gate ----------------
+
+  var SITE_PASSWORD = "hello@tasvaa";
+  var AUTH_STORAGE_KEY = "supplyRoomAuthed";
+
+  var loginScreen = document.getElementById("login-screen");
+  var shell = document.getElementById("shell");
+  var realtimeStarted = false;
+
+  function showApp() {
+    loginScreen.style.display = "none";
+    shell.style.display = "flex";
+    loadAll().then(function () {
+      render();
+      if (!realtimeStarted) { setupRealtime(); realtimeStarted = true; }
+    });
+  }
+  function showLogin(message) {
+    shell.style.display = "none";
+    loginScreen.style.display = "flex";
+    var err = document.getElementById("login-error");
+    if (message) { err.textContent = message; err.classList.add("show"); } else { err.classList.remove("show"); }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var password = document.getElementById("login-password").value;
+    if (password !== SITE_PASSWORD) { showLogin("Wrong password"); return; }
+    try { localStorage.setItem(AUTH_STORAGE_KEY, "1"); } catch (err) {}
+    showApp();
+  });
+  document.getElementById("signout-btn").addEventListener("click", function () {
+    try { localStorage.removeItem(AUTH_STORAGE_KEY); } catch (err) {}
+    showLogin();
+  });
+
+  var alreadyAuthed = false;
+  try { alreadyAuthed = localStorage.getItem(AUTH_STORAGE_KEY) === "1"; } catch (err) {}
+  if (alreadyAuthed) showApp(); else showLogin();
+})();
+</script>
+</body>
+</html>
