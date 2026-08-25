@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supply Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #F4F7F5;
+    --surface: #FFFFFF;
+    --surface-2: #EAF0EC;
+    --ink: #16211C;
+    --ink-muted: #5B6961;
+    --line: #DAE3DD;
+    --accent: #0E7C74;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E1F2EF;
+    --good: #2E7D4F;
+    --good-soft: #E4F4E9;
+    --warn: #966008;
+    --warn-soft: #FBF0DD;
+    --critical: #B23A2B;
+    --critical-soft: #FBE6E3;
+    --shadow: 0 1px 2px rgba(20, 30, 25, 0.06), 0 4px 16px rgba(20, 30, 25, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F1613;
+      --surface: #172420;
+      --surface-2: #1E2C27;
+      --ink: #E9F2EC;
+      --ink-muted: #93A69C;
+      --line: #2B3C35;
+      --accent: #45C3B5;
+      --accent-ink: #06201D;
+      --accent-soft: #16332E;
+      --good: #63CC88;
+      --good-soft: #163825;
+      --warn: #E7AC46;
+      --warn-soft: #3A2D14;
+      --critical: #F1786C;
+      --critical-soft: #3B1D18;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+    --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+    --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+    --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; min-height: 100dvh;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  #shell {
+    max-width: 480px; margin: 0 auto; min-height: 100dvh;
+    display: flex; flex-direction: column; background: var(--ground); position: relative;
+  }
+
+  header.topbar {
+    position: sticky; top: 0; z-index: 10; background: var(--ground);
+    border-bottom: 1px solid var(--line); padding: 14px 16px 12px;
+  }
+  header.topbar .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  header.topbar h1 { font-size: 1.05rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  header.topbar .synced { font-size: 0.7rem; color: var(--ink-muted); display: flex; align-items: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex: none; }
+  .dot.off { background: var(--ink-muted); }
+
+  .summary-strip { display: flex; gap: 8px; margin-top: 10px; }
+  .chip {
+    flex: 1; display: flex; align-items: baseline; justify-content: center; gap: 5px;
+    padding: 7px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 600;
+    color: var(--ink-muted); background: var(--surface-2);
+  }
+  .chip .n { font-family: "IBM Plex Mono", monospace; font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+  .chip.warn .n { color: var(--warn); }
+  .chip.critical .n { color: var(--critical); }
+
+  main { flex: 1; padding: 14px 16px 90px; overflow-y: auto; }
+
+  .banner { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; font-weight: 500; margin-bottom: 12px; }
+
+  .segmented { display: flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 14px; }
+  .segmented button {
+    flex: 1; border: none; background: transparent; color: var(--ink-muted);
+    font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 8px 6px; border-radius: 8px; cursor: pointer;
+  }
+  .segmented button.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+  input[type="search"], input[type="number"], input[type="text"], select {
+    font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%;
+  }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  label.field { display: block; margin-bottom: 12px; }
+  label.field span.fl {
+    display: block; font-size: 0.72rem; font-weight: 600; color: var(--ink-muted);
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; margin-bottom: 12px; }
+
+  .proc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .proc-tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; text-align: left; font-family: inherit; cursor: pointer; }
+  .proc-tile .name { font-weight: 600; font-size: 0.86rem; display: block; }
+  .proc-tile .runs { font-size: 0.7rem; color: var(--ink-muted); margin-top: 3px; display: block; }
+  .proc-tile .runs.warn { color: var(--warn); }
+  .proc-tile .runs.critical { color: var(--critical); }
+  .proc-tile.selected { border-color: var(--accent); background: var(--accent-soft); }
+
+  .bom-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
+  .bom-row:last-child { border-bottom: none; }
+  .bom-row .after { color: var(--ink-muted); font-size: 0.75rem; }
+  .bom-row .after.warn { color: var(--warn); }
+  .bom-row .after.critical { color: var(--critical); font-weight: 600; }
+
+  button.primary {
+    width: 100%; background: var(--accent); color: var(--accent-ink); border: none; border-radius: 10px;
+    padding: 12px; font-family: inherit; font-weight: 700; font-size: 0.92rem; cursor: pointer; margin-top: 10px;
+  }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.ghost {
+    width: 100%; background: transparent; color: var(--ink-muted); border: 1px dashed var(--line);
+    border-radius: 10px; padding: 10px; font-family: inherit; font-size: 0.82rem; cursor: pointer;
+  }
+
+  .qty-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .qty-actions input { flex: none; width: 64px; text-align: center; }
+  .qty-actions button {
+    flex: 1; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 10px; font-family: inherit; font-weight: 600; font-size: 0.82rem; padding: 10px 4px; cursor: pointer;
+  }
+  .qty-actions button.use { color: var(--critical); }
+  .qty-actions button.restock { color: var(--good); }
+
+  .cur-stock { display: flex; justify-content: space-between; align-items: baseline; background: var(--surface-2); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+  .cur-stock .val { font-family: "IBM Plex Mono", monospace; font-size: 1.3rem; font-weight: 600; }
+
+  .group-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); margin: 18px 0 8px; }
+  .group-title:first-child { margin-top: 0; }
+
+  .item-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; }
+  .item-row .name { font-size: 0.86rem; font-weight: 500; }
+  .item-row .unit { font-size: 0.7rem; color: var(--ink-muted); }
+  .item-row .right { display: flex; align-items: center; gap: 8px; flex: none; }
+  .item-row .qtyval { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.95rem; }
+  .pill { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 999px; flex: none; }
+  .pill.good { color: var(--good); background: var(--good-soft); }
+  .pill.warn { color: var(--warn); background: var(--warn-soft); }
+  .pill.critical { color: var(--critical); background: var(--critical-soft); }
+
+  .log-entry { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 0.8rem; }
+  .log-entry:last-child { border-bottom: none; }
+  .log-entry .lbl { color: var(--ink); }
+  .log-entry .delta { font-family: "IBM Plex Mono", monospace; font-weight: 600; flex: none; }
+  .log-entry .delta.pos { color: var(--good); }
+  .log-entry .delta.neg { color: var(--critical); }
+  .log-entry .ts { color: var(--ink-muted); font-size: 0.7rem; display: block; }
+
+  nav.bottomnav {
+    position: sticky; bottom: 0; z-index: 10; display: flex; background: var(--surface);
+    border-top: 1px solid var(--line); padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(20,30,25,0.04);
+  }
+  nav.bottomnav button {
+    flex: 1; background: transparent; border: none; font-family: inherit; font-size: 0.78rem; font-weight: 600;
+    color: var(--ink-muted); padding: 8px 4px 6px; border-radius: 10px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  nav.bottomnav button .ic { font-size: 1.1rem; line-height: 1; }
+  nav.bottomnav button.active { color: var(--accent); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--ink); color: var(--ground);
+    font-size: 0.8rem; font-weight: 500; padding: 9px 16px; border-radius: 999px; box-shadow: var(--shadow);
+    z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  .empty { color: var(--ink-muted); font-size: 0.85rem; padding: 20px 0; text-align: center; }
+
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+
+<div id="shell">
+  <header class="topbar">
+    <div class="row1">
+      <h1>Supply Room</h1>
+      <span class="synced" id="synced-indicator"><span class="dot off" id="sync-dot"></span><span id="sync-text">Connecting&hellip;</span></span>
+    </div>
+    <div class="summary-strip" id="summary-strip"></div>
+  </header>
+
+  <main id="view"><div class="empty">Loading stock&hellip;</div></main>
+
+  <nav class="bottomnav">
+    <button id="nav-log" data-tab="log"><span class="ic">＋</span>Log usage</button>
+    <button id="nav-stock" data-tab="stock"><span class="ic">▤</span>Stock</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // --- Fill these in before deploying ---
+  var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA"; // Project Settings -> API -> "anon public" key (safe client-side)
+  // ---------------------------------------
+
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var state = { items: [], procedures: [], log: [], activeTab: "stock" };
+  var view = document.getElementById("view");
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+
+  var logSubTab = "procedure";
+  var selectedProcId = null;
+  var selectedItemId = null;
+  var stockGroupBy = "category";
+  var stockSearch = "";
+
+  function itemById(id) { for (var i = 0; i < state.items.length; i++) if (state.items[i].id === id) return state.items[i]; return null; }
+  function procById(id) { for (var i = 0; i < state.procedures.length; i++) if (state.procedures[i].id === id) return state.procedures[i]; return null; }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function statusOf(item) { if (item.qty <= 0) return "critical"; if (item.qty <= item.low) return "warn"; return "good"; }
+  function statusLabel(s) { return s === "critical" ? "Out" : s === "warn" ? "Low" : "Good"; }
+  function runsRemaining(proc) {
+    var min = Infinity;
+    for (var i = 0; i < proc.consumables.length; i++) {
+      var c = proc.consumables[i]; var it = itemById(c.itemId);
+      if (!it || c.qty <= 0) continue;
+      min = Math.min(min, Math.floor(it.qty / c.qty));
+    }
+    return min === Infinity ? 0 : min;
+  }
+  function fmtTime(iso) {
+    try {
+      var d = new Date(iso); var now = new Date();
+      var sameDay = d.toDateString() === now.toDateString();
+      var time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      if (sameDay) return time;
+      return d.toLocaleDateString([], { day: "numeric", month: "short" }) + ", " + time;
+    } catch (e) { return ""; }
+  }
+  function showToast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+
+  // ---- Supabase data layer ----
+
+  async function loadAll() {
+    var itemsRes = await supabaseClient.from("stock_items").select("id,name,unit,category,qty,low_threshold").order("name");
+    var procsRes = await supabaseClient.from("stock_procedures").select("id,name,stock_procedure_consumables(item_id,qty)").order("name");
+    var logRes = await supabaseClient.from("stock_log").select("id,ts,kind,label,delta").order("ts", { ascending: false }).limit(15);
+
+    if (itemsRes.error || procsRes.error || logRes.error) {
+      console.error(itemsRes.error, procsRes.error, logRes.error);
+      showToast("Failed to load stock data — check console");
+      return;
+    }
+
+    state.items = itemsRes.data.map(function (r) { return { id: r.id, name: r.name, unit: r.unit, category: r.category, qty: r.qty, low: r.low_threshold }; });
+    state.procedures = procsRes.data.map(function (r) {
+      return { id: r.id, name: r.name, consumables: (r.stock_procedure_consumables || []).map(function (c) { return { itemId: c.item_id, qty: c.qty }; }) };
+    });
+    state.log = logRes.data.map(function (r) { return { id: r.id, ts: r.ts, kind: r.kind, label: r.label, delta: r.delta }; });
+  }
+
+  async function updateItemQty(itemId, newQty) {
+    var it = itemById(itemId);
+    if (it) it.qty = newQty; // optimistic
+    var { error } = await supabaseClient.from("stock_items").update({ qty: newQty }).eq("id", itemId);
+    if (error) { console.error(error); showToast("Failed to save — check connection"); }
+  }
+
+  async function insertLog(entry) {
+    var { data, error } = await supabaseClient.from("stock_log").insert({
+      kind: entry.kind, label: entry.label, item_id: entry.itemId || null, procedure_id: entry.procedureId || null, delta: entry.delta === undefined ? null : entry.delta,
+    }).select().single();
+    if (error) { console.error(error); return; }
+    state.log.unshift({ id: data.id, ts: data.ts, kind: data.kind, label: data.label, delta: data.delta });
+    if (state.log.length > 15) state.log.length = 15;
+  }
+
+  async function insertItem(item) {
+    var { error } = await supabaseClient.from("stock_items").insert({ id: item.id, name: item.name, unit: item.unit, category: item.category, qty: item.qty, low_threshold: item.low });
+    if (error) { console.error(error); showToast("Failed to add item — check connection"); return false; }
+    state.items.push(item);
+    return true;
+  }
+
+  // ---- rendering: summary strip ----
+
+  function renderSummary() {
+    var low = 0, out = 0;
+    state.items.forEach(function (it) { var s = statusOf(it); if (s === "warn") low++; if (s === "critical") out++; });
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + state.items.length + '</span><span>items</span></div>' +
+      '<div class="chip warn"><span class="n">' + low + '</span><span>low</span></div>' +
+      '<div class="chip critical"><span class="n">' + out + '</span><span>out</span></div>';
+  }
+
+  // ---- rendering: log tab ----
+
+  function renderLogTab() {
+    var html = '';
+    html += '<div class="segmented" role="tablist">';
+    html += '<button data-sub="procedure" class="' + (logSubTab === "procedure" ? "active" : "") + '">By procedure</button>';
+    html += '<button data-sub="individual" class="' + (logSubTab === "individual" ? "active" : "") + '">Individual item</button>';
+    html += '</div>';
+
+    if (logSubTab === "procedure") {
+      html += '<div class="proc-grid">';
+      state.procedures.forEach(function (p) {
+        var runs = runsRemaining(p);
+        var cls = runs <= 0 ? "critical" : runs <= 2 ? "warn" : "";
+        html += '<button class="proc-tile ' + (selectedProcId === p.id ? "selected" : "") + '" data-proc="' + p.id + '">' +
+          '<span class="name">' + escapeHtml(p.name) + '</span>' +
+          '<span class="runs ' + cls + '">' + (runs <= 0 ? "Out of stock" : "~" + runs + " runs left") + '</span></button>';
+      });
+      html += '</div>';
+
+      if (selectedProcId) {
+        var proc = procById(selectedProcId);
+        html += '<div class="card"><div class="group-title" style="margin-top:0">' + escapeHtml(proc.name) + ' consumables</div>';
+        var anyCritical = false;
+        proc.consumables.forEach(function (c) {
+          var it = itemById(c.itemId); if (!it) return;
+          var after = it.qty - c.qty;
+          var cls = after < 0 ? "critical" : after <= it.low ? "warn" : "";
+          if (after < 0) anyCritical = true;
+          html += '<div class="bom-row"><span>' + escapeHtml(it.name) + ' &times; ' + c.qty + '</span>' +
+            '<span class="after ' + cls + '">' + it.qty + ' &rarr; ' + after + ' ' + escapeHtml(it.unit) + '</span></div>';
+        });
+        html += '<button class="primary" id="confirm-proc">Log ' + escapeHtml(proc.name) + '</button>';
+        if (anyCritical) html += '<div class="banner" style="margin-top:10px;margin-bottom:0">This will take an item below zero &mdash; stock counts may be off. Log anyway if that\'s correct.</div>';
+        html += '</div>';
+      }
+    } else {
+      html += '<label class="field"><span class="fl">Item</span><select id="item-select"><option value="">Choose an item&hellip;</option>';
+      var byCat = {};
+      state.items.forEach(function (it) { (byCat[it.category] = byCat[it.category] || []).push(it); });
+      Object.keys(byCat).sort().forEach(function (cat) {
+        html += '<optgroup label="' + escapeHtml(cat) + '">';
+        byCat[cat].forEach(function (it) { html += '<option value="' + it.id + '" ' + (selectedItemId === it.id ? "selected" : "") + '>' + escapeHtml(it.name) + '</option>'; });
+        html += '</optgroup>';
+      });
+      html += '</select></label>';
+
+      if (selectedItemId) {
+        var item = itemById(selectedItemId);
+        if (item) {
+          html += '<div class="cur-stock"><span>Current stock</span><span class="val">' + item.qty + ' <span style="font-size:0.8rem;font-weight:400">' + escapeHtml(item.unit) + '</span></span></div>';
+          html += '<div class="qty-actions"><input type="number" id="qty-input" min="1" value="1" inputmode="numeric">';
+          html += '<button class="use" id="use-btn">&minus; Use</button><button class="restock" id="restock-btn">+ Restock</button></div>';
+          html += '<button class="ghost" id="correct-btn" style="margin-top:8px">Set exact count instead</button>';
+        }
+      }
+
+      html += '<div class="card" style="margin-top:16px"><div class="group-title" style="margin-top:0">Can\'t find an item?</div>';
+      html += '<label class="field"><span class="fl">Name</span><input type="text" id="new-item-name" placeholder="e.g. Surgical marker"></label>';
+      html += '<label class="field"><span class="fl">Category</span><select id="new-item-cat">';
+      Object.keys(byCat).sort().forEach(function (cat) { html += '<option>' + escapeHtml(cat) + '</option>'; });
+      html += '<option>Other</option></select></label>';
+      html += '<label class="field"><span class="fl">Unit</span><input type="text" id="new-item-unit" placeholder="pc, tube, bottle&hellip;" value="pc"></label>';
+      html += '<label class="field"><span class="fl">Starting quantity</span><input type="number" id="new-item-qty" min="0" value="0" inputmode="numeric"></label>';
+      html += '<button class="primary" id="add-item-btn">Add item</button></div>';
+    }
+
+    view.innerHTML = html;
+    wireLogTab();
+  }
+
+  function wireLogTab() {
+    view.querySelectorAll("[data-sub]").forEach(function (btn) {
+      btn.addEventListener("click", function () { logSubTab = btn.getAttribute("data-sub"); selectedProcId = null; selectedItemId = null; renderLogTab(); });
+    });
+
+    if (logSubTab === "procedure") {
+      view.querySelectorAll("[data-proc]").forEach(function (btn) {
+        btn.addEventListener("click", function () { var id = btn.getAttribute("data-proc"); selectedProcId = selectedProcId === id ? null : id; renderLogTab(); });
+      });
+      var confirmBtn = document.getElementById("confirm-proc");
+      if (confirmBtn) confirmBtn.addEventListener("click", async function () {
+        confirmBtn.disabled = true;
+        var proc = procById(selectedProcId);
+        for (var i = 0; i < proc.consumables.length; i++) {
+          var c = proc.consumables[i]; var it = itemById(c.itemId);
+          if (it) await updateItemQty(it.id, it.qty - c.qty);
+        }
+        await insertLog({ kind: "procedure", label: proc.name + " logged", procedureId: proc.id });
+        selectedProcId = null;
+        showToast("Saved"); renderAll();
+      });
+    } else {
+      var sel = document.getElementById("item-select");
+      if (sel) sel.addEventListener("change", function () { selectedItemId = sel.value || null; renderLogTab(); });
+      var useBtn = document.getElementById("use-btn");
+      var restockBtn = document.getElementById("restock-btn");
+      var correctBtn = document.getElementById("correct-btn");
+      var qtyInput = document.getElementById("qty-input");
+
+      if (useBtn) useBtn.addEventListener("click", async function () {
+        var n = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+        var it = itemById(selectedItemId);
+        await updateItemQty(it.id, it.qty - n);
+        await insertLog({ kind: "adjust", label: it.name + " used", delta: -n, itemId: it.id });
+        showToast("Saved"); renderAll();
+      });
+      if (restockBtn) restockBtn.addEventListener("click", async function () {
+        var n = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+        var it = itemById(selectedItemId);
+        await updateItemQty(it.id, it.qty + n);
+        await insertLog({ kind: "restock", label: it.name + " restocked", delta: n, itemId: it.id });
+        showToast("Saved"); renderAll();
+      });
+      if (correctBtn) correctBtn.addEventListener("click", async function () {
+        var it = itemById(selectedItemId);
+        var val = prompt('Set exact quantity for "' + it.name + '" (currently ' + it.qty + ' ' + it.unit + ')', it.qty);
+        if (val === null) return;
+        var n = parseInt(val, 10);
+        if (isNaN(n) || n < 0) { showToast("Enter a valid number"); return; }
+        var delta = n - it.qty;
+        await updateItemQty(it.id, n);
+        await insertLog({ kind: "adjust", label: it.name + " count corrected", delta: delta, itemId: it.id });
+        showToast("Saved"); renderAll();
+      });
+
+      var addBtn = document.getElementById("add-item-btn");
+      if (addBtn) addBtn.addEventListener("click", async function () {
+        var name = document.getElementById("new-item-name").value.trim();
+        if (!name) { showToast("Enter an item name"); return; }
+        var cat = document.getElementById("new-item-cat").value;
+        var unit = document.getElementById("new-item-unit").value.trim() || "pc";
+        var qty = Math.max(0, parseInt(document.getElementById("new-item-qty").value, 10) || 0);
+        var id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36).slice(-4);
+        var ok = await insertItem({ id: id, name: name, unit: unit, category: cat, qty: qty, low: 5 });
+        if (!ok) return;
+        await insertLog({ kind: "add", label: name + " added to catalog", delta: qty, itemId: id });
+        selectedItemId = id;
+        showToast("Saved"); renderAll();
+      });
+    }
+  }
+
+  // ---- rendering: stock tab ----
+
+  function renderStockTab() {
+    var html = '';
+    html += '<label class="field"><input type="search" id="stock-search" placeholder="Search items&hellip;" value="' + escapeHtml(stockSearch) + '"></label>';
+    html += '<div class="segmented"><button data-group="category" class="' + (stockGroupBy === "category" ? "active" : "") + '">By category</button>';
+    html += '<button data-group="procedure" class="' + (stockGroupBy === "procedure" ? "active" : "") + '">By procedure</button></div>';
+
+    var q = stockSearch.trim().toLowerCase();
+
+    if (stockGroupBy === "category") {
+      var byCat = {};
+      state.items.filter(function (it) { return !q || it.name.toLowerCase().indexOf(q) !== -1; }).forEach(function (it) { (byCat[it.category] = byCat[it.category] || []).push(it); });
+      var cats = Object.keys(byCat).sort();
+      if (cats.length === 0) html += '<div class="empty">No items match &ldquo;' + escapeHtml(stockSearch) + '&rdquo;</div>';
+      cats.forEach(function (cat) { html += '<div class="group-title">' + escapeHtml(cat) + '</div>'; byCat[cat].forEach(function (it) { html += itemRowHtml(it); }); });
+    } else {
+      var anyMatch = false;
+      state.procedures.forEach(function (proc) {
+        var rows = proc.consumables.map(function (c) { return itemById(c.itemId); }).filter(function (it) { return it && (!q || it.name.toLowerCase().indexOf(q) !== -1); });
+        if (rows.length === 0) return;
+        anyMatch = true;
+        var runs = runsRemaining(proc);
+        html += '<div class="group-title">' + escapeHtml(proc.name) + '<span style="text-transform:none;font-weight:500;color:var(--ink-muted)"> &middot; ~' + runs + ' runs left</span></div>';
+        rows.forEach(function (it) { html += itemRowHtml(it); });
+      });
+      if (!anyMatch) html += '<div class="empty">No items match &ldquo;' + escapeHtml(stockSearch) + '&rdquo;</div>';
+    }
+
+    html += '<div class="group-title">Recent activity</div><div class="card">';
+    if (state.log.length === 0) {
+      html += '<div class="empty" style="padding:8px 0">No activity logged yet</div>';
+    } else {
+      state.log.slice(0, 15).forEach(function (e) {
+        var deltaStr = e.delta === null || e.delta === undefined ? "" : '<span class="delta ' + (e.delta >= 0 ? "pos" : "neg") + '">' + (e.delta > 0 ? "+" : "") + e.delta + '</span>';
+        html += '<div class="log-entry"><span class="lbl">' + escapeHtml(e.label) + '<span class="ts">' + fmtTime(e.ts) + '</span></span>' + deltaStr + '</div>';
+      });
+    }
+    html += '</div>';
+
+    view.innerHTML = html;
+    wireStockTab();
+  }
+
+  function itemRowHtml(it) {
+    var s = statusOf(it);
+    return '<div class="item-row"><div><span class="name">' + escapeHtml(it.name) + '</span><br><span class="unit">' + escapeHtml(it.unit) + '</span></div>' +
+      '<div class="right"><span class="qtyval mono">' + it.qty + '</span><span class="pill ' + s + '">' + statusLabel(s) + '</span></div></div>';
+  }
+
+  function wireStockTab() {
+    var search = document.getElementById("stock-search");
+    if (search) search.addEventListener("input", function () {
+      stockSearch = search.value; var pos = search.selectionStart; renderStockTab();
+      var el2 = document.getElementById("stock-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    view.querySelectorAll("[data-group]").forEach(function (btn) { btn.addEventListener("click", function () { stockGroupBy = btn.getAttribute("data-group"); renderStockTab(); }); });
+  }
+
+  // ---- top-level render / nav ----
+
+  function renderAll() {
+    renderSummary();
+    if (state.activeTab === "log") renderLogTab(); else renderStockTab();
+    document.getElementById("nav-log").classList.toggle("active", state.activeTab === "log");
+    document.getElementById("nav-stock").classList.toggle("active", state.activeTab === "stock");
+  }
+
+  document.getElementById("nav-log").addEventListener("click", function () { state.activeTab = "log"; renderAll(); });
+  document.getElementById("nav-stock").addEventListener("click", function () { state.activeTab = "stock"; renderAll(); });
+
+  // ---- realtime: any other device's change refreshes this one ----
+
+  function setupRealtime() {
+    supabaseClient.channel("stock-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_items" }, function () { loadAll().then(renderAll); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_log" }, function () { loadAll().then(renderAll); })
+      .subscribe(function (status) {
+        var dot = document.getElementById("sync-dot"); var text = document.getElementById("sync-text");
+        if (status === "SUBSCRIBED") { dot.classList.remove("off"); text.textContent = "Live"; }
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") { dot.classList.add("off"); text.textContent = "Offline"; }
+      });
+  }
+
+  loadAll().then(function () { renderAll(); setupRealtime(); });
+})();
+</script>
+</body>
+</html>
