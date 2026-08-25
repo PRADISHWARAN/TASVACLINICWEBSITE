@@ -138,6 +138,14 @@
     font-size: 0.68rem; font-weight: 600; color: var(--ink-muted); background: var(--surface-2);
     padding: 2px 7px; border-radius: 6px; text-transform: capitalize;
   }
+  .pay-btn {
+    margin-left: auto; background: var(--accent-soft); color: var(--accent); border: none;
+    border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer;
+  }
+  .ghost-btn {
+    margin-left: auto; background: transparent; color: var(--ink-muted); border: 1px dashed var(--line);
+    border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  }
   .reminder-note { font-size: 0.68rem; color: var(--ink-muted); }
 
   .empty { color: var(--ink-muted); font-size: 0.85rem; padding: 30px 0; text-align: center; }
@@ -227,6 +235,7 @@
     return Math.round((due - today) / 86400000);
   }
   function urgencyOf(o) {
+    if (o.paid_at) return "paid";
     var d = daysUntil(o.due_date);
     if (d === null) return "none";
     if (d < 0) return "overdue";
@@ -249,7 +258,7 @@
   async function loadAll() {
     var res = await supabaseClient
       .from("purchase_orders")
-      .select("id,ref_no,document_number,grn_number,document_date,entry_date,supplier_name,purchase_amount,purchase_type,entered_by,medicine_status,due_date,reminder_3day_sent_at,reminder_dueday_sent_at")
+      .select("id,ref_no,document_number,grn_number,document_date,entry_date,supplier_name,purchase_amount,purchase_type,entered_by,medicine_status,due_date,reminder_3day_sent_at,reminder_dueday_sent_at,paid_at")
       .order("due_date", { ascending: true, nullsFirst: false });
 
     if (res.error) {
@@ -258,6 +267,19 @@
       return;
     }
     orders = res.data || [];
+  }
+
+  async function setPaid(id, paid) {
+    var o = orders.find(function (x) { return x.id === id; });
+    var prev = o ? o.paid_at : null;
+    if (o) o.paid_at = paid ? new Date().toISOString() : null; // optimistic
+    render();
+    var { error } = await supabaseClient.from("purchase_orders").update({ paid_at: paid ? new Date().toISOString() : null }).eq("id", id);
+    if (error) {
+      console.error(error);
+      if (o) o.paid_at = prev;
+      render();
+    }
   }
 
   // ---- rendering ----
@@ -293,7 +315,7 @@
     var html = '';
     html += '<label class="field"><input type="search" id="search-input" placeholder="Search supplier, doc number, ref no&hellip;" value="' + escapeHtml(search) + '"></label>';
     html += '<div class="segmented">';
-    [["all", "All"], ["overdue", "Overdue"], ["week", "Due soon"]].forEach(function (pair) {
+    [["all", "All"], ["overdue", "Overdue"], ["week", "Due soon"], ["paid", "Paid"]].forEach(function (pair) {
       html += '<button data-seg="' + pair[0] + '" class="' + (urgencyFilter === pair[0] ? "active" : "") + '">' + pair[1] + '</button>';
     });
     html += '</div>';
@@ -310,11 +332,16 @@
 
   function poRowHtml(o) {
     var u = urgencyOf(o);
-    var pillCls = u === "overdue" ? "critical" : u === "today" ? "warn" : u === "week" ? "good" : "neutral";
+    var pillCls = u === "paid" ? "good" : u === "overdue" ? "critical" : u === "today" ? "warn" : u === "week" ? "good" : "neutral";
     var rowCls = u === "overdue" ? "overdue" : u === "today" ? "today" : u === "week" ? "week" : "";
+    var pillLabel = u === "paid" ? "Paid " + fmtDate(o.paid_at.slice(0, 10)) : dueLabel(o);
     var reminders = [];
     if (o.reminder_3day_sent_at) reminders.push("3-day reminder sent");
     if (o.reminder_dueday_sent_at) reminders.push("due-day reminder sent");
+
+    var actionHtml = u === "paid"
+      ? '<button class="ghost-btn" data-unpaid="' + o.id + '">Undo</button>'
+      : '<button class="pay-btn" data-paid="' + o.id + '">Mark paid</button>';
 
     return '<div class="po-row ' + rowCls + '">' +
       '<div class="po-top">' +
@@ -323,8 +350,9 @@
         '<div class="po-amount mono">' + fmtMoney(o.purchase_amount) + '</div>' +
       '</div>' +
       '<div class="po-bottom">' +
-        '<span class="pill ' + pillCls + '">' + dueLabel(o) + '</span>' +
+        '<span class="pill ' + pillCls + '">' + pillLabel + '</span>' +
         '<span class="status-tag">' + escapeHtml(o.purchase_type) + (o.medicine_status ? " · " + escapeHtml(o.medicine_status) : "") + '</span>' +
+        actionHtml +
       '</div>' +
       (reminders.length ? '<div class="reminder-note" style="margin-top:6px">' + reminders.join(" · ") + '</div>' : '') +
       '<div class="po-meta" style="margin-top:6px">Due ' + fmtDate(o.due_date) + ' · entered by ' + escapeHtml(o.entered_by) + '</div>' +
@@ -346,18 +374,18 @@
       return true;
     });
 
-    var buckets = { overdue: [], today: [], week: [], month: [], later: [], none: [] };
+    var buckets = { overdue: [], today: [], week: [], month: [], later: [], none: [], paid: [] };
     filtered.forEach(function (o) { buckets[urgencyOf(o)].push(o); });
 
     var labels = {
       overdue: "Overdue", today: "Due today", week: "Due this week",
-      month: "Due this month", later: "Later", none: "No due date",
+      month: "Due this month", later: "Later", none: "No due date", paid: "Paid",
     };
 
     var html = renderFilters();
 
     var any = false;
-    ["overdue", "today", "week", "month", "later", "none"].forEach(function (key) {
+    ["overdue", "today", "week", "month", "later", "none", "paid"].forEach(function (key) {
       if (buckets[key].length === 0) return;
       any = true;
       html += '<div class="group-title">' + labels[key] + '<span class="count">' + buckets[key].length + '</span></div>';
@@ -382,6 +410,15 @@
     if (tf) tf.addEventListener("change", function () { typeFilter = tf.value; render(); });
     var sf = document.getElementById("status-filter");
     if (sf) sf.addEventListener("change", function () { statusFilter = sf.value; render(); });
+
+    document.querySelectorAll("[data-paid]").forEach(function (btn) {
+      btn.addEventListener("click", function () { setPaid(btn.getAttribute("data-paid"), true); });
+    });
+    document.querySelectorAll("[data-unpaid]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (confirm("Mark this bill as unpaid again?")) setPaid(btn.getAttribute("data-unpaid"), false);
+      });
+    });
   }
 
   // ---- realtime ----
