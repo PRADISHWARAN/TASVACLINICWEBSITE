@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book an Appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #F4F7F5; --surface: #FFFFFF; --surface-2: #EAF0EC;
+    --ink: #16211C; --ink-muted: #5B6961; --line: #DAE3DD;
+    --accent: #0E7C74; --accent-ink: #FFFFFF; --accent-soft: #E1F2EF;
+    --good: #2E7D4F; --good-soft: #E4F4E9; --warn: #966008; --warn-soft: #FBF0DD;
+    --critical: #B23A2B; --critical-soft: #FBE6E3;
+    --shadow: 0 1px 2px rgba(20, 30, 25, 0.06), 0 4px 16px rgba(20, 30, 25, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+      --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+      --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+      --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+    --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+    --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+    --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; padding: 20px 14px 60px;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  .card { max-width: 560px; margin: 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px 20px 26px; box-shadow: var(--shadow); }
+  .step { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin: 0 0 6px; }
+  h1 { font-size: 1.25rem; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .subtitle { color: var(--ink-muted); font-size: 0.85rem; margin: 0 0 18px; line-height: 1.4; }
+
+  .banner { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 13px; font-size: 0.8rem; font-weight: 500; margin-bottom: 18px; line-height: 1.4; }
+  .banner.critical { background: var(--critical-soft); color: var(--critical); }
+
+  fieldset { border: none; padding: 0; margin: 0 0 20px; }
+  legend { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); margin-bottom: 10px; padding: 0; }
+  .field { margin-bottom: 14px; }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
+  label .req { color: var(--critical); margin-left: 2px; }
+  label .opt { color: var(--ink-muted); font-weight: 400; font-size: 0.78rem; margin-left: 4px; }
+  input[type="text"], input[type="tel"], input[type="date"], select, textarea {
+    width: 100%; padding: 10px 11px; border: 1px solid var(--line); border-radius: 9px;
+    font-size: 0.92rem; font-family: inherit; background: var(--surface); color: var(--ink);
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+
+  .hint { font-size: 0.76rem; color: var(--ink-muted); margin-top: 5px; }
+
+  details.transcript { background: var(--surface-2); border-radius: 10px; padding: 10px 13px; margin-bottom: 18px; }
+  details.transcript summary { font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink); }
+  details.transcript .body { font-size: 0.78rem; color: var(--ink-muted); white-space: pre-wrap; margin-top: 8px; line-height: 1.5; max-height: 220px; overflow-y: auto; }
+
+  button {
+    width: 100%; padding: 13px; border: none; border-radius: 10px; background: var(--accent);
+    color: var(--accent-ink); font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 6px;
+  }
+  button:disabled { background: var(--ink-muted); cursor: not-allowed; }
+  .status { margin-top: 16px; padding: 12px 14px; border-radius: 10px; font-size: 0.85rem; display: none; line-height: 1.4; }
+  .status.error { display: block; background: var(--critical-soft); color: var(--critical); }
+  .status.success { display: block; background: var(--good-soft); color: var(--good); }
+  .status.loading { display: block; background: var(--surface-2); color: var(--ink-muted); }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <div id="loading-state" class="status loading" style="display:block">Loading your details…</div>
+  <div id="form-wrap" style="display:none">
+    <p class="step" id="step-label">Step 1 of 1</p>
+    <h1>Book an Appointment</h1>
+    <p class="subtitle">Pick a preferred date and time. This is a request, not a confirmed slot — our team will confirm availability with you directly.</p>
+
+    <div class="banner" id="clash-banner" style="display:none"></div>
+
+    <form id="appt-form" novalidate>
+      <fieldset>
+        <legend>Patient</legend>
+        <div class="field"><label for="patient_name">Full name<span class="req">*</span></label><input type="text" id="patient_name" required></div>
+        <div class="row2">
+          <div class="field"><label for="dob">Date of birth</label><input type="date" id="dob"></div>
+          <div class="field"><label for="mobile_number">Mobile number<span class="req">*</span></label><input type="tel" id="mobile_number" required></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Preferred time</legend>
+        <div class="field">
+          <label for="preferred_date">Date<span class="req">*</span></label>
+          <input type="date" id="preferred_date" required>
+          <div class="hint" id="date-hint">Clinic hours: Mon, Tue, Thu, Fri, Sat 11 AM–8 PM · Sun 10:30 AM–1:30 PM · Closed Wednesdays</div>
+        </div>
+        <div class="field">
+          <label for="preferred_time">Time<span class="req">*</span></label>
+          <select id="preferred_time" required disabled><option value="">Pick a date first</option></select>
+        </div>
+        <div class="field">
+          <label for="reason">What's this visit for? <span class="opt">optional</span></label>
+          <textarea id="reason" placeholder="e.g. GFC follow-up, keloid injection"></textarea>
+        </div>
+      </fieldset>
+
+      <details class="transcript" id="transcript-block" style="display:none">
+        <summary>What we discussed on WhatsApp</summary>
+        <div class="body" id="transcript-body"></div>
+      </details>
+
+      <button type="submit" id="submit-btn">Request this appointment</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function () {
+  var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
+
+  // day-of-week (0=Sun...6=Sat) -> {open,close} in 24h "HH:MM", or null if closed
+  var HOURS = {
+    0: { open: "10:30", close: "13:30" },
+    1: { open: "11:00", close: "20:00" },
+    2: { open: "11:00", close: "20:00" },
+    3: null,
+    4: { open: "11:00", close: "20:00" },
+    5: { open: "11:00", close: "20:00" },
+    6: { open: "11:00", close: "20:00" },
+  };
+  var SLOT_MINUTES = 30;
+
+  var params = new URLSearchParams(window.location.search);
+  var ref = params.get("ref") || "";
+  var urlName = params.get("name") || "";
+  var urlDob = params.get("dob") || "";
+
+  var prefill = null; // appointment_prefill row, once fetched
+
+  function fmtTimeLabel(hhmm) {
+    var parts = hhmm.split(":"); var h = parseInt(parts[0], 10); var m = parts[1];
+    var ampm = h >= 12 ? "PM" : "AM";
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ":" + m + " " + ampm;
+  }
+
+  function populateTimeSlots(dateStr) {
+    var select = document.getElementById("preferred_time");
+    select.innerHTML = "";
+    if (!dateStr) { select.disabled = true; select.innerHTML = '<option value="">Pick a date first</option>'; return; }
+
+    var d = new Date(dateStr + "T00:00:00");
+    var day = d.getDay();
+    var hours = HOURS[day];
+
+    if (!hours) {
+      select.disabled = true;
+      select.innerHTML = '<option value="">Closed this day</option>';
+      return;
+    }
+
+    select.disabled = false;
+    var opts = ['<option value="" disabled selected>Choose a time</option>'];
+    var start = hours.open.split(":").map(Number);
+    var end = hours.close.split(":").map(Number);
+    var cur = start[0] * 60 + start[1];
+    var endMin = end[0] * 60 + end[1];
+    while (cur + SLOT_MINUTES <= endMin) {
+      var h1 = Math.floor(cur / 60), m1 = cur % 60;
+      var next = cur + SLOT_MINUTES;
+      var h2 = Math.floor(next / 60), m2 = next % 60;
+      var hhmm1 = (h1 < 10 ? "0" : "") + h1 + ":" + (m1 < 10 ? "0" : "") + m1;
+      var hhmm2 = (h2 < 10 ? "0" : "") + h2 + ":" + (m2 < 10 ? "0" : "") + m2;
+      var label = fmtTimeLabel(hhmm1) + " – " + fmtTimeLabel(hhmm2);
+      opts.push('<option value="' + label + '">' + label + "</option>");
+      cur = next;
+    }
+    select.innerHTML = opts.join("");
+  }
+
+  // Converts "11:00 AM" / "1:30 PM" -> "11:00" / "13:30" (24h, for building an ISO timestamp)
+  function to24Hour(label) {
+    var m = label.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!m) return null;
+    var h = parseInt(m[1], 10); var min = m[2]; var ampm = m[3].toUpperCase();
+    if (ampm === "PM" && h !== 12) h += 12;
+    if (ampm === "AM" && h === 12) h = 0;
+    return (h < 10 ? "0" : "") + h + ":" + min;
+  }
+
+  // booked_appointments stores start_at/end_at as timestamptz (UTC). The
+  // clinic is IST (UTC+5:30), so the slot's local wall-clock time is
+  // converted to an explicit +05:30 offset before comparing — this way it's
+  // correct regardless of the browser's own timezone.
+  async function checkClash(dateStr, timeLabel) {
+    var parts = timeLabel.split("–").map(function (s) { return s.trim(); });
+    var startHHMM = to24Hour(parts[0]);
+    var endHHMM = to24Hour(parts[1]);
+    if (!startHHMM || !endHHMM) return { clash: false };
+
+    var startIso = dateStr + "T" + startHHMM + ":00+05:30";
+    var endIso = dateStr + "T" + endHHMM + ":00+05:30";
+
+    try {
+      var url = SUPABASE_URL + "/rest/v1/booked_appointments?select=id"
+        + "&start_at=lt." + encodeURIComponent(endIso)
+        + "&end_at=gt." + encodeURIComponent(startIso);
+      var res = await fetch(url, { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY } });
+      if (!res.ok) { console.error("Clash check failed:", res.status, await res.text()); return { clash: false }; }
+      var rows = await res.json();
+      return { clash: rows.length > 0 };
+    } catch (err) {
+      console.error("Clash check failed:", err);
+      return { clash: false }; // fail open — never block submission on a network hiccup
+    }
+  }
+
+  var dateInput = document.getElementById("preferred_date");
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  dateInput.min = today.toISOString().slice(0, 10);
+
+  dateInput.addEventListener("change", async function () {
+    var d = new Date(dateInput.value + "T00:00:00");
+    var banner = document.getElementById("clash-banner");
+    if (HOURS[d.getDay()] === null) {
+      banner.className = "banner critical";
+      banner.style.display = "block";
+      banner.textContent = "The clinic is closed on Wednesdays — please pick another day.";
+      dateInput.value = "";
+      populateTimeSlots("");
+      return;
+    }
+    banner.style.display = "none";
+    populateTimeSlots(dateInput.value);
+  });
+
+  document.getElementById("preferred_time").addEventListener("change", async function () {
+    var timeSelect = this;
+    var banner = document.getElementById("clash-banner");
+    if (!dateInput.value || !timeSelect.value) return;
+    var result = await checkClash(dateInput.value, timeSelect.value);
+    if (result.clash) {
+      banner.className = "banner critical";
+      banner.style.display = "block";
+      banner.textContent = "That slot looks taken — pick another time, or submit anyway and our team will find you the closest available slot.";
+    } else {
+      banner.style.display = "none";
+    }
+  });
+
+  function fmtTranscriptTs(iso) {
+    try { return new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+    catch (e) { return ""; }
+  }
+
+  async function loadPrefill() {
+    if (!ref) return;
+    var res = await fetch(
+      SUPABASE_URL + "/rest/v1/appointment_prefill?id=eq." + encodeURIComponent(ref) + "&select=*",
+      { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY } }
+    );
+    if (!res.ok) return;
+    var rows = await res.json();
+    if (rows && rows[0]) prefill = rows[0];
+  }
+
+  function init() {
+    document.getElementById("patient_name").value = urlName || (prefill && prefill.name) || "";
+    document.getElementById("dob").value = urlDob || (prefill && prefill.dob) || "";
+    document.getElementById("mobile_number").value = (prefill && prefill.mobile_number) || "";
+
+    if (prefill && prefill.chat_transcript) {
+      document.getElementById("transcript-block").style.display = "block";
+      document.getElementById("transcript-body").textContent = prefill.chat_transcript;
+    }
+
+    document.getElementById("loading-state").style.display = "none";
+    document.getElementById("form-wrap").style.display = "block";
+  }
+
+  var form = document.getElementById("appt-form");
+  var statusEl = document.getElementById("status");
+  var submitBtn = document.getElementById("submit-btn");
+
+  function setStatus(kind, message) {
+    statusEl.className = "status " + kind;
+    statusEl.textContent = message;
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+
+    var timeVal = document.getElementById("preferred_time").value;
+    if (!timeVal) { setStatus("error", "Please choose a time."); return; }
+
+    var row = {
+      patient_type: (prefill && prefill.patient_type) || (urlName ? "new" : "existing"),
+      patient_name: document.getElementById("patient_name").value.trim(),
+      dob: document.getElementById("dob").value || null,
+      mobile_number: document.getElementById("mobile_number").value.trim(),
+      preferred_date: document.getElementById("preferred_date").value,
+      preferred_time: timeVal,
+      reason_for_visit: document.getElementById("reason").value.trim() || null,
+      chat_transcript: (prefill && prefill.chat_transcript) || "",
+      intake_ref: ref || null,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+    statusEl.className = "status";
+
+    try {
+      var res = await fetch(SUPABASE_URL + "/rest/v1/appointment_submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Prefer": "return=minimal",
+        },
+        body: JSON.stringify(row),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status + ": " + (await res.text()));
+
+      setStatus("success", "Request received! Our team will confirm your exact appointment slot by WhatsApp or phone shortly.");
+      form.querySelectorAll("input, select, textarea, button").forEach(function (el) { el.disabled = true; });
+    } catch (err) {
+      console.error("Appointment submission failed:", err);
+      setStatus("error", "Something went wrong submitting this. Please try again, or message us directly.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Request this appointment";
+    }
+  });
+
+  loadPrefill().then(init);
+})();
+</script>
+</body>
+</html>
