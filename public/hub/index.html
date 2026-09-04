@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Front Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #F4F7F5; --surface: #FFFFFF; --surface-2: #EAF0EC;
+    --ink: #16211C; --ink-muted: #5B6961; --line: #DAE3DD;
+    --accent: #0E7C74; --accent-ink: #FFFFFF; --accent-soft: #E1F2EF;
+    --good: #2E7D4F; --good-soft: #E4F4E9; --warn: #966008; --warn-soft: #FBF0DD;
+    --critical: #B23A2B; --critical-soft: #FBE6E3;
+    --shadow: 0 1px 2px rgba(20, 30, 25, 0.06), 0 4px 16px rgba(20, 30, 25, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+      --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+      --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+      --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F1613; --surface: #172420; --surface-2: #1E2C27; --ink: #E9F2EC;
+    --ink-muted: #93A69C; --line: #2B3C35; --accent: #45C3B5; --accent-ink: #06201D;
+    --accent-soft: #16332E; --good: #63CC88; --good-soft: #163825; --warn: #E7AC46;
+    --warn-soft: #3A2D14; --critical: #F1786C; --critical-soft: #3B1D18;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; min-height: 100dvh;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---- shell / responsive nav ---- */
+  .app-shell { display: flex; flex-direction: column; min-height: 100dvh; }
+  .sidebar { display: none; }
+  .content-col { flex: 1; display: flex; flex-direction: column; min-height: 100dvh; }
+
+  header.topbar { position: sticky; top: 0; z-index: 10; background: var(--ground); border-bottom: 1px solid var(--line); padding: 14px 16px 12px; }
+  header.topbar .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  header.topbar h1 { font-size: 1.05rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  header.topbar .synced { font-size: 0.7rem; color: var(--ink-muted); display: flex; align-items: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex: none; }
+  .dot.off { background: var(--ink-muted); }
+  .signout { background: transparent; border: none; color: var(--ink-muted); font-family: inherit; font-size: 0.7rem; text-decoration: underline; cursor: pointer; padding: 0; margin-top: 4px; }
+
+  .summary-strip { display: flex; gap: 8px; margin-top: 10px; }
+  .chip { flex: 1; display: flex; align-items: baseline; justify-content: center; gap: 5px; padding: 7px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; color: var(--ink-muted); background: var(--surface-2); cursor: pointer; border: none; font-family: inherit; }
+  .chip .n { font-family: "IBM Plex Mono", monospace; font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+  .chip.warn .n { color: var(--warn); }
+  .chip.critical .n { color: var(--critical); }
+  .chip.active { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  main { flex: 1; padding: 14px 16px 90px; overflow-y: auto; max-width: 680px; margin: 0 auto; width: 100%; }
+  header.topbar { max-width: 680px; margin: 0 auto; width: 100%; }
+  #shell.wide-view main, #shell.wide-view header.topbar { max-width: 960px; }
+
+  nav.bottomnav { position: sticky; bottom: 0; z-index: 10; display: flex; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -2px 10px rgba(20,30,25,0.04); }
+  nav.bottomnav button { flex: 1; background: transparent; border: none; font-family: inherit; font-size: 0.68rem; font-weight: 600; color: var(--ink-muted); padding: 7px 2px 5px; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  nav.bottomnav button .ic { font-size: 1.05rem; line-height: 1; }
+  nav.bottomnav button.active { color: var(--accent); }
+
+  @media (min-width: 860px) {
+    .app-shell { flex-direction: row; }
+    .sidebar {
+      display: flex; flex-direction: column; width: 220px; flex: none;
+      background: var(--surface); border-right: 1px solid var(--line); padding: 20px 12px;
+      position: sticky; top: 0; height: 100dvh; align-self: flex-start;
+    }
+    .sidebar-brand { font-weight: 700; font-size: 1.05rem; padding: 0 10px 20px; letter-spacing: -0.01em; }
+    .side-nav { display: flex; flex-direction: column; gap: 3px; }
+    .side-link {
+      display: flex; align-items: center; gap: 10px; text-align: left; background: transparent; border: none;
+      color: var(--ink-muted); font-family: inherit; font-size: 0.88rem; font-weight: 600; padding: 10px 12px;
+      border-radius: 10px; cursor: pointer;
+    }
+    .side-link .ic { font-size: 1.05rem; }
+    .side-link.active { background: var(--accent-soft); color: var(--accent); }
+    nav.bottomnav { display: none; }
+    main { padding-bottom: 40px; }
+  }
+
+  /* ---- shared form/list primitives ---- */
+  .segmented { display: flex; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 10px; }
+  .segmented button { flex: 1; border: none; background: transparent; color: var(--ink-muted); font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 8px 6px; border-radius: 8px; cursor: pointer; }
+  .segmented button.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .filter-row select { flex: 1; min-width: 0; }
+
+  input[type="search"], input[type="number"], input[type="text"], input[type="password"], select, textarea {
+    font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  label.field { display: block; margin-bottom: 12px; }
+  label.field span.fl { display: block; font-size: 0.72rem; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; margin-bottom: 12px; }
+  .banner { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; font-weight: 500; margin-bottom: 12px; }
+
+  .group-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); margin: 18px 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
+  .group-title:first-child { margin-top: 0; }
+  .group-title .count { font-family: "IBM Plex Mono", monospace; font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  button.primary { width: 100%; background: var(--accent); color: var(--accent-ink); border: none; border-radius: 10px; padding: 12px; font-family: inherit; font-weight: 700; font-size: 0.92rem; cursor: pointer; margin-top: 10px; }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.ghost { width: 100%; background: transparent; color: var(--ink-muted); border: 1px dashed var(--line); border-radius: 10px; padding: 10px; font-family: inherit; font-size: 0.82rem; cursor: pointer; }
+
+  .pill { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 999px; flex: none; white-space: nowrap; }
+  .pill.good { color: var(--good); background: var(--good-soft); }
+  .pill.warn { color: var(--warn); background: var(--warn-soft); }
+  .pill.critical { color: var(--critical); background: var(--critical-soft); }
+  .pill.neutral { color: var(--ink-muted); background: var(--surface-2); }
+  .pill.accent { color: var(--accent); background: var(--accent-soft); }
+
+  .action-btn, .pay-btn { margin-left: auto; background: var(--accent-soft); color: var(--accent); border: none; border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+  .ghost-btn { margin-left: auto; background: transparent; color: var(--ink-muted); border: 1px dashed var(--line); border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+  .link-btn { background: transparent; color: var(--accent); border: none; font-family: inherit; font-size: 0.72rem; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 0; }
+
+  .empty { color: var(--ink-muted); font-size: 0.85rem; padding: 30px 0; text-align: center; }
+
+  .toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--ink); color: var(--ground); font-size: 0.8rem; font-weight: 500; padding: 9px 16px; border-radius: 999px; box-shadow: var(--shadow); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+  /* ---- stock pane ---- */
+  .proc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .proc-tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; text-align: left; font-family: inherit; cursor: pointer; }
+  .proc-tile .name { font-weight: 600; font-size: 0.86rem; display: block; }
+  .proc-tile .runs { font-size: 0.7rem; color: var(--ink-muted); margin-top: 3px; display: block; }
+  .proc-tile .runs.warn { color: var(--warn); }
+  .proc-tile .runs.critical { color: var(--critical); }
+  .proc-tile.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .bom-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
+  .bom-row:last-child { border-bottom: none; }
+  .bom-row .after { color: var(--ink-muted); font-size: 0.75rem; }
+  .bom-row .after.warn { color: var(--warn); }
+  .bom-row .after.critical { color: var(--critical); font-weight: 600; }
+  .qty-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .qty-actions input { flex: none; width: 64px; text-align: center; }
+  .qty-actions button { flex: 1; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; font-family: inherit; font-weight: 600; font-size: 0.82rem; padding: 10px 4px; cursor: pointer; }
+  .qty-actions button.use { color: var(--critical); }
+  .qty-actions button.restock { color: var(--good); }
+  .cur-stock { display: flex; justify-content: space-between; align-items: baseline; background: var(--surface-2); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+  .cur-stock .val { font-family: "IBM Plex Mono", monospace; font-size: 1.3rem; font-weight: 600; }
+  .item-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; }
+  .item-row .name { font-size: 0.86rem; font-weight: 500; }
+  .item-row .unit { font-size: 0.7rem; color: var(--ink-muted); }
+  .item-row .right { display: flex; align-items: center; gap: 8px; flex: none; }
+  .item-row .qtyval { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.95rem; }
+  .log-entry { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 0.8rem; }
+  .log-entry:last-child { border-bottom: none; }
+  .log-entry .delta { font-family: "IBM Plex Mono", monospace; font-weight: 600; flex: none; }
+  .log-entry .delta.pos { color: var(--good); }
+  .log-entry .delta.neg { color: var(--critical); }
+  .log-entry .ts { color: var(--ink-muted); font-size: 0.7rem; display: block; }
+
+  /* ---- payables pane ---- */
+  .po-row { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 12px; padding: 11px 13px; margin-bottom: 8px; }
+  .po-row.overdue { border-left-color: var(--critical); }
+  .po-row.today { border-left-color: var(--warn); }
+  .po-row.week { border-left-color: var(--accent); }
+  .po-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .po-supplier { font-size: 0.92rem; font-weight: 600; line-height: 1.3; }
+  .po-amount { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.92rem; flex: none; white-space: nowrap; }
+  .po-meta { font-size: 0.74rem; color: var(--ink-muted); margin-top: 3px; }
+  .po-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px; flex-wrap: wrap; }
+  .status-tag { font-size: 0.68rem; font-weight: 600; color: var(--ink-muted); background: var(--surface-2); padding: 2px 7px; border-radius: 6px; text-transform: capitalize; }
+  .reminder-note { font-size: 0.68rem; color: var(--ink-muted); }
+
+  /* ---- appointments / patients / conversations panes ---- */
+  .row-card { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 12px; padding: 12px 13px; margin-bottom: 8px; }
+  .row-card.today { border-left-color: var(--warn); }
+  .row-card.pastdue { border-left-color: var(--critical); }
+  .row-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .row-name { font-size: 0.92rem; font-weight: 600; line-height: 1.3; }
+  .row-meta { font-size: 0.76rem; color: var(--ink-muted); margin-top: 3px; line-height: 1.5; }
+  .row-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 9px; gap: 8px; flex-wrap: wrap; }
+
+  details.more { margin-top: 8px; }
+  details.more summary { font-size: 0.76rem; font-weight: 600; color: var(--accent); cursor: pointer; list-style: none; }
+  details.more summary::-webkit-details-marker { display: none; }
+  details.more .body { font-size: 0.8rem; color: var(--ink); margin-top: 8px; line-height: 1.7; }
+  details.more .body b { font-weight: 600; color: var(--ink-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  details.transcript { background: var(--surface-2); border-radius: 10px; padding: 9px 12px; margin-top: 8px; }
+  details.transcript summary { font-size: 0.76rem; font-weight: 600; cursor: pointer; }
+  details.transcript .body { font-size: 0.76rem; color: var(--ink-muted); white-space: pre-wrap; margin-top: 7px; line-height: 1.5; max-height: 200px; overflow-y: auto; }
+
+  .convo-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 13px; margin-bottom: 8px; cursor: pointer; }
+  .convo-row .name { font-weight: 600; font-size: 0.9rem; }
+  .convo-row .meta { font-size: 0.75rem; color: var(--ink-muted); margin-top: 2px; }
+  .convo-row .right { flex: none; text-align: right; }
+
+  .thread-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .back-btn { background: transparent; border: none; color: var(--accent); font-family: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; padding: 4px 0; }
+  .thread-name { font-weight: 700; font-size: 1rem; flex: 1; }
+  .thread-msgs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .msg-bubble { max-width: 82%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; }
+  .msg-bubble.user { align-self: flex-start; background: var(--surface-2); color: var(--ink); border-bottom-left-radius: 3px; }
+  .msg-bubble.assistant { align-self: flex-end; background: var(--accent-soft); color: var(--ink); border-bottom-right-radius: 3px; }
+  .msg-bubble.staff { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 3px; }
+  .msg-ts { font-size: 0.65rem; color: var(--ink-muted); margin-top: 3px; }
+  .send-row { display: flex; gap: 8px; position: sticky; bottom: 0; background: var(--ground); padding: 8px 0 4px; }
+  .send-row textarea { flex: 1; resize: none; min-height: 40px; max-height: 100px; }
+  .send-row button { flex: none; width: auto; padding: 0 16px; margin-top: 0; }
+
+  /* ---- calendar ---- */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+  .cal-nav-btn { background: var(--surface-2); border: none; border-radius: 8px; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; color: var(--ink); flex: none; }
+  .cal-title { font-weight: 700; font-size: 0.98rem; flex: 1; text-align: center; }
+  .cal-today-btn { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; font-size: 0.76rem; font-weight: 600; cursor: pointer; color: var(--ink-muted); flex: none; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+  .cal-dow { text-align: center; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; color: var(--ink-muted); padding-bottom: 6px; }
+  .cal-cell {
+    aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); background: var(--surface);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    cursor: pointer; font-size: 0.8rem; font-family: inherit; color: var(--ink); padding: 0;
+  }
+  .cal-cell.outside { visibility: hidden; cursor: default; }
+  .cal-cell.today { border-color: var(--accent); border-width: 2px; }
+  .cal-cell.selected { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .cal-cell .daynum { font-weight: 600; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .cal-dot.warn { background: var(--warn); }
+  .cal-dot.critical { background: var(--critical); }
+  .cal-dot.good { background: var(--good); }
+  .cal-cell.selected .cal-dot { background: var(--accent-ink); }
+  @media (min-width: 560px) { .cal-cell { font-size: 0.9rem; } .cal-dot { width: 6px; height: 6px; } }
+
+  /* ---- login ---- */
+  #login-screen { max-width: 340px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; padding: 24px; }
+  #login-screen h1 { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
+  #login-screen p.sub { color: var(--ink-muted); font-size: 0.82rem; margin: 0 0 20px; }
+  #login-error { display: none; background: var(--critical-soft); color: var(--critical); font-size: 0.8rem; padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; }
+  #login-error.show { display: block; }
+</style>
+</head>
+<body>
+
+<div id="login-screen" style="display:none">
+  <h1>Front Desk</h1>
+  <p class="sub">Enter the staff password to continue.</p>
+  <div id="login-error"></div>
+  <form id="login-form">
+    <label class="field"><span class="fl">Password</span><input type="password" id="login-password" autocomplete="current-password" required></label>
+    <button type="submit" class="primary" id="login-submit">Continue</button>
+  </form>
+</div>
+
+<div id="shell" class="app-shell" style="display:none">
+  <aside class="sidebar">
+    <div class="sidebar-brand">Front Desk</div>
+    <nav class="side-nav">
+      <button class="side-link" data-pane="appointments"><span class="ic">📅</span>Appointments</button>
+      <button class="side-link" data-pane="patients"><span class="ic">🧾</span>New Patients</button>
+      <button class="side-link" data-pane="conversations"><span class="ic">💬</span>Conversations</button>
+      <button class="side-link" data-pane="stock"><span class="ic">📦</span>Stock</button>
+      <button class="side-link" data-pane="payables"><span class="ic">💳</span>Payables</button>
+    </nav>
+  </aside>
+
+  <div class="content-col">
+    <header class="topbar">
+      <div class="row1">
+        <h1 id="pane-title">Appointments</h1>
+        <span class="synced" id="synced-indicator"><span class="dot off" id="sync-dot"></span><span id="sync-text">Connecting&hellip;</span></span>
+      </div>
+      <div class="summary-strip" id="summary-strip"></div>
+      <button class="signout" id="signout-btn">Sign out</button>
+    </header>
+
+    <main id="view"><div class="empty">Loading&hellip;</div></main>
+
+    <nav class="bottomnav">
+      <button data-pane="appointments"><span class="ic">📅</span>Appts</button>
+      <button data-pane="patients"><span class="ic">🧾</span>Patients</button>
+      <button data-pane="conversations"><span class="ic">💬</span>Chats</button>
+      <button data-pane="stock"><span class="ic">📦</span>Stock</button>
+      <button data-pane="payables"><span class="ic">💳</span>Pay</button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
+  var STAFF_SEND_URL = "https://vppwvpplehaxiqzoibkj.functions.supabase.co/staff-send";
+  var STAFF_SEND_TOKEN = "wnhpzvilufa1rqb02gy8s96oj7tedm45";
+
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var activePane = "appointments"; // appointments | patients | conversations | stock | payables
+  var PANE_TITLES = { appointments: "Appointments", patients: "New Patients", conversations: "Conversations", stock: "Stock", payables: "Payables" };
+
+  var view = document.getElementById("view");
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+
+  // ==================== shared helpers ====================
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+  function fmtDate(d) {
+    if (!d) return "—";
+    var dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  }
+  function fmtDateTime(iso) {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+    catch (e) { return ""; }
+  }
+  function fmtRelativeTime(iso) {
+    try {
+      var d = new Date(iso); var now = new Date();
+      var sameDay = d.toDateString() === now.toDateString();
+      var time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      if (sameDay) return time;
+      return d.toLocaleDateString([], { day: "numeric", month: "short" }) + ", " + time;
+    } catch (e) { return ""; }
+  }
+  function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var d = new Date(dateStr + "T00:00:00");
+    return Math.round((d - today) / 86400000);
+  }
+  function showToast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+  async function apiGet(path) {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
+      headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY },
+    });
+    if (!res.ok) { console.error(await res.text()); return []; }
+    return res.json();
+  }
+  async function apiPatch(table, id, body) {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/" + table + "?id=eq." + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY, "Prefer": "return=minimal" },
+      body: JSON.stringify(body),
+    });
+    return res.ok;
+  }
+
+  // ==================== STOCK pane ====================
+
+  var stockState = { items: [], procedures: [], log: [] };
+  var stockLogSubTab = "procedure";
+  var stockSelectedProcId = null;
+  var stockSelectedItemId = null;
+  var stockGroupBy = "category";
+  var stockSearch = "";
+
+  function stockItemById(id) { for (var i = 0; i < stockState.items.length; i++) if (stockState.items[i].id === id) return stockState.items[i]; return null; }
+  function stockProcById(id) { for (var i = 0; i < stockState.procedures.length; i++) if (stockState.procedures[i].id === id) return stockState.procedures[i]; return null; }
+  function stockStatusOf(item) { if (item.qty <= 0) return "critical"; if (item.qty <= item.low) return "warn"; return "good"; }
+  function stockStatusLabel(s) { return s === "critical" ? "Out" : s === "warn" ? "Low" : "Good"; }
+  function stockRunsRemaining(proc) {
+    var min = Infinity;
+    for (var i = 0; i < proc.consumables.length; i++) {
+      var c = proc.consumables[i]; var it = stockItemById(c.itemId);
+      if (!it || c.qty <= 0) continue;
+      min = Math.min(min, Math.floor(it.qty / c.qty));
+    }
+    return min === Infinity ? 0 : min;
+  }
+
+  async function loadStockData() {
+    var itemsRes = await supabaseClient.from("stock_items").select("id,name,unit,category,qty,low_threshold").order("name");
+    var procsRes = await supabaseClient.from("stock_procedures").select("id,name,stock_procedure_consumables(item_id,qty)").order("name");
+    var logRes = await supabaseClient.from("stock_log").select("id,ts,kind,label,delta").order("ts", { ascending: false }).limit(15);
+    if (itemsRes.error || procsRes.error || logRes.error) { console.error(itemsRes.error, procsRes.error, logRes.error); return; }
+    stockState.items = itemsRes.data.map(function (r) { return { id: r.id, name: r.name, unit: r.unit, category: r.category, qty: r.qty, low: r.low_threshold }; });
+    stockState.procedures = procsRes.data.map(function (r) {
+      return { id: r.id, name: r.name, consumables: (r.stock_procedure_consumables || []).map(function (c) { return { itemId: c.item_id, qty: c.qty }; }) };
+    });
+    stockState.log = logRes.data.map(function (r) { return { id: r.id, ts: r.ts, kind: r.kind, label: r.label, delta: r.delta }; });
+  }
+
+  async function stockUpdateQty(itemId, newQty) {
+    var it = stockItemById(itemId);
+    if (it) it.qty = newQty;
+    var res = await supabaseClient.from("stock_items").update({ qty: newQty }).eq("id", itemId);
+    if (res.error) { console.error(res.error); showToast("Failed to save — check connection"); }
+  }
+  async function stockInsertLog(entry) {
+    var res = await supabaseClient.from("stock_log").insert({
+      kind: entry.kind, label: entry.label, item_id: entry.itemId || null, procedure_id: entry.procedureId || null, delta: entry.delta === undefined ? null : entry.delta,
+    }).select().single();
+    if (res.error) { console.error(res.error); return; }
+    stockState.log.unshift({ id: res.data.id, ts: res.data.ts, kind: res.data.kind, label: res.data.label, delta: res.data.delta });
+    if (stockState.log.length > 15) stockState.log.length = 15;
+  }
+  async function stockInsertItem(item) {
+    var res = await supabaseClient.from("stock_items").insert({ id: item.id, name: item.name, unit: item.unit, category: item.category, qty: item.qty, low_threshold: item.low });
+    if (res.error) { console.error(res.error); showToast("Failed to add item — check connection"); return false; }
+    stockState.items.push(item);
+    return true;
+  }
+
+  function renderStockSummary() {
+    var low = 0, out = 0;
+    stockState.items.forEach(function (it) { var s = stockStatusOf(it); if (s === "warn") low++; if (s === "critical") out++; });
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + stockState.items.length + '</span><span>items</span></div>' +
+      '<div class="chip warn"><span class="n">' + low + '</span><span>low</span></div>' +
+      '<div class="chip critical"><span class="n">' + out + '</span><span>out</span></div>';
+  }
+
+  function renderStockPane() {
+    renderStockSummary();
+    var html = '<div class="segmented" role="tablist">';
+    html += '<button data-stock-sub="log" class="' + (stockView === "log" ? "active" : "") + '">Log usage</button>';
+    html += '<button data-stock-sub="levels" class="' + (stockView === "levels" ? "active" : "") + '">Stock levels</button>';
+    html += '</div>';
+    html += stockView === "log" ? renderStockLogBody() : renderStockLevelsBody();
+    view.innerHTML = html;
+    wireStockPane();
+  }
+
+  var stockView = "log"; // log | levels
+
+  function renderStockLogBody() {
+    var html = '<div class="segmented" style="margin-bottom:14px">';
+    html += '<button data-sub="procedure" class="' + (stockLogSubTab === "procedure" ? "active" : "") + '">By procedure</button>';
+    html += '<button data-sub="individual" class="' + (stockLogSubTab === "individual" ? "active" : "") + '">Individual item</button>';
+    html += '</div>';
+
+    if (stockLogSubTab === "procedure") {
+      html += '<div class="proc-grid">';
+      stockState.procedures.forEach(function (p) {
+        var runs = stockRunsRemaining(p);
+        var cls = runs <= 0 ? "critical" : runs <= 2 ? "warn" : "";
+        html += '<button class="proc-tile ' + (stockSelectedProcId === p.id ? "selected" : "") + '" data-proc="' + p.id + '">' +
+          '<span class="name">' + escapeHtml(p.name) + '</span>' +
+          '<span class="runs ' + cls + '">' + (runs <= 0 ? "Out of stock" : "~" + runs + " runs left") + '</span></button>';
+      });
+      html += '</div>';
+
+      if (stockSelectedProcId) {
+        var proc = stockProcById(stockSelectedProcId);
+        html += '<div class="card"><div class="group-title" style="margin-top:0">' + escapeHtml(proc.name) + ' consumables</div>';
+        var anyCritical = false;
+        proc.consumables.forEach(function (c) {
+          var it = stockItemById(c.itemId); if (!it) return;
+          var after = it.qty - c.qty;
+          var cls = after < 0 ? "critical" : after <= it.low ? "warn" : "";
+          if (after < 0) anyCritical = true;
+          html += '<div class="bom-row"><span>' + escapeHtml(it.name) + ' &times; ' + c.qty + '</span>' +
+            '<span class="after ' + cls + '">' + it.qty + ' &rarr; ' + after + ' ' + escapeHtml(it.unit) + '</span></div>';
+        });
+        html += '<button class="primary" id="confirm-proc">Log ' + escapeHtml(proc.name) + '</button>';
+        if (anyCritical) html += '<div class="banner" style="margin-top:10px;margin-bottom:0">This will take an item below zero &mdash; stock counts may be off. Log anyway if that\'s correct.</div>';
+        html += '</div>';
+      }
+      return html;
+    }
+
+    html += '<label class="field"><span class="fl">Item</span><select id="item-select"><option value="">Choose an item&hellip;</option>';
+    var byCat = {};
+    stockState.items.forEach(function (it) { (byCat[it.category] = byCat[it.category] || []).push(it); });
+    Object.keys(byCat).sort().forEach(function (cat) {
+      html += '<optgroup label="' + escapeHtml(cat) + '">';
+      byCat[cat].forEach(function (it) { html += '<option value="' + it.id + '" ' + (stockSelectedItemId === it.id ? "selected" : "") + '>' + escapeHtml(it.name) + '</option>'; });
+      html += '</optgroup>';
+    });
+    html += '</select></label>';
+
+    if (stockSelectedItemId) {
+      var item = stockItemById(stockSelectedItemId);
+      if (item) {
+        html += '<div class="cur-stock"><span>Current stock</span><span class="val">' + item.qty + ' <span style="font-size:0.8rem;font-weight:400">' + escapeHtml(item.unit) + '</span></span></div>';
+        html += '<div class="qty-actions"><input type="number" id="qty-input" min="1" value="1" inputmode="numeric">';
+        html += '<button class="use" id="use-btn">&minus; Use</button><button class="restock" id="restock-btn">+ Restock</button></div>';
+        html += '<button class="ghost" id="correct-btn" style="margin-top:8px">Set exact count instead</button>';
+      }
+    }
+
+    html += '<div class="card" style="margin-top:16px"><div class="group-title" style="margin-top:0">Can\'t find an item?</div>';
+    html += '<label class="field"><span class="fl">Name</span><input type="text" id="new-item-name" placeholder="e.g. Surgical marker"></label>';
+    html += '<label class="field"><span class="fl">Category</span><select id="new-item-cat">';
+    Object.keys(byCat).sort().forEach(function (cat) { html += '<option>' + escapeHtml(cat) + '</option>'; });
+    html += '<option>Other</option></select></label>';
+    html += '<label class="field"><span class="fl">Unit</span><input type="text" id="new-item-unit" placeholder="pc, tube, bottle&hellip;" value="pc"></label>';
+    html += '<label class="field"><span class="fl">Starting quantity</span><input type="number" id="new-item-qty" min="0" value="0" inputmode="numeric"></label>';
+    html += '<button class="primary" id="add-item-btn">Add item</button></div>';
+    return html;
+  }
+
+  function stockItemRowHtml(it) {
+    var s = stockStatusOf(it);
+    return '<div class="item-row"><div><span class="name">' + escapeHtml(it.name) + '</span><br><span class="unit">' + escapeHtml(it.unit) + '</span></div>' +
+      '<div class="right"><span class="qtyval mono">' + it.qty + '</span><span class="pill ' + s + '">' + stockStatusLabel(s) + '</span></div></div>';
+  }
+
+  function renderStockLevelsBody() {
+    var html = '<label class="field"><input type="search" id="stock-search" placeholder="Search items&hellip;" value="' + escapeHtml(stockSearch) + '"></label>';
+    html += '<div class="segmented"><button data-group="category" class="' + (stockGroupBy === "category" ? "active" : "") + '">By category</button>';
+    html += '<button data-group="procedure" class="' + (stockGroupBy === "procedure" ? "active" : "") + '">By procedure</button></div>';
+
+    var q = stockSearch.trim().toLowerCase();
+    if (stockGroupBy === "category") {
+      var byCat = {};
+      stockState.items.filter(function (it) { return !q || it.name.toLowerCase().indexOf(q) !== -1; }).forEach(function (it) { (byCat[it.category] = byCat[it.category] || []).push(it); });
+      var cats = Object.keys(byCat).sort();
+      if (cats.length === 0) html += '<div class="empty">No items match &ldquo;' + escapeHtml(stockSearch) + '&rdquo;</div>';
+      cats.forEach(function (cat) { html += '<div class="group-title">' + escapeHtml(cat) + '</div>'; byCat[cat].forEach(function (it) { html += stockItemRowHtml(it); }); });
+    } else {
+      var anyMatch = false;
+      stockState.procedures.forEach(function (proc) {
+        var rows = proc.consumables.map(function (c) { return stockItemById(c.itemId); }).filter(function (it) { return it && (!q || it.name.toLowerCase().indexOf(q) !== -1); });
+        if (rows.length === 0) return;
+        anyMatch = true;
+        var runs = stockRunsRemaining(proc);
+        html += '<div class="group-title">' + escapeHtml(proc.name) + '<span style="text-transform:none;font-weight:500;color:var(--ink-muted)"> &middot; ~' + runs + ' runs left</span></div>';
+        rows.forEach(function (it) { html += stockItemRowHtml(it); });
+      });
+      if (!anyMatch) html += '<div class="empty">No items match &ldquo;' + escapeHtml(stockSearch) + '&rdquo;</div>';
+    }
+
+    html += '<div class="group-title">Recent activity</div><div class="card">';
+    if (stockState.log.length === 0) {
+      html += '<div class="empty" style="padding:8px 0">No activity logged yet</div>';
+    } else {
+      stockState.log.slice(0, 15).forEach(function (e) {
+        var deltaStr = e.delta === null || e.delta === undefined ? "" : '<span class="delta ' + (e.delta >= 0 ? "pos" : "neg") + '">' + (e.delta > 0 ? "+" : "") + e.delta + '</span>';
+        html += '<div class="log-entry"><span class="lbl">' + escapeHtml(e.label) + '<span class="ts">' + fmtRelativeTime(e.ts) + '</span></span>' + deltaStr + '</div>';
+      });
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function wireStockPane() {
+    view.querySelectorAll("[data-stock-sub]").forEach(function (btn) {
+      btn.addEventListener("click", function () { stockView = btn.getAttribute("data-stock-sub"); renderStockPane(); });
+    });
+
+    if (stockView === "log") {
+      view.querySelectorAll("[data-sub]").forEach(function (btn) {
+        btn.addEventListener("click", function () { stockLogSubTab = btn.getAttribute("data-sub"); stockSelectedProcId = null; stockSelectedItemId = null; renderStockPane(); });
+      });
+      if (stockLogSubTab === "procedure") {
+        view.querySelectorAll("[data-proc]").forEach(function (btn) {
+          btn.addEventListener("click", function () { var id = btn.getAttribute("data-proc"); stockSelectedProcId = stockSelectedProcId === id ? null : id; renderStockPane(); });
+        });
+        var confirmBtn = document.getElementById("confirm-proc");
+        if (confirmBtn) confirmBtn.addEventListener("click", async function () {
+          confirmBtn.disabled = true;
+          var proc = stockProcById(stockSelectedProcId);
+          for (var i = 0; i < proc.consumables.length; i++) {
+            var c = proc.consumables[i]; var it = stockItemById(c.itemId);
+            if (it) await stockUpdateQty(it.id, it.qty - c.qty);
+          }
+          await stockInsertLog({ kind: "procedure", label: proc.name + " logged", procedureId: proc.id });
+          stockSelectedProcId = null;
+          showToast("Saved"); renderStockPane();
+        });
+      } else {
+        var sel = document.getElementById("item-select");
+        if (sel) sel.addEventListener("change", function () { stockSelectedItemId = sel.value || null; renderStockPane(); });
+        var useBtn = document.getElementById("use-btn");
+        var restockBtn = document.getElementById("restock-btn");
+        var correctBtn = document.getElementById("correct-btn");
+        var qtyInput = document.getElementById("qty-input");
+
+        if (useBtn) useBtn.addEventListener("click", async function () {
+          var n = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+          var it = stockItemById(stockSelectedItemId);
+          await stockUpdateQty(it.id, it.qty - n);
+          await stockInsertLog({ kind: "adjust", label: it.name + " used", delta: -n, itemId: it.id });
+          showToast("Saved"); renderStockPane();
+        });
+        if (restockBtn) restockBtn.addEventListener("click", async function () {
+          var n = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+          var it = stockItemById(stockSelectedItemId);
+          await stockUpdateQty(it.id, it.qty + n);
+          await stockInsertLog({ kind: "restock", label: it.name + " restocked", delta: n, itemId: it.id });
+          showToast("Saved"); renderStockPane();
+        });
+        if (correctBtn) correctBtn.addEventListener("click", async function () {
+          var it = stockItemById(stockSelectedItemId);
+          var val = prompt('Set exact quantity for "' + it.name + '" (currently ' + it.qty + ' ' + it.unit + ')', it.qty);
+          if (val === null) return;
+          var n = parseInt(val, 10);
+          if (isNaN(n) || n < 0) { showToast("Enter a valid number"); return; }
+          var delta = n - it.qty;
+          await stockUpdateQty(it.id, n);
+          await stockInsertLog({ kind: "adjust", label: it.name + " count corrected", delta: delta, itemId: it.id });
+          showToast("Saved"); renderStockPane();
+        });
+        var addBtn = document.getElementById("add-item-btn");
+        if (addBtn) addBtn.addEventListener("click", async function () {
+          var name = document.getElementById("new-item-name").value.trim();
+          if (!name) { showToast("Enter an item name"); return; }
+          var cat = document.getElementById("new-item-cat").value;
+          var unit = document.getElementById("new-item-unit").value.trim() || "pc";
+          var qty = Math.max(0, parseInt(document.getElementById("new-item-qty").value, 10) || 0);
+          var id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36).slice(-4);
+          var ok = await stockInsertItem({ id: id, name: name, unit: unit, category: cat, qty: qty, low: 5 });
+          if (!ok) return;
+          await stockInsertLog({ kind: "add", label: name + " added to catalog", delta: qty, itemId: id });
+          stockSelectedItemId = id;
+          showToast("Saved"); renderStockPane();
+        });
+      }
+    } else {
+      var search = document.getElementById("stock-search");
+      if (search) search.addEventListener("input", function () {
+        stockSearch = search.value; var pos = search.selectionStart; renderStockPane();
+        var el2 = document.getElementById("stock-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+      });
+      view.querySelectorAll("[data-group]").forEach(function (btn) { btn.addEventListener("click", function () { stockGroupBy = btn.getAttribute("data-group"); renderStockPane(); }); });
+    }
+  }
+
+  // ==================== PAYABLES pane ====================
+
+  var payablesOrders = [];
+  var payablesUrgencyFilter = "all";
+  var payablesTypeFilter = "";
+  var payablesStatusFilter = "";
+  var payablesSearch = "";
+
+  function fmtMoney(n) {
+    var v = Number(n) || 0;
+    return "₹" + v.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  }
+  function payablesUrgencyOf(o) {
+    if (o.paid_at) return "paid";
+    var d = daysUntil(o.due_date);
+    if (d === null) return "none";
+    if (d < 0) return "overdue";
+    if (d === 0) return "today";
+    if (d <= 7) return "week";
+    if (d <= 30) return "month";
+    return "later";
+  }
+  function payablesDueLabel(o) {
+    var d = daysUntil(o.due_date);
+    if (d === null) return "No due date";
+    if (d < 0) return "Overdue by " + (-d) + " day" + (-d === 1 ? "" : "s");
+    if (d === 0) return "Due today";
+    if (d === 1) return "Due tomorrow";
+    return "Due in " + d + " days";
+  }
+
+  async function loadPayablesData() {
+    var res = await supabaseClient
+      .from("purchase_orders")
+      .select("id,ref_no,document_number,grn_number,document_date,entry_date,supplier_name,purchase_amount,purchase_type,entered_by,medicine_status,due_date,reminder_3day_sent_at,reminder_dueday_sent_at,paid_at")
+      .order("due_date", { ascending: true, nullsFirst: false });
+    if (res.error) { console.error(res.error); return; }
+    payablesOrders = res.data || [];
+  }
+
+  async function payablesSetPaid(id, paid) {
+    var o = payablesOrders.find(function (x) { return x.id === id; });
+    var prev = o ? o.paid_at : null;
+    if (o) o.paid_at = paid ? new Date().toISOString() : null;
+    renderPayablesPane();
+    var res = await supabaseClient.from("purchase_orders").update({ paid_at: paid ? new Date().toISOString() : null }).eq("id", id);
+    if (res.error) { console.error(res.error); if (o) o.paid_at = prev; renderPayablesPane(); }
+  }
+
+  function renderPayablesSummary() {
+    var overdue = 0, today = 0, week = 0;
+    payablesOrders.forEach(function (o) {
+      var u = payablesUrgencyOf(o);
+      if (u === "overdue") overdue++; else if (u === "today") today++; else if (u === "week") week++;
+    });
+    document.getElementById("summary-strip").innerHTML =
+      '<button class="chip critical' + (payablesUrgencyFilter === "overdue" ? " active" : "") + '" data-pay-urgency="overdue"><span class="n">' + overdue + '</span><span>overdue</span></button>' +
+      '<button class="chip warn' + (payablesUrgencyFilter === "today" ? " active" : "") + '" data-pay-urgency="today"><span class="n">' + today + '</span><span>today</span></button>' +
+      '<button class="chip' + (payablesUrgencyFilter === "week" ? " active" : "") + '" data-pay-urgency="week"><span class="n">' + week + '</span><span>this week</span></button>';
+  }
+
+  function payablesDistinctValues(key) {
+    var set = {};
+    payablesOrders.forEach(function (o) { if (o[key]) set[o[key]] = true; });
+    return Object.keys(set).sort();
+  }
+
+  function poRowHtml(o) {
+    var u = payablesUrgencyOf(o);
+    var pillCls = u === "paid" ? "good" : u === "overdue" ? "critical" : u === "today" ? "warn" : u === "week" ? "good" : "neutral";
+    var rowCls = u === "overdue" ? "overdue" : u === "today" ? "today" : u === "week" ? "week" : "";
+    var pillLabel = u === "paid" ? "Paid " + fmtDate(o.paid_at.slice(0, 10)) : payablesDueLabel(o);
+    var reminders = [];
+    if (o.reminder_3day_sent_at) reminders.push("3-day reminder sent");
+    if (o.reminder_dueday_sent_at) reminders.push("due-day reminder sent");
+    var actionHtml = u === "paid"
+      ? '<button class="ghost-btn" data-unpaid="' + o.id + '">Undo</button>'
+      : '<button class="pay-btn" data-paid="' + o.id + '">Mark paid</button>';
+
+    return '<div class="po-row ' + rowCls + '">' +
+      '<div class="po-top"><div><div class="po-supplier">' + escapeHtml(o.supplier_name) + '</div>' +
+      '<div class="po-meta">' + escapeHtml(o.document_number || o.ref_no) + (o.grn_number ? " · GRN " + escapeHtml(o.grn_number) : "") + '</div></div>' +
+      '<div class="po-amount mono">' + fmtMoney(o.purchase_amount) + '</div></div>' +
+      '<div class="po-bottom"><span class="pill ' + pillCls + '">' + pillLabel + '</span>' +
+      '<span class="status-tag">' + escapeHtml(o.purchase_type) + (o.medicine_status ? " · " + escapeHtml(o.medicine_status) : "") + '</span>' + actionHtml + '</div>' +
+      (reminders.length ? '<div class="reminder-note" style="margin-top:6px">' + reminders.join(" · ") + '</div>' : '') +
+      '<div class="po-meta" style="margin-top:6px">Due ' + fmtDate(o.due_date) + ' · entered by ' + escapeHtml(o.entered_by) + '</div>' +
+    '</div>';
+  }
+
+  function renderPayablesPane() {
+    renderPayablesSummary();
+    var q = payablesSearch.trim().toLowerCase();
+    var filtered = payablesOrders.filter(function (o) {
+      if (payablesUrgencyFilter !== "all" && payablesUrgencyOf(o) !== payablesUrgencyFilter) return false;
+      if (payablesTypeFilter && o.purchase_type !== payablesTypeFilter) return false;
+      if (payablesStatusFilter && o.medicine_status !== payablesStatusFilter) return false;
+      if (q) {
+        var hay = ((o.supplier_name || "") + " " + (o.document_number || "") + " " + (o.ref_no || "") + " " + (o.grn_number || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var buckets = { overdue: [], today: [], week: [], month: [], later: [], none: [], paid: [] };
+    filtered.forEach(function (o) { buckets[payablesUrgencyOf(o)].push(o); });
+    var labels = { overdue: "Overdue", today: "Due today", week: "Due this week", month: "Due this month", later: "Later", none: "No due date", paid: "Paid" };
+
+    var html = '<label class="field"><input type="search" id="pay-search" placeholder="Search supplier, doc number, ref no&hellip;" value="' + escapeHtml(payablesSearch) + '"></label>';
+    html += '<div class="segmented">';
+    [["all", "All"], ["overdue", "Overdue"], ["week", "Due soon"], ["paid", "Paid"]].forEach(function (pair) {
+      html += '<button data-pay-seg="' + pair[0] + '" class="' + (payablesUrgencyFilter === pair[0] ? "active" : "") + '">' + pair[1] + '</button>';
+    });
+    html += '</div><div class="filter-row">';
+    html += '<select id="pay-type-filter"><option value="">All types</option>';
+    payablesDistinctValues("purchase_type").forEach(function (t) { html += '<option value="' + escapeHtml(t) + '" ' + (payablesTypeFilter === t ? "selected" : "") + '>' + escapeHtml(t) + '</option>'; });
+    html += '</select><select id="pay-status-filter"><option value="">All statuses</option>';
+    payablesDistinctValues("medicine_status").forEach(function (s) { html += '<option value="' + escapeHtml(s) + '" ' + (payablesStatusFilter === s ? "selected" : "") + '>' + escapeHtml(s) + '</option>'; });
+    html += '</select></div>';
+
+    var any = false;
+    ["overdue", "today", "week", "month", "later", "none", "paid"].forEach(function (key) {
+      if (buckets[key].length === 0) return;
+      any = true;
+      html += '<div class="group-title">' + labels[key] + '<span class="count">' + buckets[key].length + '</span></div>';
+      buckets[key].forEach(function (o) { html += poRowHtml(o); });
+    });
+    if (!any) html += '<div class="empty">No purchase orders match your filters</div>';
+
+    view.innerHTML = html;
+    wirePayablesPane();
+  }
+
+  function wirePayablesPane() {
+    document.querySelectorAll("[data-pay-urgency]").forEach(function (btn) {
+      btn.addEventListener("click", function () { var u = btn.getAttribute("data-pay-urgency"); payablesUrgencyFilter = payablesUrgencyFilter === u ? "all" : u; renderPayablesPane(); });
+    });
+    var s = document.getElementById("pay-search");
+    if (s) s.addEventListener("input", function () {
+      payablesSearch = s.value; var pos = s.selectionStart; renderPayablesPane();
+      var el2 = document.getElementById("pay-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-pay-seg]").forEach(function (btn) {
+      btn.addEventListener("click", function () { payablesUrgencyFilter = btn.getAttribute("data-pay-seg"); renderPayablesPane(); });
+    });
+    var tf = document.getElementById("pay-type-filter");
+    if (tf) tf.addEventListener("change", function () { payablesTypeFilter = tf.value; renderPayablesPane(); });
+    var sf = document.getElementById("pay-status-filter");
+    if (sf) sf.addEventListener("change", function () { payablesStatusFilter = sf.value; renderPayablesPane(); });
+    document.querySelectorAll("[data-paid]").forEach(function (btn) { btn.addEventListener("click", function () { payablesSetPaid(btn.getAttribute("data-paid"), true); }); });
+    document.querySelectorAll("[data-unpaid]").forEach(function (btn) {
+      btn.addEventListener("click", function () { if (confirm("Mark this bill as unpaid again?")) payablesSetPaid(btn.getAttribute("data-unpaid"), false); });
+    });
+  }
+
+  // ==================== APPOINTMENTS / PATIENTS / CONVERSATIONS panes ====================
+
+  var appts = [];
+  var patients = [];
+  var conversations = [];
+
+  var apptFilter = "pending";
+  var apptTypeFilter = "";
+  var apptSearch = "";
+  var apptViewMode = "list"; // list | calendar
+  var calendarMonth = new Date(); calendarMonth.setDate(1); calendarMonth.setHours(0, 0, 0, 0);
+  var calendarSelectedDate = toDateStr(new Date());
+
+  var patientFilter = "pending";
+  var patientSearch = "";
+
+  var conversationSearch = "";
+  var selectedConversationId = null;
+  var threadMessages = [];
+
+  function pad2(n) { return n < 10 ? "0" + n : "" + n; }
+  function toDateStr(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function fmtMonthYear(d) { return d.toLocaleDateString("en-IN", { month: "long", year: "numeric" }); }
+  function apptTimeSortKey(o) {
+    var m = (o.preferred_time || "").match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!m) return 0;
+    var h = parseInt(m[1], 10); var min = parseInt(m[2], 10); var ap = m[3].toUpperCase();
+    if (ap === "PM" && h !== 12) h += 12;
+    if (ap === "AM" && h === 12) h = 0;
+    return h * 60 + min;
+  }
+  function apptsOnDate(dateStr) {
+    return appts.filter(function (o) { return o.preferred_date === dateStr; }).sort(function (a, b) { return apptTimeSortKey(a) - apptTimeSortKey(b); });
+  }
+
+  async function loadFrontDeskData() {
+    var apptRes = await apiGet("appointment_submissions?select=*&order=preferred_date.asc");
+    var patientRes = await apiGet("patient_intake_queue?select=*&order=created_at.desc");
+    var convoRes = await apiGet("conversations?select=*&order=updated_at.desc&limit=200");
+    appts = apptRes || [];
+    patients = patientRes || [];
+    conversations = convoRes || [];
+  }
+  async function loadThread(conversationId) {
+    var res = await apiGet("messages?conversation_id=eq." + encodeURIComponent(conversationId) + "&select=role,content,created_at,seen_at&order=created_at.asc&limit=100");
+    threadMessages = res || [];
+  }
+  async function resumeBot(conversationId) {
+    var c = conversations.find(function (x) { return x.id === conversationId; });
+    if (c) c.bot_paused_until = null;
+    render();
+    await apiPatch("conversations", conversationId, { bot_paused_until: null });
+  }
+  async function sendStaffMessage(phone, text) {
+    var res = await fetch(STAFF_SEND_URL + "?token=" + encodeURIComponent(STAFF_SEND_TOKEN), {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: phone, text: text }),
+    });
+    return res.ok;
+  }
+  async function markAppt(id, handled) {
+    var o = appts.find(function (x) { return x.id === id; });
+    var prev = o ? o.handled_at : null;
+    if (o) o.handled_at = handled ? new Date().toISOString() : null;
+    render();
+    var ok = await apiPatch("appointment_submissions", id, { handled_at: handled ? new Date().toISOString() : null });
+    if (!ok && o) { o.handled_at = prev; render(); }
+  }
+  async function markPatient(id, entered) {
+    var p = patients.find(function (x) { return x.id === id; });
+    var prev = p ? p.entered_crm_at : null;
+    if (p) p.entered_crm_at = entered ? new Date().toISOString() : null;
+    render();
+    var ok = await apiPatch("patient_intake_queue", id, { entered_crm_at: entered ? new Date().toISOString() : null });
+    if (!ok && p) { p.entered_crm_at = prev; render(); }
+  }
+
+  function apptBucket(o) {
+    if (o.handled_at) return "handled";
+    var d = daysUntil(o.preferred_date);
+    if (d === null) return "later";
+    if (d < 0) return "pastdue";
+    if (d === 0) return "today";
+    if (d === 1) return "tomorrow";
+    if (d <= 7) return "week";
+    return "later";
+  }
+
+  function renderApptSummary() {
+    var pending = 0, today = 0, pastdue = 0;
+    appts.forEach(function (o) {
+      var b = apptBucket(o);
+      if (b !== "handled") pending++;
+      if (b === "today") today++;
+      if (b === "pastdue") pastdue++;
+    });
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + pending + '</span><span>pending</span></div>' +
+      '<div class="chip warn"><span class="n">' + today + '</span><span>today</span></div>' +
+      '<div class="chip critical"><span class="n">' + pastdue + '</span><span>past due</span></div>';
+  }
+
+  function apptRowHtml(o) {
+    var bucket = apptBucket(o);
+    var rowCls = bucket === "today" ? "today" : bucket === "pastdue" ? "pastdue" : "";
+    var typePill = o.patient_type === "new" ? '<span class="pill accent">New</span>' : '<span class="pill neutral">Existing</span>';
+    var statusPill = o.handled_at
+      ? '<span class="pill good">Booked ' + fmtDateTime(o.handled_at) + '</span>'
+      : (bucket === "pastdue" ? '<span class="pill critical">Past due</span>' : bucket === "today" ? '<span class="pill warn">Today</span>' : '');
+    var actionHtml = o.handled_at
+      ? '<button class="ghost-btn" data-unhandle-appt="' + o.id + '">Undo</button>'
+      : '<button class="action-btn" data-handle-appt="' + o.id + '">Mark booked in CareMap</button>';
+    var linkTag = o.intake_ref ? '<button class="link-btn" data-jump-intake="' + o.intake_ref + '">View intake record →</button>' : '';
+
+    return '<div class="row-card ' + rowCls + '">' +
+      '<div class="row-top"><div><div class="row-name">' + escapeHtml(o.patient_name) + ' ' + typePill + '</div>' +
+      '<div class="row-meta">' + escapeHtml(o.mobile_number) + ' · ' + fmtDate(o.preferred_date) + ', ' + escapeHtml(o.preferred_time) + '</div></div></div>' +
+      (o.reason_for_visit ? '<div class="row-meta" style="margin-top:6px">' + escapeHtml(o.reason_for_visit) + '</div>' : '') +
+      '<div class="row-bottom">' + statusPill + linkTag + actionHtml + '</div>' +
+      (o.chat_transcript ? '<details class="transcript"><summary>WhatsApp transcript</summary><div class="body">' + escapeHtml(o.chat_transcript) + '</div></details>' : '') +
+    '</div>';
+  }
+
+  function renderApptListBody() {
+    var q = apptSearch.trim().toLowerCase();
+    var filtered = appts.filter(function (o) {
+      var bucket = apptBucket(o);
+      if (apptFilter === "pending" && bucket === "handled") return false;
+      if (apptFilter === "handled" && bucket !== "handled") return false;
+      if (apptTypeFilter && o.patient_type !== apptTypeFilter) return false;
+      if (q) {
+        var hay = ((o.patient_name || "") + " " + (o.mobile_number || "") + " " + (o.intake_ref || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var buckets = { pastdue: [], today: [], tomorrow: [], week: [], later: [], handled: [] };
+    filtered.forEach(function (o) { buckets[apptBucket(o)].push(o); });
+    var labels = { pastdue: "Past due", today: "Today", tomorrow: "Tomorrow", week: "This week", later: "Later", handled: "Booked" };
+
+    var html = '<label class="field"><input type="search" id="appt-search" placeholder="Search name or mobile…" value="' + escapeHtml(apptSearch) + '"></label>';
+    html += '<div class="segmented">';
+    [["pending", "Pending"], ["all", "All"], ["handled", "Booked"]].forEach(function (p) {
+      html += '<button data-appt-seg="' + p[0] + '" class="' + (apptFilter === p[0] ? "active" : "") + '">' + p[1] + '</button>';
+    });
+    html += '</div><div class="filter-row"><select id="appt-type-filter"><option value="">All patient types</option>' +
+      '<option value="new" ' + (apptTypeFilter === "new" ? "selected" : "") + '>New patients</option>' +
+      '<option value="existing" ' + (apptTypeFilter === "existing" ? "selected" : "") + '>Existing patients</option></select></div>';
+
+    var any = false;
+    ["pastdue", "today", "tomorrow", "week", "later", "handled"].forEach(function (key) {
+      if (buckets[key].length === 0) return;
+      any = true;
+      html += '<div class="group-title">' + labels[key] + '<span class="count">' + buckets[key].length + '</span></div>';
+      buckets[key].forEach(function (o) { html += apptRowHtml(o); });
+    });
+    if (!any) html += '<div class="empty">No appointment requests match your filters</div>';
+    return html;
+  }
+
+  function renderCalendarBody() {
+    var year = calendarMonth.getFullYear(), month = calendarMonth.getMonth();
+    var firstDow = new Date(year, month, 1).getDay();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var todayStr = toDateStr(new Date());
+
+    var html = '<div class="cal-header">' +
+      '<button class="cal-nav-btn" id="cal-prev">&larr;</button>' +
+      '<span class="cal-title">' + fmtMonthYear(calendarMonth) + '</span>' +
+      '<button class="cal-today-btn" id="cal-today">Today</button>' +
+      '<button class="cal-nav-btn" id="cal-next">&rarr;</button></div>';
+
+    html += '<div class="cal-grid">';
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(function (d) { html += '<div class="cal-dow">' + d + '</div>'; });
+    for (var i = 0; i < firstDow; i++) html += '<div class="cal-cell outside"></div>';
+    for (var day = 1; day <= daysInMonth; day++) {
+      var dStr = year + "-" + pad2(month + 1) + "-" + pad2(day);
+      var dayAppts = apptsOnDate(dStr);
+      var cls = "cal-cell";
+      if (dStr === todayStr) cls += " today";
+      if (dStr === calendarSelectedDate) cls += " selected";
+      var anyPending = dayAppts.some(function (o) { return !o.handled_at; });
+      var dotCls = anyPending ? (dStr <= todayStr ? "critical" : "warn") : "good";
+      html += '<button class="' + cls + '" data-cal-day="' + dStr + '"><span class="daynum">' + day + '</span>' +
+        (dayAppts.length ? '<span class="cal-dot ' + dotCls + '"></span>' : '') + '</button>';
+    }
+    html += '</div>';
+
+    var dayList = apptsOnDate(calendarSelectedDate);
+    html += '<div class="group-title">' + fmtDate(calendarSelectedDate) + '<span class="count">' + dayList.length + '</span></div>';
+    if (dayList.length === 0) html += '<div class="empty">No appointment requests for this day</div>';
+    else dayList.forEach(function (o) { html += apptRowHtml(o); });
+    return html;
+  }
+
+  function renderAppointmentsPane() {
+    renderApptSummary();
+    var html = '<div class="segmented" style="margin-bottom:14px">' +
+      '<button data-appt-view="list" class="' + (apptViewMode === "list" ? "active" : "") + '">List</button>' +
+      '<button data-appt-view="calendar" class="' + (apptViewMode === "calendar" ? "active" : "") + '">Calendar</button></div>';
+    html += apptViewMode === "calendar" ? renderCalendarBody() : renderApptListBody();
+
+    document.getElementById("shell").classList.toggle("wide-view", apptViewMode === "calendar");
+    view.innerHTML = html;
+    wireAppointmentsPane();
+  }
+
+  function wireApptRowActions() {
+    document.querySelectorAll("[data-handle-appt]").forEach(function (btn) { btn.addEventListener("click", function () { markAppt(btn.getAttribute("data-handle-appt"), true); }); });
+    document.querySelectorAll("[data-unhandle-appt]").forEach(function (btn) {
+      btn.addEventListener("click", function () { if (confirm("Mark this appointment request as not-yet-booked again?")) markAppt(btn.getAttribute("data-unhandle-appt"), false); });
+    });
+    document.querySelectorAll("[data-jump-intake]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        patientSearch = btn.getAttribute("data-jump-intake"); patientFilter = "all"; activePane = "patients"; render();
+      });
+    });
+  }
+
+  function wireAppointmentsPane() {
+    document.querySelectorAll("[data-appt-view]").forEach(function (btn) {
+      btn.addEventListener("click", function () { apptViewMode = btn.getAttribute("data-appt-view"); renderAppointmentsPane(); });
+    });
+
+    if (apptViewMode === "calendar") {
+      var prev = document.getElementById("cal-prev"), next = document.getElementById("cal-next"), today = document.getElementById("cal-today");
+      if (prev) prev.addEventListener("click", function () { calendarMonth.setMonth(calendarMonth.getMonth() - 1); renderAppointmentsPane(); });
+      if (next) next.addEventListener("click", function () { calendarMonth.setMonth(calendarMonth.getMonth() + 1); renderAppointmentsPane(); });
+      if (today) today.addEventListener("click", function () { calendarMonth = new Date(); calendarMonth.setDate(1); calendarMonth.setHours(0, 0, 0, 0); calendarSelectedDate = toDateStr(new Date()); renderAppointmentsPane(); });
+      document.querySelectorAll("[data-cal-day]").forEach(function (btn) {
+        btn.addEventListener("click", function () { calendarSelectedDate = btn.getAttribute("data-cal-day"); renderAppointmentsPane(); });
+      });
+    } else {
+      var s = document.getElementById("appt-search");
+      if (s) s.addEventListener("input", function () {
+        apptSearch = s.value; var pos = s.selectionStart; renderAppointmentsPane();
+        var el2 = document.getElementById("appt-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+      });
+      document.querySelectorAll("[data-appt-seg]").forEach(function (btn) { btn.addEventListener("click", function () { apptFilter = btn.getAttribute("data-appt-seg"); renderAppointmentsPane(); }); });
+      var tf = document.getElementById("appt-type-filter");
+      if (tf) tf.addEventListener("change", function () { apptTypeFilter = tf.value; renderAppointmentsPane(); });
+    }
+    wireApptRowActions();
+  }
+
+  function renderPatientSummary() {
+    var pending = 0;
+    patients.forEach(function (p) { if (!p.entered_crm_at) pending++; });
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + patients.length + '</span><span>total</span></div>' +
+      '<div class="chip warn"><span class="n">' + pending + '</span><span>pending</span></div>' +
+      '<div class="chip good"><span class="n">' + (patients.length - pending) + '</span><span>entered</span></div>';
+  }
+  function fieldLine(label, value) { if (!value) return ""; return "<div><b>" + label + "</b><br>" + value + "</div>"; }
+  function patientRowHtml(p) {
+    var name = (p.name_prefix ? p.name_prefix + " " : "") + (p.patient_name || "Unnamed");
+    var statusPill = p.entered_crm_at ? '<span class="pill good">Entered ' + fmtDateTime(p.entered_crm_at) + '</span>' : '<span class="pill warn">Pending CRM entry</span>';
+    var actionHtml = p.entered_crm_at
+      ? '<button class="ghost-btn" data-unenter-patient="' + p.id + '">Undo</button>'
+      : '<button class="action-btn" data-enter-patient="' + p.id + '">Mark entered in CRM</button>';
+    var linkTag = p.source_row_ref ? '<button class="link-btn" data-jump-appt="' + p.source_row_ref + '">View appointment →</button>' : '';
+    var mobileLine = p.no_phone_number ? "No phone number on file" : escapeHtml(p.mobile_number || "—");
+
+    var details = '';
+    details += fieldLine("Gender / age", (p.gender || "—") + (p.age ? " · " + escapeHtml(p.age) : ""));
+    details += fieldLine("DOB", fmtDate(p.date_of_birth));
+    details += fieldLine("Alternate number", p.alternate_number);
+    details += fieldLine("Email", p.contact_emailid);
+    details += fieldLine("Address", [p.flat_house_building, p.colony_street_locality, p.pincode].filter(Boolean).map(escapeHtml).join(", "));
+    details += fieldLine("Referred by", p.referred_by);
+    details += fieldLine("ID proof", (p.id_proof || "—") + (p.id_number ? " · " + escapeHtml(p.id_number) : ""));
+    details += fieldLine("Emergency contact", [p.emergency_name, p.emergency_relationship, p.emergency_contactnumber].filter(Boolean).map(escapeHtml).join(", "));
+    details += fieldLine("Emergency email", p.emergency_emailid);
+
+    return '<div class="row-card"><div class="row-top"><div><div class="row-name">' + escapeHtml(name) + '</div>' +
+      '<div class="row-meta">' + mobileLine + '</div></div></div>' +
+      '<div class="row-bottom">' + statusPill + linkTag + actionHtml + '</div>' +
+      '<details class="more"><summary>Full registration details</summary><div class="body">' + details + '</div></details></div>';
+  }
+
+  function renderPatientsPane() {
+    renderPatientSummary();
+    var q = patientSearch.trim().toLowerCase();
+    var filtered = patients.filter(function (p) {
+      var entered = !!p.entered_crm_at;
+      if (patientFilter === "pending" && entered) return false;
+      if (patientFilter === "entered" && !entered) return false;
+      if (q) {
+        var hay = ((p.patient_name || "") + " " + (p.mobile_number || "") + " " + (p.id_number || "") + " " + (p.source_row_ref || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var html = '<label class="field"><input type="search" id="patient-search" placeholder="Search name, mobile, ID number…" value="' + escapeHtml(patientSearch) + '"></label>';
+    html += '<div class="segmented">';
+    [["pending", "Pending"], ["all", "All"], ["entered", "Entered"]].forEach(function (p) {
+      html += '<button data-patient-seg="' + p[0] + '" class="' + (patientFilter === p[0] ? "active" : "") + '">' + p[1] + '</button>';
+    });
+    html += '</div>';
+    if (filtered.length === 0) html += '<div class="empty">No new-patient registrations match your filters</div>';
+    else filtered.forEach(function (p) { html += patientRowHtml(p); });
+
+    view.innerHTML = html;
+    wirePatientsPane();
+  }
+
+  function wirePatientsPane() {
+    var s = document.getElementById("patient-search");
+    if (s) s.addEventListener("input", function () {
+      patientSearch = s.value; var pos = s.selectionStart; renderPatientsPane();
+      var el2 = document.getElementById("patient-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-patient-seg]").forEach(function (btn) { btn.addEventListener("click", function () { patientFilter = btn.getAttribute("data-patient-seg"); renderPatientsPane(); }); });
+    document.querySelectorAll("[data-enter-patient]").forEach(function (btn) { btn.addEventListener("click", function () { markPatient(btn.getAttribute("data-enter-patient"), true); }); });
+    document.querySelectorAll("[data-unenter-patient]").forEach(function (btn) {
+      btn.addEventListener("click", function () { if (confirm("Mark this patient as not-yet-entered in CRM again?")) markPatient(btn.getAttribute("data-unenter-patient"), false); });
+    });
+    document.querySelectorAll("[data-jump-appt]").forEach(function (btn) {
+      btn.addEventListener("click", function () { apptSearch = btn.getAttribute("data-jump-appt"); apptFilter = "all"; apptViewMode = "list"; activePane = "appointments"; render(); });
+    });
+  }
+
+  function isPaused(c) { return !!(c.bot_paused_until && new Date(c.bot_paused_until) > new Date()); }
+
+  function renderConversationsSummary() {
+    var paused = conversations.filter(isPaused).length;
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + conversations.length + '</span><span>conversations</span></div>' +
+      '<div class="chip warn"><span class="n">' + paused + '</span><span>bot paused</span></div>';
+  }
+
+  function renderConversationsList() {
+    renderConversationsSummary();
+    var q = conversationSearch.trim().toLowerCase();
+    var filtered = conversations.filter(function (c) {
+      if (!q) return true;
+      var hay = ((c.patient_name || "") + " " + (c.phone_number || "")).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    var html = '<label class="field"><input type="search" id="convo-search" placeholder="Search name or phone…" value="' + escapeHtml(conversationSearch) + '"></label>';
+    if (filtered.length === 0) {
+      html += '<div class="empty">No conversations match your search</div>';
+    } else {
+      filtered.forEach(function (c) {
+        var paused = isPaused(c);
+        html += '<div class="convo-row" data-open-convo="' + c.id + '"><div><div class="name">' + escapeHtml(c.patient_name || c.phone_number) + '</div>' +
+          '<div class="meta">' + escapeHtml(c.phone_number) + ' · updated ' + fmtDateTime(c.updated_at) + '</div></div>' +
+          '<div class="right">' + (paused ? '<span class="pill warn">Bot paused</span>' : '<span class="pill good">Bot active</span>') + '</div></div>';
+      });
+    }
+    view.innerHTML = html;
+
+    var s = document.getElementById("convo-search");
+    if (s) s.addEventListener("input", function () {
+      conversationSearch = s.value; var pos = s.selectionStart; renderConversationsList();
+      var el2 = document.getElementById("convo-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-open-convo]").forEach(function (row) {
+      row.addEventListener("click", function () { selectedConversationId = row.getAttribute("data-open-convo"); loadThread(selectedConversationId).then(renderConversationsPane); });
+    });
+  }
+
+  function renderConversationThread() {
+    var c = conversations.find(function (x) { return x.id === selectedConversationId; });
+    if (!c) { selectedConversationId = null; renderConversationsList(); return; }
+    var paused = isPaused(c);
+
+    var html = '<div class="thread-header"><button class="back-btn" id="convo-back">&larr; Back</button>' +
+      '<span class="thread-name">' + escapeHtml(c.patient_name || c.phone_number) + '</span>' +
+      (paused ? '<span class="pill warn">Paused until ' + fmtDateTime(c.bot_paused_until) + '</span>' : '<span class="pill good">Bot active</span>') + '</div>';
+    if (paused) html += '<button class="ghost-btn" id="resume-bot-btn" style="margin-bottom:12px">Resume bot now</button>';
+
+    html += '<div class="thread-msgs">';
+    if (threadMessages.length === 0) {
+      html += '<div class="empty">No messages yet</div>';
+    } else {
+      threadMessages.forEach(function (m) {
+        var isStaff = m.role === "assistant" && m.content.indexOf("[Staff]") === 0;
+        var cls = isStaff ? "staff" : m.role;
+        var text = isStaff ? m.content.replace(/^\[Staff\]\s*/, "") : m.content;
+        var seenLine = m.role === "assistant" ? (m.seen_at ? " · Seen " + fmtDateTime(m.seen_at) : " · Sent") : "";
+        html += '<div class="msg-bubble ' + cls + '">' + escapeHtml(text) + '<div class="msg-ts">' + fmtDateTime(m.created_at) + escapeHtml(seenLine) + '</div></div>';
+      });
+    }
+    html += '</div><div class="send-row"><textarea id="staff-reply-text" placeholder="Reply as the clinic — sending pauses the bot on this conversation for 24h"></textarea>' +
+      '<button class="primary" id="staff-send-btn">Send</button></div>';
+
+    view.innerHTML = html;
+    document.getElementById("convo-back").addEventListener("click", function () { selectedConversationId = null; renderConversationsList(); });
+    var resumeBtn = document.getElementById("resume-bot-btn");
+    if (resumeBtn) resumeBtn.addEventListener("click", function () { resumeBot(c.id); });
+    document.getElementById("staff-send-btn").addEventListener("click", async function () {
+      var textEl = document.getElementById("staff-reply-text");
+      var text = textEl.value.trim();
+      if (!text) return;
+      var btn = this; btn.disabled = true;
+      var ok = await sendStaffMessage(c.phone_number, text);
+      btn.disabled = false;
+      if (!ok) { alert("Failed to send — check connection and try again."); return; }
+      c.bot_paused_until = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      await loadThread(c.id);
+      renderConversationThread();
+    });
+  }
+
+  function renderConversationsPane() {
+    if (selectedConversationId) renderConversationThread(); else renderConversationsList();
+  }
+
+  // ==================== top-level ====================
+
+  function render() {
+    document.getElementById("pane-title").textContent = PANE_TITLES[activePane];
+    if (activePane !== "appointments") document.getElementById("shell").classList.remove("wide-view");
+
+    if (activePane === "appointments") renderAppointmentsPane();
+    else if (activePane === "patients") renderPatientsPane();
+    else if (activePane === "conversations") renderConversationsPane();
+    else if (activePane === "stock") renderStockPane();
+    else renderPayablesPane();
+
+    document.querySelectorAll("[data-pane]").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-pane") === activePane);
+    });
+  }
+
+  document.querySelectorAll("[data-pane]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      activePane = btn.getAttribute("data-pane");
+      if (activePane === "conversations") selectedConversationId = null;
+      render();
+    });
+  });
+
+  async function loadAllData() {
+    await Promise.all([loadStockData(), loadPayablesData(), loadFrontDeskData()]);
+  }
+
+  function setupRealtime() {
+    function refreshUnlessComposing() {
+      if (activePane === "conversations" && selectedConversationId) return;
+      loadAllData().then(render);
+    }
+    supabaseClient.channel("hub-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_items" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_log" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "purchase_orders" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointment_submissions" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "patient_intake_queue" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, refreshUnlessComposing)
+      .subscribe(function (status) {
+        var dot = document.getElementById("sync-dot"); var text = document.getElementById("sync-text");
+        if (status === "SUBSCRIBED") { dot.classList.remove("off"); text.textContent = "Live"; }
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") { dot.classList.add("off"); text.textContent = "Offline"; }
+      });
+  }
+
+  // ==================== auth gate ====================
+
+  var SITE_PASSWORD = "hello@tasvaa";
+  var AUTH_STORAGE_KEY = "supplyRoomAuthed";
+  var loginScreen = document.getElementById("login-screen");
+  var shell = document.getElementById("shell");
+  var realtimeStarted = false;
+
+  function showApp() {
+    loginScreen.style.display = "none";
+    shell.style.display = "flex";
+    loadAllData().then(function () {
+      render();
+      if (!realtimeStarted) { setupRealtime(); realtimeStarted = true; }
+    });
+  }
+  function showLogin(message) {
+    shell.style.display = "none";
+    loginScreen.style.display = "flex";
+    var err = document.getElementById("login-error");
+    if (message) { err.textContent = message; err.classList.add("show"); } else { err.classList.remove("show"); }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var password = document.getElementById("login-password").value;
+    if (password !== SITE_PASSWORD) { showLogin("Wrong password"); return; }
+    try { localStorage.setItem(AUTH_STORAGE_KEY, "1"); } catch (err) {}
+    showApp();
+  });
+  document.getElementById("signout-btn").addEventListener("click", function () {
+    try { localStorage.removeItem(AUTH_STORAGE_KEY); } catch (err) {}
+    showLogin();
+  });
+
+  var alreadyAuthed = false;
+  try { alreadyAuthed = localStorage.getItem(AUTH_STORAGE_KEY) === "1"; } catch (err) {}
+  if (alreadyAuthed) showApp(); else showLogin();
+})();
+</script>
+</body>
+</html>
