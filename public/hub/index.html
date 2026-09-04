@@ -230,10 +230,12 @@
   .cal-cell.today { border-color: var(--accent); border-width: 2px; }
   .cal-cell.selected { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   .cal-cell .daynum { font-weight: 600; }
+  .dot-row { display: flex; gap: 3px; }
   .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
   .cal-dot.warn { background: var(--warn); }
   .cal-dot.critical { background: var(--critical); }
   .cal-dot.good { background: var(--good); }
+  .cal-dot.accent { background: var(--accent); }
   .cal-cell.selected .cal-dot { background: var(--accent-ink); }
   @media (min-width: 560px) { .cal-cell { font-size: 0.9rem; } .cal-dot { width: 6px; height: 6px; } }
 
@@ -302,6 +304,7 @@
   var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
   var STAFF_SEND_URL = "https://vppwvpplehaxiqzoibkj.functions.supabase.co/staff-send";
   var STAFF_SEND_TOKEN = "wnhpzvilufa1rqb02gy8s96oj7tedm45";
+  var STAFF_SCHEDULE_URL = "https://vppwvpplehaxiqzoibkj.functions.supabase.co/staff-schedule";
 
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -795,6 +798,7 @@
   var appts = [];
   var patients = [];
   var conversations = [];
+  var bookedAppts = []; // confirmed CareMap appointments, from staff-schedule
 
   var apptFilter = "pending";
   var apptTypeFilter = "";
@@ -825,6 +829,43 @@
     return appts.filter(function (o) { return o.preferred_date === dateStr; }).sort(function (a, b) { return apptTimeSortKey(a) - apptTimeSortKey(b); });
   }
 
+  // booked_appointments' start_at/end_at are UTC timestamptz — always render
+  // and bucket them in IST regardless of the browser's own timezone.
+  function fmtISTTime(iso) {
+    try { return new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }); }
+    catch (e) { return ""; }
+  }
+  function istDateStrOf(iso) {
+    try { return new Date(iso).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); } // en-CA => YYYY-MM-DD
+    catch (e) { return ""; }
+  }
+  function bookedSortKey(b) {
+    try {
+      var parts = new Date(b.start_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" }).split(":");
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    } catch (e) { return 0; }
+  }
+  function bookedOnDate(dateStr) {
+    return bookedAppts.filter(function (b) { return istDateStrOf(b.start_at) === dateStr; }).sort(function (a, b) { return bookedSortKey(a) - bookedSortKey(b); });
+  }
+  function dayAgendaItems(dateStr) {
+    var items = [];
+    apptsOnDate(dateStr).forEach(function (o) { items.push({ type: "request", sortKey: apptTimeSortKey(o), data: o }); });
+    bookedOnDate(dateStr).forEach(function (b) { items.push({ type: "booked", sortKey: bookedSortKey(b), data: b }); });
+    items.sort(function (a, b) { return a.sortKey - b.sortKey; });
+    return items;
+  }
+  function bookedRowHtml(b) {
+    var timeLabel = fmtISTTime(b.start_at) + (b.end_at ? " – " + fmtISTTime(b.end_at) : "");
+    var subline = [b.visit_type, b.visit_reason].filter(Boolean).join(" — ");
+    return '<div class="row-card" style="border-left-color:var(--good)">' +
+      '<div class="row-top"><div><div class="row-name">' + escapeHtml(b.patient_name || "Unnamed") + ' <span class="pill good">Confirmed</span></div>' +
+      '<div class="row-meta">' + escapeHtml(b.mobile_number || "") + ' · ' + timeLabel + (b.doctor_name ? " · Dr " + escapeHtml(b.doctor_name) : "") + '</div></div></div>' +
+      (subline ? '<div class="row-meta" style="margin-top:6px">' + escapeHtml(subline) + '</div>' : '') +
+      (b.treatment_notes ? '<div class="row-meta" style="margin-top:4px">' + escapeHtml(b.treatment_notes) + '</div>' : '') +
+    '</div>';
+  }
+
   async function loadFrontDeskData() {
     var apptRes = await apiGet("appointment_submissions?select=*&order=preferred_date.asc");
     var patientRes = await apiGet("patient_intake_queue?select=*&order=created_at.desc");
@@ -833,6 +874,18 @@
     patients = patientRes || [];
     conversations = convoRes || [];
   }
+  async function loadBookedSchedule() {
+    var from = new Date(); from.setDate(from.getDate() - 14);
+    var to = new Date(); to.setDate(to.getDate() + 90);
+    var url = STAFF_SCHEDULE_URL + "?token=" + encodeURIComponent(STAFF_SEND_TOKEN) + "&from=" + toDateStr(from) + "&to=" + toDateStr(to);
+    try {
+      var res = await fetch(url);
+      if (!res.ok) { console.error("Failed to load booked schedule:", res.status, await res.text()); return; }
+      var data = await res.json();
+      bookedAppts = data.results || [];
+    } catch (e) { console.error("Failed to load booked schedule:", e); }
+  }
+
   async function loadThread(conversationId) {
     var res = await apiGet("messages?conversation_id=eq." + encodeURIComponent(conversationId) + "&select=role,content,created_at,seen_at&order=created_at.asc&limit=100");
     threadMessages = res || [];
@@ -956,15 +1009,15 @@
     var daysInMonth = new Date(year, month + 1, 0).getDate();
     var todayStr = toDateStr(new Date());
 
-    var html = '<div class="cal-header">' +
+    var left = '<div class="cal-header">' +
       '<button class="cal-nav-btn" id="cal-prev">&larr;</button>' +
       '<span class="cal-title">' + fmtMonthYear(calendarMonth) + '</span>' +
       '<button class="cal-today-btn" id="cal-today">Today</button>' +
       '<button class="cal-nav-btn" id="cal-next">&rarr;</button></div>';
 
-    html += '<div class="cal-grid">';
-    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(function (d) { html += '<div class="cal-dow">' + d + '</div>'; });
-    for (var i = 0; i < firstDow; i++) html += '<div class="cal-cell outside"></div>';
+    left += '<div class="cal-grid">';
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(function (d) { left += '<div class="cal-dow">' + d + '</div>'; });
+    for (var i = 0; i < firstDow; i++) left += '<div class="cal-cell outside"></div>';
     for (var day = 1; day <= daysInMonth; day++) {
       var dStr = year + "-" + pad2(month + 1) + "-" + pad2(day);
       var dayAppts = apptsOnDate(dStr);
@@ -973,16 +1026,19 @@
       if (dStr === calendarSelectedDate) cls += " selected";
       var anyPending = dayAppts.some(function (o) { return !o.handled_at; });
       var dotCls = anyPending ? (dStr <= todayStr ? "critical" : "warn") : "good";
-      html += '<button class="' + cls + '" data-cal-day="' + dStr + '"><span class="daynum">' + day + '</span>' +
-        (dayAppts.length ? '<span class="cal-dot ' + dotCls + '"></span>' : '') + '</button>';
+      var hasBooked = bookedOnDate(dStr).length > 0;
+      var dots = (dayAppts.length ? '<span class="cal-dot ' + dotCls + '"></span>' : "") + (hasBooked ? '<span class="cal-dot accent"></span>' : "");
+      left += '<button class="' + cls + '" data-cal-day="' + dStr + '"><span class="daynum">' + day + '</span>' +
+        (dots ? '<span class="dot-row">' + dots + '</span>' : '') + '</button>';
     }
-    html += '</div>';
+    left += '</div>';
 
-    var dayList = apptsOnDate(calendarSelectedDate);
-    html += '<div class="group-title">' + fmtDate(calendarSelectedDate) + '<span class="count">' + dayList.length + '</span></div>';
-    if (dayList.length === 0) html += '<div class="empty">No appointment requests for this day</div>';
-    else dayList.forEach(function (o) { html += apptRowHtml(o); });
-    return html;
+    var dayItems = dayAgendaItems(calendarSelectedDate);
+    left += '<div class="group-title">' + fmtDate(calendarSelectedDate) + '<span class="count">' + dayItems.length + '</span></div>';
+    if (dayItems.length === 0) left += '<div class="empty">No appointments for this day</div>';
+    else dayItems.forEach(function (item) { left += item.type === "booked" ? bookedRowHtml(item.data) : apptRowHtml(item.data); });
+
+    return left;
   }
 
   function renderAppointmentsPane() {
@@ -1227,7 +1283,7 @@
   });
 
   async function loadAllData() {
-    await Promise.all([loadStockData(), loadPayablesData(), loadFrontDeskData()]);
+    await Promise.all([loadStockData(), loadPayablesData(), loadFrontDeskData(), loadBookedSchedule()]);
   }
 
   function setupRealtime() {
