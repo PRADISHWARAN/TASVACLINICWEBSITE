@@ -144,6 +144,32 @@
   };
   var SLOT_MINUTES = 30;
 
+  // One-off closures and shortened days recorded by staff in Front Desk → Clinic.
+  // Loaded once on page load; empty on failure so a network hiccup never blocks
+  // a booking request (the team confirms every slot by hand anyway).
+  var closures = [];
+
+  function closureFor(dateStr) {
+    for (var i = 0; i < closures.length; i++) {
+      if (closures[i].starts_on <= dateStr && closures[i].ends_on >= dateStr) return closures[i];
+    }
+    return null;
+  }
+
+  async function loadClosures() {
+    try {
+      var today = new Date();
+      var todayStr = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+      var res = await fetch(SUPABASE_URL + "/rest/v1/clinic_closures?select=starts_on,ends_on,opens_at,closes_at,note&ends_on=gte." + todayStr, {
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY },
+      });
+      if (!res.ok) { console.error("Closure lookup failed:", res.status); return; }
+      closures = await res.json();
+    } catch (err) {
+      console.error("Closure lookup failed:", err);
+    }
+  }
+
   var params = new URLSearchParams(window.location.search);
   var ref = params.get("ref") || "";
   var urlName = params.get("name") || "";
@@ -166,6 +192,15 @@
     var d = new Date(dateStr + "T00:00:00");
     var day = d.getDay();
     var hours = HOURS[day];
+
+    // A recorded closure overrides the regular weekly hours for that date:
+    // both times set = shortened day, neither = closed outright.
+    var closure = closureFor(dateStr);
+    if (closure) {
+      hours = closure.opens_at && closure.closes_at
+        ? { open: closure.opens_at.slice(0, 5), close: closure.closes_at.slice(0, 5) }
+        : null;
+    }
 
     if (!hours) {
       select.disabled = true;
@@ -236,12 +271,30 @@
   dateInput.addEventListener("change", async function () {
     var d = new Date(dateInput.value + "T00:00:00");
     var banner = document.getElementById("clash-banner");
+    var closure = closureFor(dateInput.value);
+
     if (HOURS[d.getDay()] === null) {
       banner.className = "banner critical";
       banner.style.display = "block";
       banner.textContent = "The clinic is closed on Wednesdays — please pick another day.";
       dateInput.value = "";
       populateTimeSlots("");
+      return;
+    }
+    if (closure && !closure.opens_at) {
+      banner.className = "banner critical";
+      banner.style.display = "block";
+      banner.textContent = "The clinic is closed that day" + (closure.note ? " (" + closure.note + ")" : "") + " — please pick another day.";
+      dateInput.value = "";
+      populateTimeSlots("");
+      return;
+    }
+    if (closure && closure.opens_at) {
+      banner.className = "banner";
+      banner.style.display = "block";
+      banner.textContent = "Shorter day: the clinic is open only " + fmtTimeLabel(closure.opens_at.slice(0, 5)) +
+        " – " + fmtTimeLabel(closure.closes_at.slice(0, 5)) + (closure.note ? " (" + closure.note + ")" : "") + ".";
+      populateTimeSlots(dateInput.value);
       return;
     }
     banner.style.display = "none";
@@ -347,7 +400,7 @@
     }
   });
 
-  loadPrefill().then(init);
+  Promise.all([loadPrefill(), loadClosures()]).then(init);
 })();
 </script>
 </body>
