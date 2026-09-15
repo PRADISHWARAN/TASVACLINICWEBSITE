@@ -65,7 +65,7 @@
   .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
   .filter-row select { flex: 1; min-width: 0; }
 
-  input[type="search"], input[type="password"], select {
+  input[type="search"], input[type="password"], input[type="text"], input[type="date"], input[type="time"], select, textarea {
     font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface);
     border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%;
   }
@@ -118,6 +118,41 @@
   nav.bottomnav button { flex: 1; background: transparent; border: none; font-family: inherit; font-size: 0.78rem; font-weight: 600; color: var(--ink-muted); padding: 8px 4px 6px; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
   nav.bottomnav button .ic { font-size: 1.1rem; line-height: 1; }
   nav.bottomnav button.active { color: var(--accent); }
+
+  .convo-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 13px; margin-bottom: 8px; cursor: pointer; }
+  .convo-row .name { font-weight: 600; font-size: 0.9rem; }
+  .convo-row .meta { font-size: 0.75rem; color: var(--ink-muted); margin-top: 2px; }
+  .convo-row .right { flex: none; text-align: right; }
+
+  .thread-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .back-btn { background: transparent; border: none; color: var(--accent); font-family: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; padding: 4px 0; }
+  .thread-name { font-weight: 700; font-size: 1rem; flex: 1; }
+
+  .thread-msgs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .msg-bubble { max-width: 82%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; }
+  .msg-bubble.user { align-self: flex-start; background: var(--surface-2); color: var(--ink); border-bottom-left-radius: 3px; }
+  .msg-bubble.assistant { align-self: flex-end; background: var(--accent-soft); color: var(--ink); border-bottom-right-radius: 3px; }
+  .msg-bubble.staff { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 3px; }
+  .msg-ts { font-size: 0.65rem; color: var(--ink-muted); margin-top: 3px; }
+
+  .send-row { display: flex; gap: 8px; position: sticky; bottom: 0; background: var(--ground); padding: 8px 0 4px; }
+  .send-row textarea { flex: 1; resize: none; min-height: 40px; max-height: 100px; }
+  .send-row button { flex: none; width: auto; padding: 0 16px; margin-top: 0; }
+
+  /* clinic tab */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px; margin-bottom: 14px; }
+  .panel .panel-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 3px; }
+  .panel .panel-sub { font-size: 0.76rem; color: var(--ink-muted); line-height: 1.5; }
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .switch-btn { flex: none; border: none; border-radius: 999px; padding: 8px 14px; font-family: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+  .switch-btn.on { background: var(--good-soft); color: var(--good); }
+  .switch-btn.off { background: var(--critical-soft); color: var(--critical); }
+  .two-col { display: flex; gap: 8px; }
+  .two-col > * { flex: 1; min-width: 0; }
+  .closure-note { font-size: 0.76rem; color: var(--ink-muted); margin-top: 3px; }
+  .radio-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .radio-row label { flex: 1; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; background: var(--surface-2); border-radius: 10px; padding: 9px 10px; cursor: pointer; }
+  .radio-row input { accent-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -147,6 +182,8 @@
   <nav class="bottomnav">
     <button id="nav-appts" data-tab="appointments"><span class="ic">📅</span>Appointments</button>
     <button id="nav-patients" data-tab="patients"><span class="ic">🧾</span>New patients</button>
+    <button id="nav-conversations" data-tab="conversations"><span class="ic">💬</span>Conversations</button>
+    <button id="nav-clinic" data-tab="clinic"><span class="ic">🏥</span>Clinic</button>
   </nav>
 </div>
 
@@ -157,10 +194,17 @@
 
   var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
   var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
+  // Fill in after deploying the staff-send function (see its deploy comment)
+  var STAFF_SEND_URL = "https://vppwvpplehaxiqzoibkj.functions.supabase.co/staff-send";
+  var STAFF_SEND_TOKEN = "wnhpzvilufa1rqb02gy8s96oj7tedm45";
 
   var activeTab = "appointments";
   var appts = [];
   var patients = [];
+  var conversations = [];
+  var conversationSearch = "";
+  var selectedConversationId = null;
+  var threadMessages = [];
 
   var apptFilter = "pending";   // pending | all | handled
   var apptTypeFilter = "";      // "" | new | existing
@@ -168,6 +212,10 @@
 
   var patientFilter = "pending"; // pending | all | entered
   var patientSearch = "";
+
+  var closures = [];
+  var botEnabled = true;
+  var closureKind = "full"; // full | short — which kind of closure the add form is building
 
   var view = document.getElementById("view");
 
@@ -200,6 +248,27 @@
     if (!res.ok) { console.error(await res.text()); return []; }
     return res.json();
   }
+  async function apiPost(table, body) {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/" + table, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) console.error(await res.text());
+    return res.ok;
+  }
+  async function apiDelete(table, id) {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/" + table + "?id=eq." + encodeURIComponent(id), {
+      method: "DELETE",
+      headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY },
+    });
+    if (!res.ok) console.error(await res.text());
+    return res.ok;
+  }
   async function apiPatch(table, id, body) {
     var res = await fetch(SUPABASE_URL + "/rest/v1/" + table + "?id=eq." + encodeURIComponent(id), {
       method: "PATCH",
@@ -216,8 +285,40 @@
   async function loadAll() {
     var apptRes = await apiGet("appointment_submissions?select=*&order=preferred_date.asc");
     var patientRes = await apiGet("patient_intake_queue?select=*&order=created_at.desc");
+    var convoRes = await apiGet("conversations?select=*&order=updated_at.desc&limit=200");
     appts = apptRes || [];
     patients = patientRes || [];
+    conversations = convoRes || [];
+
+    // Local date parts, not toISOString() — between midnight and 5:30 AM IST the
+    // UTC date is still yesterday, which would keep a finished closure listed.
+    var now = new Date();
+    var todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+    var closureRes = await apiGet("clinic_closures?select=*&ends_on=gte." + todayStr + "&order=starts_on.asc");
+    closures = closureRes || [];
+    var settingsRes = await apiGet("clinic_settings?select=bot_enabled&limit=1");
+    if (settingsRes && settingsRes.length) botEnabled = settingsRes[0].bot_enabled !== false;
+  }
+
+  async function loadThread(conversationId) {
+    var res = await apiGet("messages?conversation_id=eq." + encodeURIComponent(conversationId) + "&select=role,content,created_at,seen_at&order=created_at.asc&limit=100");
+    threadMessages = res || [];
+  }
+
+  async function resumeBot(conversationId) {
+    var c = conversations.find(function (x) { return x.id === conversationId; });
+    if (c) c.bot_paused_until = null;
+    render();
+    await apiPatch("conversations", conversationId, { bot_paused_until: null });
+  }
+
+  async function sendStaffMessage(phone, text) {
+    var res = await fetch(STAFF_SEND_URL + "?token=" + encodeURIComponent(STAFF_SEND_TOKEN), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phone, text: text }),
+    });
+    return res.ok;
   }
 
   async function markAppt(id, handled) {
@@ -473,23 +574,304 @@
     });
   }
 
+  // ---------------- conversations tab ----------------
+
+  function isPaused(c) {
+    return !!(c.bot_paused_until && new Date(c.bot_paused_until) > new Date());
+  }
+
+  function renderConversationsSummary() {
+    var paused = conversations.filter(isPaused).length;
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip"><span class="n">' + conversations.length + '</span><span>conversations</span></div>' +
+      '<div class="chip warn"><span class="n">' + paused + '</span><span>bot paused</span></div>';
+  }
+
+  function renderConversationsList() {
+    renderConversationsSummary();
+    var q = conversationSearch.trim().toLowerCase();
+    var filtered = conversations.filter(function (c) {
+      if (!q) return true;
+      var hay = ((c.patient_name || "") + " " + (c.phone_number || "")).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    var html = '<label class="field"><input type="search" id="convo-search" placeholder="Search name or phone…" value="' + escapeHtml(conversationSearch) + '"></label>';
+    if (filtered.length === 0) {
+      html += '<div class="empty">No conversations match your search</div>';
+    } else {
+      filtered.forEach(function (c) {
+        var paused = isPaused(c);
+        html += '<div class="convo-row" data-open-convo="' + c.id + '">' +
+          '<div><div class="name">' + escapeHtml(c.patient_name || c.phone_number) + '</div>' +
+          '<div class="meta">' + escapeHtml(c.phone_number) + ' · updated ' + fmtDateTime(c.updated_at) + '</div></div>' +
+          '<div class="right">' + (paused ? '<span class="pill warn">Bot paused</span>' : '<span class="pill good">Bot active</span>') + '</div>' +
+        '</div>';
+      });
+    }
+
+    view.innerHTML = html;
+
+    var s = document.getElementById("convo-search");
+    if (s) s.addEventListener("input", function () {
+      conversationSearch = s.value; var pos = s.selectionStart; renderConversationsList();
+      var el2 = document.getElementById("convo-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    });
+    document.querySelectorAll("[data-open-convo]").forEach(function (row) {
+      row.addEventListener("click", function () {
+        selectedConversationId = row.getAttribute("data-open-convo");
+        loadThread(selectedConversationId).then(renderConversationsTab);
+      });
+    });
+  }
+
+  function renderConversationThread() {
+    var c = conversations.find(function (x) { return x.id === selectedConversationId; });
+    if (!c) { selectedConversationId = null; renderConversationsList(); return; }
+    var paused = isPaused(c);
+
+    var html = '<div class="thread-header">' +
+      '<button class="back-btn" id="convo-back">&larr; Back</button>' +
+      '<span class="thread-name">' + escapeHtml(c.patient_name || c.phone_number) + '</span>' +
+      (paused
+        ? '<span class="pill warn">Paused until ' + fmtDateTime(c.bot_paused_until) + '</span>'
+        : '<span class="pill good">Bot active</span>') +
+    '</div>';
+
+    if (paused) html += '<button class="ghost-btn ' + '" id="resume-bot-btn" style="margin-bottom:12px">Resume bot now</button>';
+
+    html += '<div class="thread-msgs">';
+    if (threadMessages.length === 0) {
+      html += '<div class="empty">No messages yet</div>';
+    } else {
+      threadMessages.forEach(function (m) {
+        var isStaff = m.role === "assistant" && m.content.indexOf("[Staff]") === 0;
+        var cls = isStaff ? "staff" : m.role;
+        var text = isStaff ? m.content.replace(/^\[Staff\]\s*/, "") : m.content;
+        var seenLine = m.role === "assistant" ? (m.seen_at ? " · Seen " + fmtDateTime(m.seen_at) : " · Sent") : "";
+        html += '<div class="msg-bubble ' + cls + '">' + escapeHtml(text) + '<div class="msg-ts">' + fmtDateTime(m.created_at) + escapeHtml(seenLine) + '</div></div>';
+      });
+    }
+    html += '</div>';
+
+    html += '<div class="send-row">' +
+      '<textarea id="staff-reply-text" placeholder="Reply as the clinic — sending pauses the bot on this conversation for 24h"></textarea>' +
+      '<button class="primary" id="staff-send-btn">Send</button>' +
+    '</div>';
+
+    view.innerHTML = html;
+
+    document.getElementById("convo-back").addEventListener("click", function () {
+      selectedConversationId = null;
+      renderConversationsList();
+    });
+    var resumeBtn = document.getElementById("resume-bot-btn");
+    if (resumeBtn) resumeBtn.addEventListener("click", function () { resumeBot(c.id); });
+
+    document.getElementById("staff-send-btn").addEventListener("click", async function () {
+      var textEl = document.getElementById("staff-reply-text");
+      var text = textEl.value.trim();
+      if (!text) return;
+      var btn = this;
+      btn.disabled = true;
+      var ok = await sendStaffMessage(c.phone_number, text);
+      btn.disabled = false;
+      if (!ok) { alert("Failed to send — check connection and try again."); return; }
+      var pauseUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      c.bot_paused_until = pauseUntil;
+      await loadThread(c.id);
+      renderConversationThread();
+    });
+  }
+
+  function renderConversationsTab() {
+    if (selectedConversationId) renderConversationThread(); else renderConversationsList();
+  }
+
+  // ---------------- clinic tab ----------------
+  //
+  // Whatever is recorded here is injected into the bot's context on every
+  // patient message, so it knows when the clinic is shut instead of guessing or
+  // telling patients to "call the clinic".
+
+  function fmtTimeLabel(hhmmss) {
+    if (!hhmmss) return "";
+    var parts = hhmmss.split(":");
+    var h = parseInt(parts[0], 10);
+    var ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12; if (h === 0) h = 12;
+    return h + ":" + parts[1] + " " + ampm;
+  }
+
+  function closureLine(c) {
+    var span = c.starts_on === c.ends_on ? fmtDate(c.starts_on) : fmtDate(c.starts_on) + " – " + fmtDate(c.ends_on);
+    var what = c.opens_at && c.closes_at
+      ? "Open only " + fmtTimeLabel(c.opens_at) + " – " + fmtTimeLabel(c.closes_at)
+      : "Closed all day";
+    return { span: span, what: what };
+  }
+
+  async function setBotEnabled(enabled) {
+    botEnabled = enabled;
+    renderClinicTab();
+    var res = await fetch(SUPABASE_URL + "/rest/v1/clinic_settings?id=eq.true", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal",
+      },
+      body: JSON.stringify({ bot_enabled: enabled, updated_at: new Date().toISOString() }),
+    });
+    if (!res.ok) {
+      console.error(await res.text());
+      botEnabled = !enabled;
+      alert("Couldn't change the bot setting — check your connection and try again.");
+      renderClinicTab();
+    }
+  }
+
+  async function addClosure() {
+    var from = document.getElementById("closure-from").value;
+    var to = document.getElementById("closure-to").value || from;
+    var note = document.getElementById("closure-note").value.trim();
+    var opens = closureKind === "short" ? document.getElementById("closure-opens").value : "";
+    var closesAt = closureKind === "short" ? document.getElementById("closure-closes").value : "";
+
+    if (!from) { alert("Pick a date first."); return; }
+    if (to < from) { alert("The end date can't be before the start date."); return; }
+    if (closureKind === "short" && (!opens || !closesAt)) { alert("Enter both the opening and closing time."); return; }
+    if (closureKind === "short" && closesAt <= opens) { alert("Closing time has to be after the opening time."); return; }
+
+    var ok = await apiPost("clinic_closures", {
+      starts_on: from,
+      ends_on: to,
+      opens_at: closureKind === "short" ? opens : null,
+      closes_at: closureKind === "short" ? closesAt : null,
+      note: note || null,
+    });
+    if (!ok) { alert("Couldn't save that — check your connection and try again."); return; }
+    await loadAll();
+    renderClinicTab();
+  }
+
+  async function removeClosure(id) {
+    closures = closures.filter(function (c) { return c.id !== id; });
+    renderClinicTab();
+    var ok = await apiDelete("clinic_closures", id);
+    if (!ok) { alert("Couldn't remove that — refreshing."); await loadAll(); renderClinicTab(); }
+  }
+
+  function renderClinicTab() {
+    document.getElementById("summary-strip").innerHTML =
+      '<div class="chip' + (botEnabled ? "" : " critical") + '"><span class="n">' + (botEnabled ? "On" : "Off") + '</span><span>WhatsApp bot</span></div>' +
+      '<div class="chip"><span class="n">' + closures.length + '</span><span>closures set</span></div>';
+
+    var html = '<div class="panel">' +
+      '<div class="switch-row">' +
+        '<div><div class="panel-title">WhatsApp bot</div>' +
+        '<div class="panel-sub">' + (botEnabled
+          ? "Answering patients automatically. Switch off when you want to handle WhatsApp yourselves — messages still arrive in Conversations, the bot just stays quiet."
+          : "Switched off. Patient messages are still logged in Conversations, but nobody is auto-replying — answer them yourselves.") +
+        '</div></div>' +
+        '<button class="switch-btn ' + (botEnabled ? "on" : "off") + '" id="bot-toggle">' + (botEnabled ? "On" : "Off") + '</button>' +
+      '</div>' +
+    '</div>';
+
+    html += '<div class="panel">' +
+      '<div class="panel-title">Closures and changed hours</div>' +
+      '<div class="panel-sub" style="margin-bottom:12px">Regular hours (Mon, Tue, Thu, Fri, Sat 11 AM–8 PM · Sun 10:30 AM–1:30 PM · closed Wednesdays) are already built in — only add the exceptions. Anything listed here, the bot knows about within seconds and won\'t offer appointments for.</div>' +
+      '<div class="radio-row">' +
+        '<label><input type="radio" name="closure-kind" value="full"' + (closureKind === "full" ? " checked" : "") + '> Closed all day</label>' +
+        '<label><input type="radio" name="closure-kind" value="short"' + (closureKind === "short" ? " checked" : "") + '> Different hours</label>' +
+      '</div>' +
+      '<div class="two-col" style="margin-bottom:10px">' +
+        '<label class="field" style="margin:0"><span class="fl">From</span><input type="date" id="closure-from"></label>' +
+        '<label class="field" style="margin:0"><span class="fl">To (same day if blank)</span><input type="date" id="closure-to"></label>' +
+      '</div>' +
+      (closureKind === "short"
+        ? '<div class="two-col" style="margin-bottom:10px">' +
+            '<label class="field" style="margin:0"><span class="fl">Opens</span><input type="time" id="closure-opens"></label>' +
+            '<label class="field" style="margin:0"><span class="fl">Closes</span><input type="time" id="closure-closes"></label>' +
+          '</div>'
+        : '') +
+      '<label class="field"><span class="fl">Reason (optional, patients may be told this)</span><input type="text" id="closure-note" placeholder="Ganesh Chaturthi / doctor on leave"></label>' +
+      '<button class="primary" id="closure-add" style="margin-top:0">Add</button>' +
+    '</div>';
+
+    html += '<div class="group-title">Coming up<span class="count">' + closures.length + '</span></div>';
+    if (closures.length === 0) {
+      html += '<div class="empty">Nothing recorded — regular hours apply on every upcoming day.</div>';
+    } else {
+      closures.forEach(function (c) {
+        var line = closureLine(c);
+        html += '<div class="row-card">' +
+          '<div class="row-top">' +
+            '<div><div class="row-name">' + escapeHtml(line.span) + '</div>' +
+            '<div class="row-meta">' + escapeHtml(line.what) + (c.note ? ' · ' + escapeHtml(c.note) : "") + '</div></div>' +
+            '<span class="pill ' + (c.opens_at ? "warn" : "critical") + '">' + (c.opens_at ? "Short day" : "Closed") + '</span>' +
+          '</div>' +
+          '<div class="row-bottom"><button class="ghost-btn" data-remove-closure="' + c.id + '">Remove</button></div>' +
+        '</div>';
+      });
+    }
+
+    view.innerHTML = html;
+
+    document.getElementById("bot-toggle").addEventListener("click", function () { setBotEnabled(!botEnabled); });
+    document.getElementById("closure-add").addEventListener("click", addClosure);
+    document.querySelectorAll('input[name="closure-kind"]').forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        // Re-render to show/hide the time fields; the dates typed so far are carried over.
+        var from = document.getElementById("closure-from").value;
+        var to = document.getElementById("closure-to").value;
+        var note = document.getElementById("closure-note").value;
+        closureKind = radio.value;
+        renderClinicTab();
+        document.getElementById("closure-from").value = from;
+        document.getElementById("closure-to").value = to;
+        document.getElementById("closure-note").value = note;
+      });
+    });
+    document.querySelectorAll("[data-remove-closure]").forEach(function (btn) {
+      btn.addEventListener("click", function () { removeClosure(btn.getAttribute("data-remove-closure")); });
+    });
+  }
+
   // ---------------- top-level ----------------
 
   function render() {
-    if (activeTab === "appointments") renderAppointmentsTab(); else renderPatientsTab();
+    if (activeTab === "appointments") renderAppointmentsTab();
+    else if (activeTab === "patients") renderPatientsTab();
+    else if (activeTab === "clinic") renderClinicTab();
+    else renderConversationsTab();
     document.getElementById("nav-appts").classList.toggle("active", activeTab === "appointments");
     document.getElementById("nav-patients").classList.toggle("active", activeTab === "patients");
+    document.getElementById("nav-conversations").classList.toggle("active", activeTab === "conversations");
+    document.getElementById("nav-clinic").classList.toggle("active", activeTab === "clinic");
   }
 
   document.getElementById("nav-appts").addEventListener("click", function () { activeTab = "appointments"; render(); });
   document.getElementById("nav-patients").addEventListener("click", function () { activeTab = "patients"; render(); });
+  document.getElementById("nav-conversations").addEventListener("click", function () { activeTab = "conversations"; selectedConversationId = null; render(); });
+  document.getElementById("nav-clinic").addEventListener("click", function () { activeTab = "clinic"; render(); });
 
   function setupRealtime() {
     var supa = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
     if (!supa) return;
+
+    // Skip auto-refresh while a staff member has a conversation thread open —
+    // re-rendering would wipe an in-progress reply draft out of the textarea.
+    function refreshUnlessComposing() {
+      if (activeTab === "conversations" && selectedConversationId) return;
+      if (activeTab === "clinic") return; // would wipe a half-filled closure form
+      loadAll().then(render);
+    }
+
     supa.channel("front-desk-sync")
-      .on("postgres_changes", { event: "*", schema: "public", table: "appointment_submissions" }, function () { loadAll().then(render); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "patient_intake_queue" }, function () { loadAll().then(render); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointment_submissions" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "patient_intake_queue" }, refreshUnlessComposing)
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, refreshUnlessComposing)
       .subscribe(function (status) {
         var dot = document.getElementById("sync-dot"); var text = document.getElementById("sync-text");
         if (status === "SUBSCRIBED") { dot.classList.remove("off"); text.textContent = "Live"; }
