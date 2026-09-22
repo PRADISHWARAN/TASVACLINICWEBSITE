@@ -11,6 +11,7 @@ import { SkinGuidePage } from "@/pages/SkinGuidePage";
 import { BlogAffordableSkincarePage } from "@/pages/BlogAffordableSkincarePage";
 import { BlogAcneSkinChangesPage } from "@/pages/BlogAcneSkinChangesPage";
 import { BlogFairnessCreamSteroidPage } from "@/pages/BlogFairnessCreamSteroidPage";
+import { BlogBlueLightScreenTimePage } from "@/pages/BlogBlueLightScreenTimePage";
 import { DrKrithiPage } from "@/pages/DrKrithiPage";
 
 function renderPage(path: string) {
@@ -31,6 +32,7 @@ function renderPage(path: string) {
     case "/blog/affordable-skincare-simple-routine": return <BlogAffordableSkincarePage />;
     case "/blog/acne-treatment-skin-changes-dermatologist": return <BlogAcneSkinChangesPage />;
     case "/blog/fairness-cream-steroid-skin-awareness": return <BlogFairnessCreamSteroidPage />;
+    case "/blog/blue-light-skin-damage-screen-time": return <BlogBlueLightScreenTimePage />;
     case "/gallery":      return <GalleryPage />;
     case "/appointments": return <AppointmentsPage />;
     case "/contact":      return <ContactPage />;

@@ -65,6 +65,14 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Blog post: Blue Light & Screen Time -->
+  <url>
+    <loc>https://tasvaaskinandhairclinic.com/blog/blue-light-skin-damage-screen-time</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Gallery -->
   <url>
     <loc>https://tasvaaskinandhairclinic.com/gallery</loc>

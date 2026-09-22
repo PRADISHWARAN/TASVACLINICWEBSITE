@@ -38,6 +38,18 @@ const posts = [
     border: "border-violet-200/60",
     slug: "/blog/fairness-cream-steroid-skin-awareness",
   },
+  {
+    category: "Skin Health & Digital Lifestyle",
+    title: "Blue Light & Skin Damage: Should You Worry About Screen Time?",
+    excerpt:
+      "Can your phone and laptop actually damage your skin? Here's what science really says about blue light, pigmentation, wrinkles and \"blue light\" skincare.",
+    author: "Dr. Tasvaa Team",
+    readTime: "6 min",
+    date: "September 2026",
+    color: "from-sky-50 to-blue-50",
+    border: "border-sky-200/60",
+    slug: "/blog/blue-light-skin-damage-screen-time",
+  },
 ];
 
 export function Blog() {
