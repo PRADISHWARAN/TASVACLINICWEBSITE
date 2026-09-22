@@ -7,6 +7,7 @@ import { trackPhoneClick } from "@/lib/analytics";
 
 const links = [
   { href: "/about",       label: "About" },
+  { href: "/dr-krithi-subhas-chandra-dermatologist-bengaluru", label: "Dr. Krithi" },
   { href: "/treatments",  label: "Treatments" },
   { href: "/skin-guide",  label: "Skin Guide" },
   { href: "/gallery",     label: "Gallery" },

@@ -81,12 +81,20 @@ export function Doctor() {
               personal setting.
             </p>
 
-            <button
-              onClick={() => navigate("/appointments")}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-coffee px-6 py-3.5 text-sm text-primary-foreground hover:opacity-90 transition shadow-soft"
-            >
-              Book a Consultation <ArrowRight className="h-4 w-4" />
-            </button>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                onClick={() => navigate("/appointments")}
+                className="inline-flex items-center gap-2 rounded-full bg-coffee px-6 py-3.5 text-sm text-primary-foreground hover:opacity-90 transition shadow-soft"
+              >
+                Book a Consultation <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => navigate("/dr-krithi-subhas-chandra-dermatologist-bengaluru")}
+                className="inline-flex items-center gap-2 rounded-full border border-coffee/25 bg-transparent px-6 py-3.5 text-sm text-coffee hover:bg-coffee/5 transition"
+              >
+                Read Full Profile <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

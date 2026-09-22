@@ -6,6 +6,7 @@ import { trackPhoneClick } from "@/lib/analytics";
 
 const quick = [
   { href: "/about",        label: "About Us" },
+  { href: "/dr-krithi-subhas-chandra-dermatologist-bengaluru", label: "About Dr. Krithi" },
   { href: "/treatments",   label: "Treatments" },
   { href: "/gallery",      label: "Gallery" },
   { href: "/blog",         label: "Blog" },

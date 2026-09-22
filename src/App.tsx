@@ -11,10 +11,20 @@ import { SkinGuidePage } from "@/pages/SkinGuidePage";
 import { BlogAffordableSkincarePage } from "@/pages/BlogAffordableSkincarePage";
 import { BlogAcneSkinChangesPage } from "@/pages/BlogAcneSkinChangesPage";
 import { BlogFairnessCreamSteroidPage } from "@/pages/BlogFairnessCreamSteroidPage";
+import { DrKrithiPage } from "@/pages/DrKrithiPage";
 
 function renderPage(path: string) {
   switch (path) {
     case "/about":        return <AboutPage />;
+    case "/dr-krithi-subhas-chandra-dermatologist-bengaluru": return <DrKrithiPage />;
+    // Legacy / alternate slugs — redirect to canonical Dr. Krithi page for SEO
+    case "/dr-krithi-subhas":
+    case "/dr-krithi-subhas-chandra":
+    case "/dr-kriti-subhas":
+    case "/dr-kriti-subhas-chandra":
+    case "/dr-krithi":
+    case "/dr-kriti":
+    case "/doctor":       return <DrKrithiPage />;
     case "/treatments":   return <TreatmentsPage />;
     case "/skin-guide":   return <SkinGuidePage />;
     case "/blog":         return <BlogPage />;
