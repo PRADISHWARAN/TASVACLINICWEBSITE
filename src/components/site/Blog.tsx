@@ -7,7 +7,7 @@ const posts = [
     title: "Before You Buy Expensive Skincare Products, Read This",
     excerpt:
       "Good skincare does not always need expensive products. A simple routine with a gentle cleanser, moisturiser, and sunscreen — along with safe daily habits — is often enough.",
-    author: "Dr. Tasvaa Team",
+    author: "Dr. Krithi Subhas",
     readTime: "5 min",
     date: "June 2026",
     color: "from-amber-50 to-orange-50",
@@ -19,7 +19,7 @@ const posts = [
     title: "Acne, Skin Changes & When Should You See a Dermatologist?",
     excerpt:
       "Acne can happen due to oil, hormones, dandruff, stress, and more. If it is recurring, painful, or leaving marks, early consultation can prevent long-term skin damage.",
-    author: "Dr. Tasvaa Team",
+    author: "Dr. Krithi Subhas",
     readTime: "7 min",
     date: "June 2026",
     color: "from-rose-50 to-pink-50",
@@ -31,7 +31,7 @@ const posts = [
     title: "Is Your Fairness Cream Secretly Damaging Your Skin?",
     excerpt:
       "A cream that gives quick results isn't always the right one. Learn why using steroid creams without medical supervision can do more harm than good.",
-    author: "Dr. Tasvaa Team",
+    author: "Dr. Krithi Subhas",
     readTime: "5 min",
     date: "July 2026",
     color: "from-violet-50 to-purple-50",
@@ -43,7 +43,7 @@ const posts = [
     title: "Blue Light & Skin Damage: Should You Worry About Screen Time?",
     excerpt:
       "Can your phone and laptop actually damage your skin? Here's what science really says about blue light, pigmentation, wrinkles and \"blue light\" skincare.",
-    author: "Dr. Tasvaa Team",
+    author: "Dr. Krithi Subhas",
     readTime: "6 min",
     date: "September 2026",
     color: "from-sky-50 to-blue-50",

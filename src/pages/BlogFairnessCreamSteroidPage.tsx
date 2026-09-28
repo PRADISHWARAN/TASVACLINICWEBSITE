@@ -213,7 +213,7 @@ export function BlogFairnessCreamSteroidPage() {
           {/* Meta */}
           <div className="mt-5 flex flex-wrap items-center gap-4 text-xs text-primary-foreground/50">
             <span className="flex items-center gap-1.5">
-              <User className="h-3.5 w-3.5" /> Dr. Tasvaa Team
+              <User className="h-3.5 w-3.5" /> Dr. Krithi Subhas
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" /> 5 min read
