@@ -215,6 +215,7 @@
 
   var closures = [];
   var botEnabled = true;
+  var doctorHours = {};
   var closureKind = "full"; // full | short — which kind of closure the add form is building
 
   var view = document.getElementById("view");
@@ -296,8 +297,11 @@
     var todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
     var closureRes = await apiGet("clinic_closures?select=*&ends_on=gte." + todayStr + "&order=starts_on.asc");
     closures = closureRes || [];
-    var settingsRes = await apiGet("clinic_settings?select=bot_enabled&limit=1");
-    if (settingsRes && settingsRes.length) botEnabled = settingsRes[0].bot_enabled !== false;
+    var settingsRes = await apiGet("clinic_settings?select=bot_enabled,doctor_hours&limit=1");
+    if (settingsRes && settingsRes.length) {
+      botEnabled = settingsRes[0].bot_enabled !== false;
+      doctorHours = settingsRes[0].doctor_hours || {};
+    }
   }
 
   async function loadThread(conversationId) {
@@ -731,6 +735,30 @@
     }
   }
 
+  var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var CLINIC_HOURS_LABEL = { 0: "10:30 AM – 1:30 PM", 1: "11 AM – 8 PM", 2: "11 AM – 8 PM", 3: null, 4: "11 AM – 8 PM", 5: "11 AM – 8 PM", 6: "11 AM – 8 PM" };
+
+  async function saveDoctorHours(next) {
+    var prev = doctorHours;
+    doctorHours = next;
+    renderClinicTab();
+    var res = await fetch(SUPABASE_URL + "/rest/v1/clinic_settings?id=eq.true", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal",
+      },
+      body: JSON.stringify({ doctor_hours: next }),
+    });
+    if (!res.ok) {
+      console.error(await res.text());
+      doctorHours = prev;
+      alert("Couldn't save the doctor's hours — check your connection and try again.");
+      renderClinicTab();
+    }
+  }
+
   async function addClosure() {
     var from = document.getElementById("closure-from").value;
     var to = document.getElementById("closure-to").value || from;
@@ -779,6 +807,31 @@
     '</div>';
 
     html += '<div class="panel">' +
+      '<div class="panel-title">Doctor\'s consultation hours</div>' +
+      '<div class="panel-sub" style="margin-bottom:12px">The clinic opens before the doctor arrives, and those earlier hours are therapist-run procedure time. Set when she actually consults each day — the bot only offers consultations and first visits inside these windows, and the booking page hides earlier slots from new patients.</div>';
+    for (var d = 0; d < 7; d++) {
+      var clinicLabel = CLINIC_HOURS_LABEL[d];
+      if (!clinicLabel) continue; // Wednesday — clinic shut
+      var w = doctorHours[String(d)];
+      html += '<div class="row-card" style="margin-bottom:6px">' +
+        '<div class="row-top">' +
+          '<div><div class="row-name">' + DAY_NAMES[d] + '</div>' +
+          '<div class="row-meta">Clinic open ' + clinicLabel + '</div></div>' +
+          '<label style="display:flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:600;color:var(--ink-muted)">' +
+            '<input type="checkbox" data-doc-in="' + d + '"' + (w ? " checked" : "") + '> Doctor in' +
+          '</label>' +
+        '</div>' +
+        (w
+          ? '<div class="two-col" style="margin-top:9px">' +
+              '<label class="field" style="margin:0"><span class="fl">From</span><input type="time" data-doc-from="' + d + '" value="' + escapeHtml(w.from) + '"></label>' +
+              '<label class="field" style="margin:0"><span class="fl">To</span><input type="time" data-doc-to="' + d + '" value="' + escapeHtml(w.to) + '"></label>' +
+            '</div>'
+          : '<div class="closure-note" style="margin-top:6px">No consultations this day — procedures only.</div>') +
+      '</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="panel">' +
       '<div class="panel-title">Closures and changed hours</div>' +
       '<div class="panel-sub" style="margin-bottom:12px">Regular hours (Mon, Tue, Thu, Fri, Sat 11 AM–8 PM · Sun 10:30 AM–1:30 PM · closed Wednesdays) are already built in — only add the exceptions. Anything listed here, the bot knows about within seconds and won\'t offer appointments for.</div>' +
       '<div class="radio-row">' +
@@ -820,6 +873,30 @@
 
     document.getElementById("bot-toggle").addEventListener("click", function () { setBotEnabled(!botEnabled); });
     document.getElementById("closure-add").addEventListener("click", addClosure);
+
+    document.querySelectorAll("[data-doc-in]").forEach(function (box) {
+      box.addEventListener("change", function () {
+        var d = box.getAttribute("data-doc-in");
+        var next = JSON.parse(JSON.stringify(doctorHours));
+        // Re-ticking a day restores a sensible window rather than an empty one.
+        next[d] = box.checked ? { from: d === "0" ? "10:30" : "15:00", to: d === "0" ? "13:30" : "20:00" } : null;
+        saveDoctorHours(next);
+      });
+    });
+    ["from", "to"].forEach(function (end) {
+      document.querySelectorAll("[data-doc-" + end + "]").forEach(function (input) {
+        input.addEventListener("change", function () {
+          var d = input.getAttribute("data-doc-" + end);
+          if (!input.value) return;
+          var next = JSON.parse(JSON.stringify(doctorHours));
+          var w = next[d] || { from: "15:00", to: "20:00" };
+          w[end] = input.value;
+          if (w.from >= w.to) { alert("The doctor's finish time has to be after her start time."); renderClinicTab(); return; }
+          next[d] = w;
+          saveDoctorHours(next);
+        });
+      });
+    });
     document.querySelectorAll('input[name="closure-kind"]').forEach(function (radio) {
       radio.addEventListener("change", function () {
         // Re-render to show/hide the time fields; the dates typed so far are carried over.
