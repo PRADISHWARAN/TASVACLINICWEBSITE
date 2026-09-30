@@ -109,6 +109,7 @@
         <div class="field">
           <label for="preferred_time">Time<span class="req">*</span></label>
           <select id="preferred_time" required disabled><option value="">Pick a date first</option></select>
+          <div class="hint" id="doctor-hours-note" style="display:none"></div>
         </div>
         <div class="field">
           <label for="reason">What's this visit for? <span class="opt">optional</span></label>
@@ -148,6 +149,43 @@
   // Loaded once on page load; empty on failure so a network hiccup never blocks
   // a booking request (the team confirms every slot by hand anyway).
   var closures = [];
+
+  // The doctor is not in for all of the clinic's opening hours — she arrives
+  // later on the 11-8 days, and those earlier hours are therapist-run procedure
+  // time. Keyed by getDay() (0 = Sunday); null means she isn't in that day.
+  // Falls back to the seeded values if the lookup fails.
+  var doctorHours = {
+    "0": { from: "10:30", to: "13:30" },
+    "1": { from: "15:00", to: "20:00" },
+    "2": { from: "15:00", to: "20:00" },
+    "3": null,
+    "4": { from: "15:00", to: "20:00" },
+    "5": { from: "15:00", to: "20:00" },
+    "6": { from: "15:00", to: "20:00" },
+  };
+
+  async function loadDoctorHours() {
+    try {
+      var res = await fetch(SUPABASE_URL + "/rest/v1/clinic_settings?select=doctor_hours&limit=1", {
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY },
+      });
+      if (!res.ok) { console.error("Doctor hours lookup failed:", res.status); return; }
+      var rows = await res.json();
+      if (rows && rows[0] && rows[0].doctor_hours) doctorHours = rows[0].doctor_hours;
+    } catch (err) {
+      console.error("Doctor hours lookup failed:", err);
+    }
+  }
+
+  // The doctor's window for a date, narrowed to the clinic's actual hours that
+  // day (a shortened day can cut it at either end). Null if she isn't in.
+  function doctorWindowFor(dateStr, clinicHours) {
+    var w = doctorHours[String(new Date(dateStr + "T00:00:00").getDay())];
+    if (!w || !clinicHours) return null;
+    var from = w.from > clinicHours.open ? w.from : clinicHours.open;
+    var to = w.to < clinicHours.close ? w.to : clinicHours.close;
+    return from < to ? { open: from, close: to } : null;
+  }
 
   function closureFor(dateStr) {
     for (var i = 0; i < closures.length; i++) {
@@ -209,11 +247,19 @@
     }
 
     select.disabled = false;
+
+    // A first visit always needs the doctor, so only her window is offered.
+    // Returning patients also see the earlier procedure slots, flagged as
+    // repeat-session-only and subject to the team confirming.
+    var isNewPatient = !prefill || prefill.patient_type !== "existing";
+    var docWindow = doctorWindowFor(dateStr, hours);
+
     var opts = ['<option value="" disabled selected>Choose a time</option>'];
     var start = hours.open.split(":").map(Number);
     var end = hours.close.split(":").map(Number);
     var cur = start[0] * 60 + start[1];
     var endMin = end[0] * 60 + end[1];
+    var offeredConsult = 0, offeredProcedure = 0;
     while (cur + SLOT_MINUTES <= endMin) {
       var h1 = Math.floor(cur / 60), m1 = cur % 60;
       var next = cur + SLOT_MINUTES;
@@ -221,10 +267,39 @@
       var hhmm1 = (h1 < 10 ? "0" : "") + h1 + ":" + (m1 < 10 ? "0" : "") + m1;
       var hhmm2 = (h2 < 10 ? "0" : "") + h2 + ":" + (m2 < 10 ? "0" : "") + m2;
       var label = fmtTimeLabel(hhmm1) + " – " + fmtTimeLabel(hhmm2);
-      opts.push('<option value="' + label + '">' + label + "</option>");
+      var withDoctor = !!docWindow && hhmm1 >= docWindow.open && hhmm2 <= docWindow.close;
+
+      if (withDoctor) {
+        offeredConsult++;
+        // value stays the clean label — it's what gets stored and clash-checked
+        opts.push('<option value="' + label + '">' + label + "</option>");
+      } else if (!isNewPatient) {
+        offeredProcedure++;
+        opts.push('<option value="' + label + '">' + label + " — repeat sessions only</option>");
+      }
       cur = next;
     }
-    select.innerHTML = opts.join("");
+
+    if (offeredConsult === 0 && offeredProcedure === 0) {
+      select.disabled = true;
+      select.innerHTML = '<option value="">No slots that day</option>';
+    } else {
+      select.innerHTML = opts.join("");
+    }
+
+    var note = document.getElementById("doctor-hours-note");
+    if (!docWindow) {
+      note.textContent = "The doctor isn't consulting that day.";
+      note.style.display = "block";
+    } else if (isNewPatient) {
+      note.textContent = "The doctor consults from " + fmtTimeLabel(docWindow.open) + " on this day, so first visits are booked from then onwards.";
+      note.style.display = "block";
+    } else if (offeredProcedure > 0) {
+      note.textContent = "The doctor consults from " + fmtTimeLabel(docWindow.open) + ". Earlier slots are for repeat treatment sessions a therapist can do — the team will confirm.";
+      note.style.display = "block";
+    } else {
+      note.style.display = "none";
+    }
   }
 
   // Converts "11:00 AM" / "1:30 PM" -> "11:00" / "13:30" (24h, for building an ISO timestamp)
@@ -400,7 +475,7 @@
     }
   });
 
-  Promise.all([loadPrefill(), loadClosures()]).then(init);
+  Promise.all([loadPrefill(), loadClosures(), loadDoctorHours()]).then(init);
 })();
 </script>
 </body>
