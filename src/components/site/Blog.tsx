@@ -50,6 +50,54 @@ const posts = [
     border: "border-sky-200/60",
     slug: "/blog/blue-light-skin-damage-screen-time",
   },
+  {
+    category: "Acne & Acne Scars",
+    title: "The Ultimate Guide to Acne Scar Treatments: MNRF vs. Fractional CO2 Laser",
+    excerpt:
+      "MNRF and Fractional CO2 Laser are two commonly used treatments for acne scars. Learn how they work, recovery, suitability for Indian skin, and how to choose with your dermatologist.",
+    author: "Dr. Krithi Subhas",
+    readTime: "8 min",
+    date: "October 2026",
+    color: "from-emerald-50 to-green-50",
+    border: "border-emerald-200/60",
+    slug: "/blog/mnrf-vs-fractional-co2-laser-acne-scars",
+  },
+  {
+    category: "Acne & Skin Care",
+    title: "Bangalore Weather & Your Skin Barrier: How Humidity and Pollution Trigger Breakouts",
+    excerpt:
+      "Why does your skin feel oilier, more congested, or more irritated in Bangalore? Here's how humidity, sweat, pollution, and your skin barrier can interact.",
+    author: "Dr. Krithi Subhas",
+    readTime: "6 min",
+    date: "October 2026",
+    color: "from-teal-50 to-cyan-50",
+    border: "border-teal-200/60",
+    slug: "/blog/bangalore-weather-skin-barrier-breakouts",
+  },
+  {
+    category: "Laser Hair Reduction",
+    title: "Is Laser Hair Reduction Permanent? 7 Myths Debunked by Dermatologists",
+    excerpt:
+      "Wondering whether laser hair reduction is permanent? Here are 7 common myths about laser hair reduction and what you should actually expect from the treatment.",
+    author: "Dr. Krithi Subhas",
+    readTime: "6 min",
+    date: "October 2026",
+    color: "from-indigo-50 to-violet-50",
+    border: "border-indigo-200/60",
+    slug: "/blog/laser-hair-reduction-myths-permanent",
+  },
+  {
+    category: "Acne & Acne Scars",
+    title: "Why Do Some People Scar Easily After Pimples?",
+    excerpt:
+      "Why do some pimples leave scars while others disappear without a trace? Learn what causes acne scars, who is more prone to them, and how to reduce the risk.",
+    author: "Dr. Krithi Subhas",
+    readTime: "6 min",
+    date: "October 2026",
+    color: "from-orange-50 to-amber-50",
+    border: "border-orange-200/60",
+    slug: "/blog/why-some-people-scar-easily-after-pimples",
+  },
 ];
 
 export function Blog() {

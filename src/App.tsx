@@ -12,6 +12,10 @@ import { BlogAffordableSkincarePage } from "@/pages/BlogAffordableSkincarePage";
 import { BlogAcneSkinChangesPage } from "@/pages/BlogAcneSkinChangesPage";
 import { BlogFairnessCreamSteroidPage } from "@/pages/BlogFairnessCreamSteroidPage";
 import { BlogBlueLightScreenTimePage } from "@/pages/BlogBlueLightScreenTimePage";
+import { BlogMnrfVsCo2LaserPage } from "@/pages/BlogMnrfVsCo2LaserPage";
+import { BlogBangaloreWeatherSkinPage } from "@/pages/BlogBangaloreWeatherSkinPage";
+import { BlogLaserHairReductionMythsPage } from "@/pages/BlogLaserHairReductionMythsPage";
+import { BlogAcneScarringPage } from "@/pages/BlogAcneScarringPage";
 import { DrKrithiPage } from "@/pages/DrKrithiPage";
 
 function renderPage(path: string) {
@@ -33,6 +37,10 @@ function renderPage(path: string) {
     case "/blog/acne-treatment-skin-changes-dermatologist": return <BlogAcneSkinChangesPage />;
     case "/blog/fairness-cream-steroid-skin-awareness": return <BlogFairnessCreamSteroidPage />;
     case "/blog/blue-light-skin-damage-screen-time": return <BlogBlueLightScreenTimePage />;
+    case "/blog/mnrf-vs-fractional-co2-laser-acne-scars": return <BlogMnrfVsCo2LaserPage />;
+    case "/blog/bangalore-weather-skin-barrier-breakouts": return <BlogBangaloreWeatherSkinPage />;
+    case "/blog/laser-hair-reduction-myths-permanent": return <BlogLaserHairReductionMythsPage />;
+    case "/blog/why-some-people-scar-easily-after-pimples": return <BlogAcneScarringPage />;
     case "/gallery":      return <GalleryPage />;
     case "/appointments": return <AppointmentsPage />;
     case "/contact":      return <ContactPage />;
