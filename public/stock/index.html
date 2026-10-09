@@ -113,7 +113,7 @@
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; margin-bottom: 12px; }
 
   .proc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .proc-tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; text-align: left; font-family: inherit; cursor: pointer; }
+  .proc-tile { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; text-align: left; font-family: inherit; cursor: pointer; }
   .proc-tile .name { font-weight: 600; font-size: 0.86rem; display: block; }
   .proc-tile .runs { font-size: 0.7rem; color: var(--ink-muted); margin-top: 3px; display: block; }
   .proc-tile .runs.warn { color: var(--warn); }
@@ -125,6 +125,12 @@
   .bom-row .after { color: var(--ink-muted); font-size: 0.75rem; }
   .bom-row .after.warn { color: var(--warn); }
   .bom-row .after.critical { color: var(--critical); font-weight: 600; }
+  .bom-row { gap: 10px; }
+  .bom-row .bom-name { flex: 1; min-width: 0; }
+  .bom-row .bom-name small { display: block; color: var(--ink-muted); font-size: 0.7rem; margin-top: 1px; }
+  .bom-row input.bom-qty { flex: none; width: 58px; padding: 7px 4px; text-align: center; font-size: 0.95rem; font-weight: 600; }
+  .bom-row .after { flex: none; min-width: 84px; text-align: right; }
+  .bom-hint { font-size: 0.74rem; color: var(--ink-muted); margin: 0 0 6px; }
 
   button.primary {
     width: 100%; background: var(--accent); color: var(--accent-ink); border: none; border-radius: 10px;
@@ -261,6 +267,10 @@
 
   var logSubTab = "procedure";
   var selectedProcId = null;
+  // Per-use overrides for the selected procedure, keyed by item id. A procedure
+  // defines the usual amounts, but real use varies (3 gloves one time, 0 the
+  // next), so staff can change them before logging. Empty = use the usual amount.
+  var procUse = {};
   var selectedItemId = null;
   var stockGroupBy = "category";
   var stockSearch = "";
@@ -270,6 +280,11 @@
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function statusOf(item) { if (item.qty <= 0) return "critical"; if (item.qty <= item.low) return "warn"; return "good"; }
   function statusLabel(s) { return s === "critical" ? "Out" : s === "warn" ? "Low" : "Good"; }
+  /** Amount of this consumable to deduct this time: the override if set, else the usual amount. */
+  function procUseFor(c) {
+    var v = procUse[c.itemId];
+    return v === undefined ? c.qty : v;
+  }
   function runsRemaining(proc) {
     var min = Infinity;
     for (var i = 0; i < proc.consumables.length; i++) {
@@ -371,17 +386,20 @@
       if (selectedProcId) {
         var proc = procById(selectedProcId);
         html += '<div class="card"><div class="group-title" style="margin-top:0">' + escapeHtml(proc.name) + ' consumables</div>';
-        var anyCritical = false;
+        html += '<div class="bom-hint">Change a number if this time used a different amount &mdash; use 0 for anything you didn\'t use.</div>';
         proc.consumables.forEach(function (c) {
           var it = itemById(c.itemId); if (!it) return;
-          var after = it.qty - c.qty;
+          var use = procUseFor(c);
+          var after = it.qty - use;
           var cls = after < 0 ? "critical" : after <= it.low ? "warn" : "";
-          if (after < 0) anyCritical = true;
-          html += '<div class="bom-row"><span>' + escapeHtml(it.name) + ' &times; ' + c.qty + '</span>' +
+          html += '<div class="bom-row" data-bom-item="' + escapeHtml(it.id) + '">' +
+            '<label class="bom-name" for="bom-' + escapeHtml(it.id) + '">' + escapeHtml(it.name) +
+              '<small>usually ' + c.qty + ' ' + escapeHtml(it.unit) + '</small></label>' +
+            '<input type="number" class="bom-qty" id="bom-' + escapeHtml(it.id) + '" data-bom-input="' + escapeHtml(it.id) + '" min="0" step="1" inputmode="numeric" placeholder="0" value="' + use + '">' +
             '<span class="after ' + cls + '">' + it.qty + ' &rarr; ' + after + ' ' + escapeHtml(it.unit) + '</span></div>';
         });
         html += '<button class="primary" id="confirm-proc">Log ' + escapeHtml(proc.name) + '</button>';
-        if (anyCritical) html += '<div class="banner" style="margin-top:10px;margin-bottom:0">This will take an item below zero &mdash; stock counts may be off. Log anyway if that\'s correct.</div>';
+        html += '<div class="banner" id="bom-banner" style="margin-top:10px;margin-bottom:0;display:none">This will take an item below zero &mdash; stock counts may be off. Log anyway if that\'s correct.</div>';
         html += '</div>';
       }
     } else {
@@ -421,23 +439,72 @@
 
   function wireLogTab() {
     view.querySelectorAll("[data-sub]").forEach(function (btn) {
-      btn.addEventListener("click", function () { logSubTab = btn.getAttribute("data-sub"); selectedProcId = null; selectedItemId = null; renderLogTab(); });
+      btn.addEventListener("click", function () { logSubTab = btn.getAttribute("data-sub"); selectedProcId = null; selectedItemId = null; procUse = {}; renderLogTab(); });
     });
 
     if (logSubTab === "procedure") {
       view.querySelectorAll("[data-proc]").forEach(function (btn) {
-        btn.addEventListener("click", function () { var id = btn.getAttribute("data-proc"); selectedProcId = selectedProcId === id ? null : id; renderLogTab(); });
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-proc");
+          selectedProcId = selectedProcId === id ? null : id;
+          procUse = {}; // a different procedure (or closing it) starts back at the usual amounts
+          renderLogTab();
+        });
       });
+
       var confirmBtn = document.getElementById("confirm-proc");
+      var banner = document.getElementById("bom-banner");
+
+      // Refresh the "stock after" figures, the below-zero warning and the button
+      // in place. Re-rendering the tab here would drop focus mid-typing.
+      function refreshBom() {
+        if (!selectedProcId || !confirmBtn) return;
+        var proc = procById(selectedProcId);
+        var anyBelowZero = false, anyUse = false;
+        proc.consumables.forEach(function (c) {
+          var it = itemById(c.itemId); if (!it) return;
+          var use = procUseFor(c);
+          if (use > 0) anyUse = true;
+          var after = it.qty - use;
+          if (use > 0 && after < 0) anyBelowZero = true;
+          var row = view.querySelector('[data-bom-item="' + it.id + '"]');
+          if (!row) return;
+          var cell = row.querySelector(".after");
+          cell.className = "after " + (after < 0 ? "critical" : after <= it.low ? "warn" : "");
+          cell.innerHTML = it.qty + " &rarr; " + after + " " + escapeHtml(it.unit);
+        });
+        if (banner) banner.style.display = anyBelowZero ? "block" : "none";
+        confirmBtn.disabled = !anyUse;
+      }
+
+      view.querySelectorAll("[data-bom-input]").forEach(function (input) {
+        input.addEventListener("input", function () {
+          var raw = input.value.trim();
+          // Blank or nonsense counts as 0 rather than silently reverting to the
+          // usual amount — "I didn't use it" is exactly what clearing the box means.
+          var n = parseInt(raw, 10);
+          procUse[input.getAttribute("data-bom-input")] = isNaN(n) || n < 0 ? 0 : n;
+          refreshBom();
+        });
+        input.addEventListener("focus", function () { input.select(); });
+      });
+      refreshBom();
+
       if (confirmBtn) confirmBtn.addEventListener("click", async function () {
         confirmBtn.disabled = true;
         var proc = procById(selectedProcId);
+        var adjusted = false;
         for (var i = 0; i < proc.consumables.length; i++) {
           var c = proc.consumables[i]; var it = itemById(c.itemId);
-          if (it) await updateItemQty(it.id, it.qty - c.qty);
+          var use = procUseFor(c);
+          if (use !== c.qty) adjusted = true;
+          if (it && use > 0) await updateItemQty(it.id, it.qty - use);
         }
-        await insertLog({ kind: "procedure", label: proc.name + " logged", procedureId: proc.id });
+        // Recent activity shows when someone used a non-standard amount, so a
+        // surprising stock figure can be traced back to who adjusted what.
+        await insertLog({ kind: "procedure", label: proc.name + " logged" + (adjusted ? " (amounts adjusted)" : ""), procedureId: proc.id });
         selectedProcId = null;
+        procUse = {};
         showToast("Saved"); renderAll();
       });
     } else {
@@ -564,10 +631,24 @@
 
   // ---- realtime: any other device's change refreshes this one ----
 
+  // Re-reads and re-renders when someone else changes stock. If this person is
+  // mid-edit in a quantity box, put the cursor back afterwards — the numbers
+  // themselves survive (they live in procUse), but a re-render drops focus.
+  function refreshFromRemote() {
+    var active = document.activeElement;
+    var focusedId = active && active.getAttribute && active.getAttribute("data-bom-input");
+    loadAll().then(function () {
+      renderAll();
+      if (!focusedId) return;
+      var again = view.querySelector('[data-bom-input="' + focusedId + '"]');
+      if (again) { again.focus(); try { again.setSelectionRange(again.value.length, again.value.length); } catch (e) { /* number inputs don't support selection */ } }
+    });
+  }
+
   function setupRealtime() {
     supabaseClient.channel("stock-sync")
-      .on("postgres_changes", { event: "*", schema: "public", table: "stock_items" }, function () { loadAll().then(renderAll); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "stock_log" }, function () { loadAll().then(renderAll); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_items" }, refreshFromRemote)
+      .on("postgres_changes", { event: "*", schema: "public", table: "stock_log" }, refreshFromRemote)
       .subscribe(function (status) {
         var dot = document.getElementById("sync-dot"); var text = document.getElementById("sync-text");
         if (status === "SUBSCRIBED") { dot.classList.remove("off"); text.textContent = "Live"; }
