@@ -98,6 +98,54 @@ const posts = [
     border: "border-orange-200/60",
     slug: "/blog/why-some-people-scar-easily-after-pimples",
   },
+  {
+    category: "Hair Fall & Hair Care",
+    title: "Can Stress Really Cause Hair Fall? Understanding Stress-Related Hair Loss",
+    excerpt:
+      "Noticing more hair on your pillow, brush, or shower drain during a stressful phase? Learn how stress triggers hair loss, how to recognise it, and how to help your hair recover.",
+    author: "Dr. Krithi Subhas",
+    readTime: "7 min",
+    date: "October 2026",
+    color: "from-purple-50 to-fuchsia-50",
+    border: "border-purple-200/60",
+    slug: "/blog/stress-related-hair-fall",
+  },
+  {
+    category: "Acne & Skin Care",
+    title: "Can Hair Products Cause Forehead Acne? The Surprising Link Between Haircare and Breakouts",
+    excerpt:
+      "Stubborn bumps along your hairline or forehead? Learn how shampoos, oils, serums, and styling products can trigger breakouts, and how to find and fix the cause.",
+    author: "Dr. Krithi Subhas",
+    readTime: "7 min",
+    date: "October 2026",
+    color: "from-pink-50 to-rose-50",
+    border: "border-pink-200/60",
+    slug: "/blog/hair-products-forehead-acne",
+  },
+  {
+    category: "Skin Care",
+    title: "Why Does Your Skin Look Dull Even After Following a Good Skincare Routine?",
+    excerpt:
+      "Cleansing, moisturising, and using sunscreen, yet your skin still looks tired? Discover the hidden reasons behind dull skin and what actually brings back your glow.",
+    author: "Dr. Krithi Subhas",
+    readTime: "8 min",
+    date: "October 2026",
+    color: "from-yellow-50 to-amber-50",
+    border: "border-yellow-200/60",
+    slug: "/blog/dull-skin-despite-good-skincare-routine",
+  },
+  {
+    category: "Acne & Skin Care",
+    title: "Small Bumps on Your Face: Acne, Milia, Folliculitis or Something Else?",
+    excerpt:
+      "Tiny bumps on your cheeks, forehead, or around your eyes? Learn how to tell acne, milia, folliculitis, and other common skin bumps apart, and what to do about each.",
+    author: "Dr. Krithi Subhas",
+    readTime: "9 min",
+    date: "October 2026",
+    color: "from-cyan-50 to-sky-50",
+    border: "border-cyan-200/60",
+    slug: "/blog/small-bumps-on-face-acne-milia-folliculitis",
+  },
 ];
 
 export function Blog() {

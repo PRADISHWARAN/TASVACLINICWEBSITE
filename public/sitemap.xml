@@ -105,6 +105,38 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Blog post: Stress-Related Hair Fall -->
+  <url>
+    <loc>https://tasvaaskinandhairclinic.com/blog/stress-related-hair-fall</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog post: Hair Products & Forehead Acne -->
+  <url>
+    <loc>https://tasvaaskinandhairclinic.com/blog/hair-products-forehead-acne</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog post: Dull Skin Despite Good Skincare -->
+  <url>
+    <loc>https://tasvaaskinandhairclinic.com/blog/dull-skin-despite-good-skincare-routine</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog post: Small Bumps on Face -->
+  <url>
+    <loc>https://tasvaaskinandhairclinic.com/blog/small-bumps-on-face-acne-milia-folliculitis</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Gallery -->
   <url>
     <loc>https://tasvaaskinandhairclinic.com/gallery</loc>

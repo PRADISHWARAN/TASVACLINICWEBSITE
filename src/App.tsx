@@ -16,6 +16,10 @@ import { BlogMnrfVsCo2LaserPage } from "@/pages/BlogMnrfVsCo2LaserPage";
 import { BlogBangaloreWeatherSkinPage } from "@/pages/BlogBangaloreWeatherSkinPage";
 import { BlogLaserHairReductionMythsPage } from "@/pages/BlogLaserHairReductionMythsPage";
 import { BlogAcneScarringPage } from "@/pages/BlogAcneScarringPage";
+import { BlogStressHairFallPage } from "@/pages/BlogStressHairFallPage";
+import { BlogHairProductsForeheadAcnePage } from "@/pages/BlogHairProductsForeheadAcnePage";
+import { BlogDullSkinPage } from "@/pages/BlogDullSkinPage";
+import { BlogSmallBumpsOnFacePage } from "@/pages/BlogSmallBumpsOnFacePage";
 import { DrKrithiPage } from "@/pages/DrKrithiPage";
 
 function renderPage(path: string) {
@@ -41,6 +45,10 @@ function renderPage(path: string) {
     case "/blog/bangalore-weather-skin-barrier-breakouts": return <BlogBangaloreWeatherSkinPage />;
     case "/blog/laser-hair-reduction-myths-permanent": return <BlogLaserHairReductionMythsPage />;
     case "/blog/why-some-people-scar-easily-after-pimples": return <BlogAcneScarringPage />;
+    case "/blog/stress-related-hair-fall": return <BlogStressHairFallPage />;
+    case "/blog/hair-products-forehead-acne": return <BlogHairProductsForeheadAcnePage />;
+    case "/blog/dull-skin-despite-good-skincare-routine": return <BlogDullSkinPage />;
+    case "/blog/small-bumps-on-face-acne-milia-folliculitis": return <BlogSmallBumpsOnFacePage />;
     case "/gallery":      return <GalleryPage />;
     case "/appointments": return <AppointmentsPage />;
     case "/contact":      return <ContactPage />;

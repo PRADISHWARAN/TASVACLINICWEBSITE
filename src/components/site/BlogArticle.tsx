@@ -421,3 +421,18 @@ export function TakeawayP({ children, lead = false }: { children: ReactNode; lea
     <p className="text-sm sm:text-base text-coffee/80 leading-relaxed">{children}</p>
   );
 }
+
+export function LabeledList({ items }: { items: [string, string][] }) {
+  return (
+    <ul className="space-y-2.5">
+      {items.map(([label, text]) => (
+        <li key={label} className="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed">
+          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[oklch(0.74_0.1_78)] flex-shrink-0" />
+          <span>
+            <strong className="text-coffee/80 font-medium">{label}:</strong> {text}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
