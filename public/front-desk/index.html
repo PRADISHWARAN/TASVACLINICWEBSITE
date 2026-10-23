@@ -139,6 +139,33 @@
   .send-row textarea { flex: 1; resize: none; min-height: 40px; max-height: 100px; }
   .send-row button { flex: none; width: auto; padding: 0 16px; margin-top: 0; }
 
+  /* calendar */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+  .cal-nav-btn { background: var(--surface-2); border: none; border-radius: 8px; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; color: var(--ink); flex: none; }
+  .cal-title { font-weight: 700; font-size: 0.98rem; flex: 1; text-align: center; }
+  .cal-today-btn { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; font-size: 0.76rem; font-weight: 600; cursor: pointer; color: var(--ink-muted); flex: none; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+  .cal-dow { text-align: center; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; color: var(--ink-muted); padding-bottom: 6px; }
+  .cal-cell {
+    aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); background: var(--surface);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    cursor: pointer; font-size: 0.8rem; font-family: inherit; color: var(--ink); padding: 0;
+  }
+  .cal-cell.outside { visibility: hidden; cursor: default; }
+  .cal-cell.today { border-color: var(--accent); border-width: 2px; }
+  .cal-cell.selected { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .cal-cell .daynum { font-weight: 600; }
+  .dot-row { display: flex; gap: 3px; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .cal-dot.warn { background: var(--warn); }
+  .cal-dot.critical { background: var(--critical); }
+  .cal-dot.good { background: var(--good); }
+  .cal-dot.accent { background: var(--accent); }
+  .cal-cell.selected .cal-dot { background: var(--accent-ink); }
+  .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.7rem; color: var(--ink-muted); margin: 2px 0 6px; }
+  .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  @media (min-width: 560px) { .cal-cell { font-size: 0.9rem; } .cal-dot { width: 6px; height: 6px; } }
+
   /* clinic tab */
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px; margin-bottom: 14px; }
   .panel .panel-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 3px; }
@@ -192,16 +219,19 @@
 (function () {
   "use strict";
 
-  var SUPABASE_URL = "https://vppwvpplehaxiqzoibkj.supabase.co";
-  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcHd2cHBsZWhheGlxem9pYmtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMzI1NzIsImV4cCI6MjA5ODgwODU3Mn0.XN9GceqLqxScG8shwxK_iu4iC4bMXiGg6pVMuuAuKxA";
+  var SUPABASE_URL = "https://ltxhelhkripcjvmbmfar.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0eGhlbGhrcmlwY2p2bWJtZmFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NTgwMDUsImV4cCI6MjEwODMzNDAwNX0.zu2f1Yy2zoUHu6DhMa3JQLl54shFF3sr-4o2j35v2I8";
   // Fill in after deploying the staff-send function (see its deploy comment)
-  var STAFF_SEND_URL = "https://vppwvpplehaxiqzoibkj.functions.supabase.co/staff-send";
+  var STAFF_SEND_URL = "https://ltxhelhkripcjvmbmfar.functions.supabase.co/staff-send";
   var STAFF_SEND_TOKEN = "wnhpzvilufa1rqb02gy8s96oj7tedm45";
+  // Confirmed CareMap appointments for the calendar view (same staff token as staff-send)
+  var STAFF_SCHEDULE_URL = "https://ltxhelhkripcjvmbmfar.functions.supabase.co/staff-schedule";
 
   var activeTab = "appointments";
   var appts = [];
   var patients = [];
   var conversations = [];
+  var bookedAppts = []; // confirmed CareMap appointments, from staff-schedule
   var conversationSearch = "";
   var selectedConversationId = null;
   var threadMessages = [];
@@ -209,6 +239,9 @@
   var apptFilter = "pending";   // pending | all | handled
   var apptTypeFilter = "";      // "" | new | existing
   var apptSearch = "";
+  var apptViewMode = "list";    // list | calendar
+  var calendarMonth = new Date(); calendarMonth.setDate(1); calendarMonth.setHours(0, 0, 0, 0);
+  var calendarSelectedDate = ""; // set below, once toDateStr exists
 
   var patientFilter = "pending"; // pending | all | entered
   var patientSearch = "";
@@ -238,6 +271,56 @@
     var today = new Date(); today.setHours(0, 0, 0, 0);
     var d = new Date(dateStr + "T00:00:00");
     return Math.round((d - today) / 86400000);
+  }
+
+  // ---------------- calendar helpers ----------------
+
+  function pad2(n) { return n < 10 ? "0" + n : "" + n; }
+  function toDateStr(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function fmtMonthYear(d) { return d.toLocaleDateString("en-IN", { month: "long", year: "numeric" }); }
+  calendarSelectedDate = toDateStr(new Date());
+
+  // "3:00 PM - 3:30 PM" -> minutes since midnight, for ordering a day's requests.
+  function apptTimeSortKey(o) {
+    var m = (o.preferred_time || "").match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!m) return 0;
+    var h = parseInt(m[1], 10); var min = parseInt(m[2], 10); var ap = m[3].toUpperCase();
+    if (ap === "PM" && h !== 12) h += 12;
+    if (ap === "AM" && h === 12) h = 0;
+    return h * 60 + min;
+  }
+  function apptsOnDate(dateStr) {
+    return appts.filter(function (o) { return o.preferred_date === dateStr; })
+      .sort(function (a, b) { return apptTimeSortKey(a) - apptTimeSortKey(b); });
+  }
+
+  // booked_appointments' start_at/end_at are UTC timestamptz — always render
+  // and bucket them in IST regardless of the browser's own timezone.
+  function fmtISTTime(iso) {
+    try { return new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }); }
+    catch (e) { return ""; }
+  }
+  function istDateStrOf(iso) {
+    try { return new Date(iso).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); } // en-CA => YYYY-MM-DD
+    catch (e) { return ""; }
+  }
+  function bookedSortKey(b) {
+    try {
+      var parts = new Date(b.start_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" }).split(":");
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    } catch (e) { return 0; }
+  }
+  function bookedOnDate(dateStr) {
+    return bookedAppts.filter(function (b) { return istDateStrOf(b.start_at) === dateStr; })
+      .sort(function (a, b) { return bookedSortKey(a) - bookedSortKey(b); });
+  }
+  // One day's agenda: requests from the bot and confirmed CareMap bookings, in time order.
+  function dayAgendaItems(dateStr) {
+    var items = [];
+    apptsOnDate(dateStr).forEach(function (o) { items.push({ type: "request", sortKey: apptTimeSortKey(o), data: o }); });
+    bookedOnDate(dateStr).forEach(function (b) { items.push({ type: "booked", sortKey: bookedSortKey(b), data: b }); });
+    items.sort(function (a, b) { return a.sortKey - b.sortKey; });
+    return items;
   }
 
   // ---------------- data ----------------
@@ -302,6 +385,25 @@
       botEnabled = settingsRes[0].bot_enabled !== false;
       doctorHours = settingsRes[0].doctor_hours || {};
     }
+
+    // Deliberately not awaited: it goes through an edge function and only the
+    // calendar needs it, so the list tabs shouldn't wait on it to appear.
+    loadBookedSchedule().then(function () {
+      if (activeTab === "appointments" && apptViewMode === "calendar") render();
+    });
+  }
+
+  // Confirmed CareMap bookings, a fortnight back to three months ahead.
+  async function loadBookedSchedule() {
+    var from = new Date(); from.setDate(from.getDate() - 14);
+    var to = new Date(); to.setDate(to.getDate() + 90);
+    var url = STAFF_SCHEDULE_URL + "?token=" + encodeURIComponent(STAFF_SEND_TOKEN) + "&from=" + toDateStr(from) + "&to=" + toDateStr(to);
+    try {
+      var res = await fetch(url);
+      if (!res.ok) { console.error("Failed to load booked schedule:", res.status, await res.text()); return; }
+      var data = await res.json();
+      bookedAppts = data.results || [];
+    } catch (e) { console.error("Failed to load booked schedule:", e); }
   }
 
   async function loadThread(conversationId) {
@@ -398,9 +500,7 @@
     '</div>';
   }
 
-  function renderAppointmentsTab() {
-    renderApptSummary();
-
+  function renderApptListBody() {
     var q = apptSearch.trim().toLowerCase();
     var filtered = appts.filter(function (o) {
       var bucket = apptBucket(o);
@@ -439,22 +539,118 @@
       buckets[key].forEach(function (o) { html += apptRowHtml(o); });
     });
     if (!any) html += '<div class="empty">No appointment requests match your filters</div>';
+    return html;
+  }
+
+  // A confirmed CareMap booking (read-only here — it lives in CareMap, not in our tables).
+  function bookedRowHtml(b) {
+    var timeLabel = fmtISTTime(b.start_at) + (b.end_at ? " – " + fmtISTTime(b.end_at) : "");
+    var subline = [b.visit_type, b.visit_reason].filter(Boolean).join(" — ");
+    return '<div class="row-card" style="border-left-color:var(--good)">' +
+      '<div class="row-top"><div><div class="row-name">' + escapeHtml(b.patient_name || "Unnamed") + ' <span class="pill good">Confirmed</span></div>' +
+      '<div class="row-meta">' + escapeHtml(b.mobile_number || "") + ' · ' + timeLabel + (b.doctor_name ? " · Dr " + escapeHtml(b.doctor_name) : "") + '</div></div></div>' +
+      (subline ? '<div class="row-meta" style="margin-top:6px">' + escapeHtml(subline) + '</div>' : '') +
+      (b.treatment_notes ? '<div class="row-meta" style="margin-top:4px">' + escapeHtml(b.treatment_notes) + '</div>' : '') +
+    '</div>';
+  }
+
+  function renderCalendarBody() {
+    var year = calendarMonth.getFullYear(), month = calendarMonth.getMonth();
+    var firstDow = new Date(year, month, 1).getDay();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var todayStr = toDateStr(new Date());
+
+    var html = '<div class="cal-header">' +
+      '<button class="cal-nav-btn" id="cal-prev" aria-label="Previous month">&larr;</button>' +
+      '<span class="cal-title">' + fmtMonthYear(calendarMonth) + '</span>' +
+      '<button class="cal-today-btn" id="cal-today">Today</button>' +
+      '<button class="cal-nav-btn" id="cal-next" aria-label="Next month">&rarr;</button></div>';
+
+    html += '<div class="cal-grid">';
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(function (d) { html += '<div class="cal-dow">' + d + '</div>'; });
+    for (var i = 0; i < firstDow; i++) html += '<div class="cal-cell outside"></div>';
+    for (var day = 1; day <= daysInMonth; day++) {
+      var dStr = year + "-" + pad2(month + 1) + "-" + pad2(day);
+      var dayAppts = apptsOnDate(dStr);
+      var cls = "cal-cell";
+      if (dStr === todayStr) cls += " today";
+      if (dStr === calendarSelectedDate) cls += " selected";
+      var anyPending = dayAppts.some(function (o) { return !o.handled_at; });
+      var dotCls = anyPending ? (dStr <= todayStr ? "critical" : "warn") : "good";
+      var hasBooked = bookedOnDate(dStr).length > 0;
+      var dots = (dayAppts.length ? '<span class="cal-dot ' + dotCls + '"></span>' : "") + (hasBooked ? '<span class="cal-dot accent"></span>' : "");
+      html += '<button class="' + cls + '" data-cal-day="' + dStr + '" aria-label="' + fmtDate(dStr) + '"><span class="daynum">' + day + '</span>' +
+        (dots ? '<span class="dot-row">' + dots + '</span>' : '') + '</button>';
+    }
+    html += '</div>';
+
+    // The dots are the only thing on the grid that needs explaining.
+    html += '<div class="cal-legend">' +
+      '<span><i class="cal-dot warn"></i>Request pending</span>' +
+      '<span><i class="cal-dot critical"></i>Pending, today or past</span>' +
+      '<span><i class="cal-dot good"></i>Request booked</span>' +
+      '<span><i class="cal-dot accent"></i>Confirmed in CareMap</span></div>';
+
+    var dayItems = dayAgendaItems(calendarSelectedDate);
+    html += '<div class="group-title">' + fmtDate(calendarSelectedDate) + '<span class="count">' + dayItems.length + '</span></div>';
+    if (dayItems.length === 0) html += '<div class="empty">No appointments for this day</div>';
+    else dayItems.forEach(function (item) { html += item.type === "booked" ? bookedRowHtml(item.data) : apptRowHtml(item.data); });
+    return html;
+  }
+
+  function renderAppointmentsTab() {
+    renderApptSummary();
+
+    var html = '<div class="segmented" style="margin-bottom:14px">' +
+      '<button data-appt-view="list" class="' + (apptViewMode === "list" ? "active" : "") + '">List</button>' +
+      '<button data-appt-view="calendar" class="' + (apptViewMode === "calendar" ? "active" : "") + '">Calendar</button></div>';
+    html += apptViewMode === "calendar" ? renderCalendarBody() : renderApptListBody();
 
     view.innerHTML = html;
     wireAppointmentsTab();
   }
 
   function wireAppointmentsTab() {
-    var s = document.getElementById("appt-search");
-    if (s) s.addEventListener("input", function () {
-      apptSearch = s.value; var pos = s.selectionStart; renderAppointmentsTab();
-      var el2 = document.getElementById("appt-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+    document.querySelectorAll("[data-appt-view]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        apptViewMode = btn.getAttribute("data-appt-view");
+        renderAppointmentsTab();
+        // CareMap bookings are synced in from outside and don't push live updates,
+        // so fetch a fresh copy whenever the calendar is opened.
+        if (apptViewMode === "calendar") {
+          loadBookedSchedule().then(function () {
+            if (activeTab === "appointments" && apptViewMode === "calendar") renderAppointmentsTab();
+          });
+        }
+      });
     });
-    document.querySelectorAll("[data-appt-seg]").forEach(function (btn) {
-      btn.addEventListener("click", function () { apptFilter = btn.getAttribute("data-appt-seg"); renderAppointmentsTab(); });
-    });
-    var tf = document.getElementById("appt-type-filter");
-    if (tf) tf.addEventListener("change", function () { apptTypeFilter = tf.value; renderAppointmentsTab(); });
+
+    if (apptViewMode === "calendar") {
+      var prev = document.getElementById("cal-prev"), next = document.getElementById("cal-next"), today = document.getElementById("cal-today");
+      if (prev) prev.addEventListener("click", function () { calendarMonth.setMonth(calendarMonth.getMonth() - 1); renderAppointmentsTab(); });
+      if (next) next.addEventListener("click", function () { calendarMonth.setMonth(calendarMonth.getMonth() + 1); renderAppointmentsTab(); });
+      if (today) today.addEventListener("click", function () {
+        calendarMonth = new Date(); calendarMonth.setDate(1); calendarMonth.setHours(0, 0, 0, 0);
+        calendarSelectedDate = toDateStr(new Date());
+        renderAppointmentsTab();
+      });
+      document.querySelectorAll("[data-cal-day]").forEach(function (btn) {
+        btn.addEventListener("click", function () { calendarSelectedDate = btn.getAttribute("data-cal-day"); renderAppointmentsTab(); });
+      });
+    } else {
+      var s = document.getElementById("appt-search");
+      if (s) s.addEventListener("input", function () {
+        apptSearch = s.value; var pos = s.selectionStart; renderAppointmentsTab();
+        var el2 = document.getElementById("appt-search"); el2.focus(); el2.setSelectionRange(pos, pos);
+      });
+      document.querySelectorAll("[data-appt-seg]").forEach(function (btn) {
+        btn.addEventListener("click", function () { apptFilter = btn.getAttribute("data-appt-seg"); renderAppointmentsTab(); });
+      });
+      var tf = document.getElementById("appt-type-filter");
+      if (tf) tf.addEventListener("change", function () { apptTypeFilter = tf.value; renderAppointmentsTab(); });
+    }
+
+    // Row buttons exist in both views, so they're wired for both.
     document.querySelectorAll("[data-handle-appt]").forEach(function (btn) {
       btn.addEventListener("click", function () { markAppt(btn.getAttribute("data-handle-appt"), true); });
     });
