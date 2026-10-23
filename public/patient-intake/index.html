@@ -225,7 +225,7 @@
     if (!form.reportValidity()) return;
 
     // Reports and bills go to this number, so it has to look like one — not blank, not a few stray characters.
-    var phoneDigits = (document.getElementById("mobile_number").value || "").replace(/D/g, "");
+    var phoneDigits = (document.getElementById("mobile_number").value || "").replace(/\D/g, "");
     if (phoneDigits.length < 10 || phoneDigits.length > 15) {
       setStatus("error", "Please enter a valid mobile number (10 digits).");
       document.getElementById("mobile_number").focus();
