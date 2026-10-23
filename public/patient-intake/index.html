@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Patient Intake</title>
+<title>Patient Registration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -70,9 +70,9 @@
 <body>
 
 <div class="card">
-  <p class="step">Step 1 of 2</p>
-  <h1>Patient Intake</h1>
-  <p class="subtitle">A few details to register you as a patient. Next you'll pick a preferred appointment time.</p>
+  <p class="step" id="step-label" hidden>Step 1 of 2</p>
+  <h1 id="page-title">Patient Registration</h1>
+  <p class="subtitle" id="page-subtitle">A few details to register you as a patient at the clinic.</p>
 
   <form id="intake-form" novalidate>
     <fieldset>
@@ -117,11 +117,8 @@
       <legend>Contact</legend>
       <div class="field">
         <label for="mobile_number">Mobile number<span class="req">*</span></label>
-        <input type="tel" id="mobile_number" required>
-        <div class="checkbox-row" style="margin-top:8px;">
-          <input type="checkbox" id="no_phone_number">
-          <label for="no_phone_number">Patient has no phone number</label>
-        </div>
+        <input type="tel" id="mobile_number" inputmode="tel" autocomplete="tel" required>
+        <div class="hint" style="font-size:0.74rem;color:var(--ink-muted);margin-top:5px;">Reports and bills are sent to this number.</div>
       </div>
       <div class="field"><label for="alternate_number">Alternate number</label><input type="tel" id="alternate_number"></div>
       <div class="field"><label for="contact_emailid">Email</label><input type="email" id="contact_emailid"></div>
@@ -157,7 +154,7 @@
       <div class="field"><label for="emergency_emailid">Email</label><input type="email" id="emergency_emailid"></div>
     </fieldset>
 
-    <button type="submit" id="submit-btn">Continue to appointment time</button>
+    <button type="submit" id="submit-btn">Submit registration</button>
     <div class="status" id="status"></div>
   </form>
 </div>
@@ -170,6 +167,20 @@
 
   var params = new URLSearchParams(window.location.search);
   var ref = params.get("ref") || "";
+
+  // Two ways in to this form:
+  //  - from the WhatsApp bot, whose link always carries a ?ref= code: a NEW patient who wants to BOOK. They register and then
+  //    carry straight on to choosing an appointment time.
+  //  - at the clinic (the front desk shares the plain link, no ref): a patient who already has an appointment and has arrived.
+  //    There is nothing further to book, so registration is all it does.
+  var wantsToBook = !!ref;
+  if (wantsToBook) {
+    document.getElementById("step-label").hidden = false;
+    document.getElementById("page-title").textContent = "Patient Intake";
+    document.getElementById("page-subtitle").textContent = "A few details to register you as a patient. Next you'll pick a preferred appointment time.";
+  }
+  var SUBMIT_LABEL = wantsToBook ? "Continue to appointment time" : "Submit registration";
+  document.getElementById("submit-btn").textContent = SUBMIT_LABEL;
 
   var form = document.getElementById("intake-form");
   var statusEl = document.getElementById("status");
@@ -213,6 +224,14 @@
     e.preventDefault();
     if (!form.reportValidity()) return;
 
+    // Reports and bills go to this number, so it has to look like one — not blank, not a few stray characters.
+    var phoneDigits = (document.getElementById("mobile_number").value || "").replace(/D/g, "");
+    if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+      setStatus("error", "Please enter a valid mobile number (10 digits).");
+      document.getElementById("mobile_number").focus();
+      return;
+    }
+
     var name = textValue("patient_name");
     var dob = textValue("date_of_birth");
 
@@ -223,7 +242,7 @@
       gender: selectValue("gender"),
       age: textValue("age"),
       mobile_number: textValue("mobile_number"),
-      no_phone_number: document.getElementById("no_phone_number").checked,
+      no_phone_number: false, // a registration always has a phone number; the option to skip it was removed
       alternate_number: textValue("alternate_number"),
       contact_emailid: textValue("contact_emailid"),
       flat_house_building: textValue("flat_house_building"),
@@ -257,20 +276,25 @@
         if (!response.ok) {
           return response.text().then(function (text) { throw new Error("HTTP " + response.status + ": " + text); });
         }
-        setStatus("success", "Details saved — taking you to appointment scheduling…");
-        var next = new URLSearchParams();
-        if (ref) next.set("ref", ref);
-        next.set("name", name);
-        next.set("dob", dob);
-        setTimeout(function () {
-          window.location.href = "../appointment/index.html?" + next.toString();
-        }, 900);
+        if (wantsToBook) {
+          setStatus("success", "Details saved — taking you to appointment scheduling…");
+          var next = new URLSearchParams();
+          next.set("ref", ref);
+          next.set("name", name);
+          next.set("dob", dob);
+          setTimeout(function () { window.location.href = "../appointment/index.html?" + next.toString(); }, 900);
+          return;
+        }
+        // At the clinic registration is the whole job, so it ends here.
+        setStatus("success", "Thank you — you're registered. The front desk will take it from here.");
+        submitBtn.textContent = "Registered";
+        form.querySelectorAll("input, select, textarea, button").forEach(function (el) { el.disabled = true; });
       })
       .catch(function (err) {
         console.error("Patient intake submission failed:", err);
         setStatus("error", "Something went wrong submitting this form. Please try again, or let the front desk know.");
         submitBtn.disabled = false;
-        submitBtn.textContent = "Continue to appointment time";
+        submitBtn.textContent = SUBMIT_LABEL;
       });
   });
 })();
