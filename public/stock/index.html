@@ -188,6 +188,19 @@
   nav.bottomnav button .ic { font-size: 1.1rem; line-height: 1; }
   nav.bottomnav button.active { color: var(--accent); }
 
+  /* admin password dialog */
+  .admin-backdrop { position: fixed; inset: 0; background: rgba(8, 14, 11, 0.55); z-index: 40; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .admin-dialog { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); width: 100%; max-width: 340px; padding: 18px; }
+  .admin-dialog h2 { font-size: 1rem; margin: 0 0 4px; }
+  .admin-dialog p { font-size: 0.8rem; color: var(--ink-muted); margin: 0 0 12px; line-height: 1.45; }
+  .admin-dialog input { width: 100%; font-family: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .admin-dialog .row { display: flex; gap: 8px; margin-top: 12px; }
+  .admin-dialog .row button { flex: 1; padding: 11px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 0.88rem; cursor: pointer; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); }
+  .admin-dialog .row button.go { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .admin-dialog .row button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .admin-note { font-size: 0.72rem; color: var(--ink-muted); margin: 6px 0 0; }
+  .link-lock { background: none; border: none; padding: 0; font: inherit; font-weight: 700; color: var(--accent); text-decoration: underline; cursor: pointer; }
+
   .toast {
     position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--ink); color: var(--ground);
     font-size: 0.8rem; font-weight: 500; padding: 9px 16px; border-radius: 999px; box-shadow: var(--shadow);
@@ -255,6 +268,10 @@
 
   // --- Fill these in before deploying ---
   var SUPABASE_URL = "https://ltxhelhkripcjvmbmfar.supabase.co";
+  // Restocking and any other change that RAISES a count is admin-only: it goes through this function, which checks the
+  // admin password on the server. (The database also refuses increases from the public key, so this isn't just a
+  // password in the page.) Using stock — "− Use" and logging a procedure — stays open to everyone.
+  var STOCK_ADMIN_URL = "https://ltxhelhkripcjvmbmfar.functions.supabase.co/stock-admin";
   var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0eGhlbGhrcmlwY2p2bWJtZmFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NTgwMDUsImV4cCI6MjEwODMzNDAwNX0.zu2f1Yy2zoUHu6DhMa3JQLl54shFF3sr-4o2j35v2I8"; // Project Settings -> API -> "anon public" key (safe client-side)
   // ---------------------------------------
 
@@ -307,6 +324,79 @@
     toastEl.textContent = msg; toastEl.classList.add("show");
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+
+  // ---- admin-only changes ----
+
+  // Typing the admin password for every single restock would be miserable, so after one correct entry the page stays
+  // unlocked for ADMIN_PW_MINUTES of inactivity (each admin action restarts the clock). It's kept in sessionStorage, so
+  // a refresh doesn't lock it, but closing the tab does; "Lock now" clears it immediately. Staff never meet any of this —
+  // using stock (− Use, logging a procedure) has never asked for a password.
+  var ADMIN_PW_MINUTES = 30;
+  var adminPw = null, adminPwAt = 0;
+  try {
+    adminPw = sessionStorage.getItem("stockAdminPw");
+    adminPwAt = parseInt(sessionStorage.getItem("stockAdminPwAt") || "0", 10);
+  } catch (e) { /* storage blocked: it just asks each time */ }
+
+  function adminUnlocked() { return !!adminPw && Date.now() - adminPwAt < ADMIN_PW_MINUTES * 60000; }
+  function rememberAdminPw(pw) {
+    adminPw = pw; adminPwAt = Date.now();
+    try { sessionStorage.setItem("stockAdminPw", pw); sessionStorage.setItem("stockAdminPwAt", String(adminPwAt)); } catch (e) {}
+  }
+  function lockAdmin() {
+    adminPw = null; adminPwAt = 0;
+    try { sessionStorage.removeItem("stockAdminPw"); sessionStorage.removeItem("stockAdminPwAt"); } catch (e) {}
+  }
+
+  function askAdminPassword(why) {
+    if (adminUnlocked()) return Promise.resolve(adminPw);
+    return new Promise(function (resolve) {
+      var back = document.createElement("div");
+      back.className = "admin-backdrop";
+      back.innerHTML =
+        '<form class="admin-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-title">' +
+        '<h2 id="admin-title">Admin password</h2>' +
+        '<p>' + escapeHtml(why) + '</p>' +
+        '<input type="password" id="admin-pw" name="admin-password" autocomplete="current-password" aria-label="Admin password" placeholder="Admin password">' +
+        '<div class="row"><button type="button" id="admin-cancel">Cancel</button><button type="submit" class="go">Confirm</button></div>' +
+        '</form>';
+      document.body.appendChild(back);
+      var input = back.querySelector("#admin-pw");
+      function close(value) { document.removeEventListener("keydown", onKey); back.remove(); resolve(value); }
+      function onKey(e) { if (e.key === "Escape") close(null); }
+      document.addEventListener("keydown", onKey);
+      back.querySelector("#admin-cancel").addEventListener("click", function () { close(null); });
+      back.addEventListener("click", function (e) { if (e.target === back) close(null); });
+      back.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var v = input.value;
+        if (!v) { input.focus(); return; }
+        close(v);
+      });
+      input.focus();
+    });
+  }
+
+  /**
+   * Asks for the password if needed, sends one admin action, and reports the result. Resolves true only if the change
+   * was saved. A wrong password is forgotten straight away so the next try asks again.
+   */
+  async function adminAction(why, body) {
+    var pw = await askAdminPassword(why);
+    if (!pw) return false;
+    try {
+      var res = await fetch(STOCK_ADMIN_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ password: pw }, body)) });
+      var data = await res.json().catch(function () { return {}; });
+      if (res.status === 401) { lockAdmin(); showToast("Wrong admin password"); return false; }
+      if (!res.ok) { showToast(data.error || "Couldn't save — try again"); return false; }
+      rememberAdminPw(pw);
+      return true;
+    } catch (e) {
+      console.error(e);
+      showToast("No connection — nothing was changed");
+      return false;
+    }
   }
 
   // ---- Supabase data layer ----
@@ -418,8 +508,11 @@
         if (item) {
           html += '<div class="cur-stock"><span>Current stock</span><span class="val">' + item.qty + ' <span style="font-size:0.8rem;font-weight:400">' + escapeHtml(item.unit) + '</span></span></div>';
           html += '<div class="qty-actions"><input type="number" id="qty-input" min="1" value="1" inputmode="numeric">';
-          html += '<button class="use" id="use-btn">&minus; Use</button><button class="restock" id="restock-btn">+ Restock</button></div>';
-          html += '<button class="ghost" id="correct-btn" style="margin-top:8px">Set exact count instead</button>';
+          html += '<button class="use" id="use-btn">&minus; Use</button><button class="restock" id="restock-btn">&#128274; Restock</button></div>';
+          html += '<button class="ghost" id="correct-btn" style="margin-top:8px">&#128274; Set exact count instead</button>';
+          html += adminUnlocked()
+            ? '<p class="admin-note">&#128275; Admin unlocked &mdash; stays open for ' + ADMIN_PW_MINUTES + ' minutes of inactivity. <button type="button" class="link-lock" id="admin-lock">Lock now</button></p>'
+            : '<p class="admin-note">&#128274; Restocking and correcting a count need the admin password.</p>';
         }
       }
 
@@ -429,7 +522,7 @@
       Object.keys(byCat).sort().forEach(function (cat) { html += '<option>' + escapeHtml(cat) + '</option>'; });
       html += '<option>Other</option></select></label>';
       html += '<label class="field"><span class="fl">Unit</span><input type="text" id="new-item-unit" placeholder="pc, tube, bottle&hellip;" value="pc"></label>';
-      html += '<label class="field"><span class="fl">Starting quantity</span><input type="number" id="new-item-qty" min="0" value="0" inputmode="numeric"></label>';
+      html += '<label class="field"><span class="fl">Starting quantity &middot; above 0 needs the admin password</span><input type="number" id="new-item-qty" min="0" value="0" inputmode="numeric"></label>';
       html += '<button class="primary" id="add-item-btn">Add item</button></div>';
     }
 
@@ -511,6 +604,8 @@
       var sel = document.getElementById("item-select");
       if (sel) sel.addEventListener("change", function () { selectedItemId = sel.value || null; renderLogTab(); });
       var useBtn = document.getElementById("use-btn");
+      var lockBtn = document.getElementById("admin-lock");
+      if (lockBtn) lockBtn.addEventListener("click", function () { lockAdmin(); showToast("Locked"); renderLogTab(); });
       var restockBtn = document.getElementById("restock-btn");
       var correctBtn = document.getElementById("correct-btn");
       var qtyInput = document.getElementById("qty-input");
@@ -525,20 +620,24 @@
       if (restockBtn) restockBtn.addEventListener("click", async function () {
         var n = Math.max(1, parseInt(qtyInput.value, 10) || 1);
         var it = itemById(selectedItemId);
-        await updateItemQty(it.id, it.qty + n);
-        await insertLog({ kind: "restock", label: it.name + " restocked", delta: n, itemId: it.id });
-        showToast("Saved"); renderAll();
+        var ok = await adminAction("Restocking " + n + " " + it.unit + " of " + it.name + " needs the admin password.", { action: "restock", item_id: it.id, amount: n });
+        if (!ok) return;
+        await loadAll(); // pick up the new count and the log line the server wrote
+        showToast("Restocked"); renderAll();
       });
       if (correctBtn) correctBtn.addEventListener("click", async function () {
         var it = itemById(selectedItemId);
+        // Password first, number second — someone without it shouldn't even get as far as typing a count.
+        var verified = await adminAction("Correcting the count of " + it.name + " needs the admin password.", { action: "check" });
+        if (!verified) return;
         var val = prompt('Set exact quantity for "' + it.name + '" (currently ' + it.qty + ' ' + it.unit + ')', it.qty);
         if (val === null) return;
         var n = parseInt(val, 10);
         if (isNaN(n) || n < 0) { showToast("Enter a valid number"); return; }
-        var delta = n - it.qty;
-        await updateItemQty(it.id, n);
-        await insertLog({ kind: "adjust", label: it.name + " count corrected", delta: delta, itemId: it.id });
-        showToast("Saved"); renderAll();
+        var ok = await adminAction("Correcting the count of " + it.name + " needs the admin password.", { action: "set_count", item_id: it.id, qty: n });
+        if (!ok) return;
+        await loadAll();
+        showToast("Count corrected"); renderAll();
       });
 
       var addBtn = document.getElementById("add-item-btn");
@@ -549,9 +648,19 @@
         var unit = document.getElementById("new-item-unit").value.trim() || "pc";
         var qty = Math.max(0, parseInt(document.getElementById("new-item-qty").value, 10) || 0);
         var id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36).slice(-4);
-        var ok = await insertItem({ id: id, name: name, unit: unit, category: cat, qty: qty, low: 5 });
+        if (qty > 0) {
+          // An item that already has stock in it is a restock by another name, so it needs the admin.
+          var added = await adminAction("Adding " + name + " with " + qty + " in stock needs the admin password. (Adding it at 0 doesn't.)", { action: "add_item", name: name, category: cat, unit: unit, qty: qty });
+          if (!added) return;
+          await loadAll();
+          var created = state.items.filter(function (x) { return x.name === name; }).pop();
+          if (created) selectedItemId = created.id;
+          showToast("Saved"); renderAll();
+          return;
+        }
+        var ok = await insertItem({ id: id, name: name, unit: unit, category: cat, qty: 0, low: 5 });
         if (!ok) return;
-        await insertLog({ kind: "add", label: name + " added to catalog", delta: qty, itemId: id });
+        await insertLog({ kind: "add", label: name + " added to catalog", delta: 0, itemId: id });
         selectedItemId = id;
         showToast("Saved"); renderAll();
       });
