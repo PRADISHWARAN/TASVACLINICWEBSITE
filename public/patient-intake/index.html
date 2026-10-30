@@ -120,8 +120,6 @@
         <input type="tel" id="mobile_number" inputmode="tel" autocomplete="tel" required>
         <div class="hint" style="font-size:0.74rem;color:var(--ink-muted);margin-top:5px;">Reports and bills are sent to this number.</div>
       </div>
-      <div class="field"><label for="alternate_number">Alternate number</label><input type="tel" id="alternate_number"></div>
-      <div class="field"><label for="contact_emailid">Email</label><input type="email" id="contact_emailid"></div>
     </fieldset>
 
     <fieldset>
@@ -132,26 +130,8 @@
     </fieldset>
 
     <fieldset>
-      <legend>Referral & ID</legend>
+      <legend>Referral</legend>
       <div class="field"><label for="referred_by">Referred by</label><input type="text" id="referred_by"></div>
-      <div class="field">
-        <label for="id_proof">ID proof</label>
-        <select id="id_proof">
-          <option value="" selected>Select</option>
-          <option>Aadhaar</option><option>PAN</option><option>Passport</option>
-          <option>Voter ID</option><option>Driving License</option><option value="__other__">Other</option>
-        </select>
-        <input type="text" class="other-input" id="id_proof_other" placeholder="Please specify">
-      </div>
-      <div class="field"><label for="id_number">ID number</label><input type="text" id="id_number"></div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Emergency contact</legend>
-      <div class="field"><label for="emergency_name">Name</label><input type="text" id="emergency_name"></div>
-      <div class="field"><label for="emergency_relationship">Relationship</label><input type="text" id="emergency_relationship"></div>
-      <div class="field"><label for="emergency_contactnumber">Contact number</label><input type="tel" id="emergency_contactnumber"></div>
-      <div class="field"><label for="emergency_emailid">Email</label><input type="email" id="emergency_emailid"></div>
     </fieldset>
 
     <button type="submit" id="submit-btn">Submit registration</button>
@@ -243,18 +223,10 @@
       age: textValue("age"),
       mobile_number: textValue("mobile_number"),
       no_phone_number: false, // a registration always has a phone number; the option to skip it was removed
-      alternate_number: textValue("alternate_number"),
-      contact_emailid: textValue("contact_emailid"),
       flat_house_building: textValue("flat_house_building"),
       colony_street_locality: textValue("colony_street_locality"),
       pincode: textValue("pincode"),
       referred_by: textValue("referred_by"),
-      id_proof: selectValue("id_proof"),
-      id_number: textValue("id_number"),
-      emergency_name: textValue("emergency_name"),
-      emergency_relationship: textValue("emergency_relationship"),
-      emergency_contactnumber: textValue("emergency_contactnumber"),
-      emergency_emailid: textValue("emergency_emailid"),
       source_row_ref: ref || ("web-form-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8)),
     };
 
