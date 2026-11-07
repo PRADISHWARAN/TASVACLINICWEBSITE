@@ -198,6 +198,7 @@
   function setStatus(kind, message) {
     statusEl.className = "status " + kind;
     statusEl.textContent = message;
+    try { statusEl.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) { /* older browsers */ }
   }
 
   form.addEventListener("submit", function (e) {
