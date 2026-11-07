@@ -427,6 +427,8 @@
   function setStatus(kind, message) {
     statusEl.className = "status " + kind;
     statusEl.textContent = message;
+    // on a phone the message sits under the button, off screen: bring it into view
+    try { statusEl.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) { /* older browsers */ }
   }
 
   form.addEventListener("submit", async function (e) {
@@ -466,6 +468,7 @@
       if (!res.ok) throw new Error("HTTP " + res.status + ": " + (await res.text()));
 
       setStatus("success", "Request received! Our team will confirm your exact appointment slot by WhatsApp or phone shortly.");
+      submitBtn.textContent = "Request sent ✓"; // was left saying "Submitting…"
       form.querySelectorAll("input, select, textarea, button").forEach(function (el) { el.disabled = true; });
     } catch (err) {
       console.error("Appointment submission failed:", err);
